@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     url: "https://www.moimrank.com/",
     images: [
       {
-        url: "https://도메인.com/og.png",
+        url: "https://www.moimrank.com/og.png",
         width: 1200,
         height: 630,
       },
