@@ -3,7 +3,7 @@ export default function Home() {
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white px-6">
       
       <h1 className="text-5xl font-bold mb-6">
-        moimrank 🔥
+        moimrank 🔥 (논알콜록 화이팅)
       </h1>
 
       <p className="text-xl text-center mb-8 max-w-xl">
