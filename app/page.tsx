@@ -18,7 +18,7 @@ const sample: EgoNode[] = [
   { id: "15", name: "수현", level: 2 },
   { id: "16", name: "진아", level: 2 },
   { id: "17", name: "덕칠", level: 1 },
-  { id: "18", name: "유미", level: 1 },
+  { id: "18", name: "유미", level: 5 },
   { id: "19", name: "원호", level: 1 },
   { id: "20", name: "대겸", level: 1 },
 ];
