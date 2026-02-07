@@ -24,7 +24,7 @@ type Props = {
 
 const LEVEL_META: Record<Level, { label: string; color: string }> = {
   5: { label: "찰떡궁합", color: "#00C853" },
-  4: { label: "합좋은편", color: "#2ECC71" },
+  4: { label: "합좋은편", color: "#1E88E5" },
   3: { label: "그럭저럭", color: "#FDD835" },
   2: { label: "조율필요", color: "#FB8C00" },
   1: { label: "한계임박", color: "#D50000" },
