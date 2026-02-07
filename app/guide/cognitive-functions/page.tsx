@@ -172,20 +172,26 @@ export default function CognitiveFunctionsGuidePage() {
           <Card title="자주 묻는 질문" badge="FAQ">
             <div className="space-y-3 text-sm leading-6 text-slate-700">
               <details className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
-                <summary className="cursor-pointer font-semibold text-slate-900">인지기능은 과학인가요?</summary>
+                <summary className="flex cursor-pointer list-none items-center gap-3 font-semibold text-slate-900">
+                    <span className="text-slate-900 transition-transform duration-200 group-open:rotate-90">▸</span>인지기능은 과학인가요?
+                </summary>
                 <p className="mt-2 text-slate-600">
                   성격을 완벽히 증명하는 과학이라기보다, 대화/협업에서 느끼는 차이를 설명하는 <b>프레임</b>에 가까워요.
                   모임랭크도 재미와 참고용으로만 사용해 주세요.
                 </p>
               </details>
               <details className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
-                <summary className="cursor-pointer font-semibold text-slate-900">같은 MBTI인데도 케미가 다른데요?</summary>
+                <summary className="flex cursor-pointer list-none items-center gap-3 font-semibold text-slate-900">
+                    <span className="text-slate-900 transition-transform duration-200 group-open:rotate-90">▸</span>같은 MBTI인데도 케미가 다른데요?
+                </summary>
                 <p className="mt-2 text-slate-600">
                   친밀도, 역할, 컨디션, 대화 주제에 따라 많이 달라져요. 그래서 결과는 ‘절대값’이 아니라 ‘경향’으로 보는 게 좋아요.
                 </p>
               </details>
               <details className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
-                <summary className="cursor-pointer font-semibold text-slate-900">결과가 마음에 안 들면요?</summary>
+                <summary className="flex cursor-pointer list-none items-center gap-3 font-semibold text-slate-900">
+                    <span className="text-slate-900 transition-transform duration-200 group-open:rotate-90">▸</span>결과가 마음에 안 들면요?
+                </summary>
                 <p className="mt-2 text-slate-600">
                   너무 진지하게 보지 말고, “우리가 어디서 오해가 날 수 있을까?” 정도로만 활용해 주세요.
                 </p>
