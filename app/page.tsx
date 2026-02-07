@@ -69,8 +69,8 @@ export default function Home() {
 
         <div style={{ padding: 16 }}>
           <EgoGraphCanvasResponsive
-            centerName="민지"
-            centerSub="ENFP"
+            centerName="태주"
+            centerSub="ESTP"
             nodes={sample}
             ringCount={3}
             maxSize={420}
