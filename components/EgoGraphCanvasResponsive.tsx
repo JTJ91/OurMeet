@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-type Level = 1 | 2 | 3 | 4;
+type Level = 1 | 2 | 3 | 4 | 5;
 
 export type EgoNode = {
   id: string;
@@ -17,16 +17,17 @@ type Props = {
   ringCount?: 2 | 3;
 
   /** 반응형 크기 제어 */
-  maxSize?: number;      // 기본 420
-  minSize?: number;      // 기본 280
-  aspect?: number;       // 정사각=1, 0.9면 약간 납작
-}; 
+  maxSize?: number; // 기본 420
+  minSize?: number; // 기본 280
+  aspect?: number; // 정사각=1, 0.9면 약간 납작
+};
 
 const LEVEL_META: Record<Level, { label: string; color: string }> = {
-  4: { label: "좋음", color: "#2ECC71" },
-  3: { label: "무난", color: "#66D9C1" },
-  2: { label: "번역필요", color: "#F4B740" },
-  1: { label: "주의", color: "#FF6B8A" },
+  5: { label: "찰떡궁합", color: "#00C853" },
+  4: { label: "합좋은편", color: "#2ECC71" },
+  3: { label: "그럭저럭", color: "#FDD835" },
+  2: { label: "조율필요", color: "#FB8C00" },
+  1: { label: "한계임박", color: "#D50000" },
 };
 
 function clampNodes(nodes: EgoNode[], max = 20) {
@@ -34,15 +35,31 @@ function clampNodes(nodes: EgoNode[], max = 20) {
 }
 
 function groupByLevel(nodes: EgoNode[]) {
-  const g: Record<Level, EgoNode[]> = { 1: [], 2: [], 3: [], 4: [] };
+  const g: Record<Level, EgoNode[]> = { 1: [], 2: [], 3: [], 4: [], 5: [] };
   nodes.forEach((n) => g[n.level].push(n));
   return g;
 }
 
+/**
+ * 5단계 링 분배
+ * - 3링: [5,4] / [3] / [2,1]
+ * - 2링: [5,4,3] / [2,1]
+ */
 function mapToRings(nodes: EgoNode[], ringCount: 2 | 3) {
   const by = groupByLevel(nodes);
-  if (ringCount === 3) return [[...by[4], ...by[3]], [...by[2]], [...by[1]]];
-  return [[...by[4], ...by[3]], [...by[2], ...by[1]]];
+
+  if (ringCount === 3) {
+    return [
+      [...by[5], ...by[4]], // 안쪽(좋은 케미)
+      [...by[3]],           // 중간(그럭저럭)
+      [...by[2], ...by[1]], // 바깥(조율/한계)
+    ];
+  }
+
+  return [
+    [...by[5], ...by[4], ...by[3]],
+    [...by[2], ...by[1]],
+  ];
 }
 
 function layoutOnRing(items: EgoNode[], radius: number, startAngle: number) {
@@ -80,7 +97,14 @@ function layoutOnRing(items: EgoNode[], radius: number, startAngle: number) {
 
 type Placed = EgoNode & { x: number; y: number; ringIndex: number; r: number };
 
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) {
   const rr = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
   ctx.moveTo(x + rr, y);
@@ -97,11 +121,9 @@ function dist2(ax: number, ay: number, bx: number, by: number) {
   return dx * dx + dy * dy;
 }
 
-/** 컨테이너 크기 측정 (ResizeObserver) */
 function useElementSize<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
   const [w, setW] = useState(0);
-  const [h, setH] = useState(0);
 
   useEffect(() => {
     const el = ref.current;
@@ -110,18 +132,16 @@ function useElementSize<T extends HTMLElement>() {
     const ro = new ResizeObserver((entries) => {
       const cr = entries[0].contentRect;
       setW(cr.width);
-      setH(cr.height);
     });
     ro.observe(el);
-    // initial
+
     const rect = el.getBoundingClientRect();
     setW(rect.width);
-    setH(rect.height);
 
     return () => ro.disconnect();
   }, []);
 
-  return { ref, w, h };
+  return { ref, w };
 }
 
 export default function EgoGraphCanvasResponsive({
@@ -139,7 +159,7 @@ export default function EgoGraphCanvasResponsive({
   const [activeId, setActiveId] = useState<string | null>(null);
 
   // pan/zoom
-  const viewRef = useRef({ panX: 0, panY: 0, scale: 1 });
+  const viewRef = useRef({ panX: 0, panY: 0, scale: 0.85 });
   const pointersRef = useRef(new Map<number, { x: number; y: number }>());
   const gestureRef = useRef({
     dragging: false,
@@ -147,17 +167,13 @@ export default function EgoGraphCanvasResponsive({
     lastY: 0,
     startDist: 0,
     startScale: 1,
-    startMidX: 0,
-    startMidY: 0,
   });
 
   const safeNodes = useMemo(() => clampNodes(nodes, 20), [nodes]);
 
-  // 반응형 size 결정: 컨테이너 폭을 기준으로 min~max 사이로 clamp
   const size = useMemo(() => {
     const raw = Math.floor(wrapW || maxSize);
-    const clamped = Math.max(minSize, Math.min(maxSize, raw));
-    return clamped;
+    return Math.max(minSize, Math.min(maxSize, raw));
   }, [wrapW, maxSize, minSize]);
 
   const height = Math.floor(size * aspect);
@@ -167,7 +183,11 @@ export default function EgoGraphCanvasResponsive({
 
     const base = size * 0.19;
     const step = size * 0.18;
-    const ringR = ringCount === 3 ? [base, base + step, base + step * 2] : [base, base + step * 1.4];
+    const ringR =
+      ringCount === 3
+        ? [base, base + step, base + step * 2]
+        : [base, base + step * 1.4];
+
     const starts =
       ringCount === 3
         ? [-Math.PI / 2, -Math.PI / 2 + 0.4, -Math.PI / 2 + 0.15]
@@ -181,7 +201,6 @@ export default function EgoGraphCanvasResponsive({
     return all;
   }, [safeNodes, ringCount, size]);
 
-  // 렌더 루프
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -195,11 +214,6 @@ export default function EgoGraphCanvasResponsive({
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
-    // 리사이즈 때마다 보기 좋은 기본값으로 살짝 리셋(과한 확대/이동 방지)
-    //viewRef.current.panX = 0;
-    //viewRef.current.panY = 0;
-    //viewRef.current.scale = 1;
 
     const draw = () => {
       const { panX, panY, scale } = viewRef.current;
@@ -225,7 +239,6 @@ export default function EgoGraphCanvasResponsive({
         y: cy + wy * scale * dpr,
       });
 
-      // 원 크기(조금 더 작게: “너무 커” 방지)
       const centerR = size * 0.07 * scale * dpr;
       const nodeR = size * 0.048 * scale * dpr;
 
@@ -292,7 +305,6 @@ export default function EgoGraphCanvasResponsive({
         ctx.fill();
         ctx.stroke();
 
-        // 라벨
         const label = n.name.length > 4 ? `${n.name.slice(0, 3)}…` : n.name;
         ctx.fillStyle = "#111827";
         ctx.font = `${Math.round(size * 0.032 * scale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
@@ -330,7 +342,6 @@ export default function EgoGraphCanvasResponsive({
     return () => cancelAnimationFrame(raf);
   }, [activeId, placed, centerName, centerSub, size, height]);
 
-  // hit test
   const hitTest = (clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
@@ -355,7 +366,6 @@ export default function EgoGraphCanvasResponsive({
     return null;
   };
 
-  // pointer handlers
   const onPointerDown = (e: React.PointerEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -363,7 +373,6 @@ export default function EgoGraphCanvasResponsive({
 
     pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
-    // 1손: 드래그, 2손: 핀치
     if (pointersRef.current.size === 1) {
       gestureRef.current.dragging = true;
       gestureRef.current.lastX = e.clientX;
@@ -374,8 +383,6 @@ export default function EgoGraphCanvasResponsive({
       const dy = pts[0].y - pts[1].y;
       gestureRef.current.startDist = Math.hypot(dx, dy);
       gestureRef.current.startScale = viewRef.current.scale;
-      gestureRef.current.startMidX = (pts[0].x + pts[1].x) / 2;
-      gestureRef.current.startMidY = (pts[0].y + pts[1].y) / 2;
       gestureRef.current.dragging = false;
     }
   };
@@ -393,27 +400,10 @@ export default function EgoGraphCanvasResponsive({
 
       const ratio = dist / Math.max(1, gestureRef.current.startDist);
       const nextScale = Math.max(0.75, Math.min(2.2, gestureRef.current.startScale * ratio));
-
-      // 핀치 중심 기준으로 pan 보정(손가락 위치가 덜 튐)
-      const canvas = canvasRef.current!;
-      const rect = canvas.getBoundingClientRect();
-      const midX = (pts[0].x + pts[1].x) / 2;
-      const midY = (pts[0].y + pts[1].y) / 2;
-
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const beforeX = midX - cx;
-      const beforeY = midY - cy;
-
-      const k = nextScale / viewRef.current.scale - 1;
-      viewRef.current.panX -= beforeX * k;
-      viewRef.current.panY -= beforeY * k;
-
       viewRef.current.scale = nextScale;
       return;
     }
 
-    // drag pan
     if (gestureRef.current.dragging) {
       const dx = e.clientX - gestureRef.current.lastX;
       const dy = e.clientY - gestureRef.current.lastY;
@@ -426,17 +416,9 @@ export default function EgoGraphCanvasResponsive({
 
   const onPointerUp = (e: React.PointerEvent) => {
     pointersRef.current.delete(e.pointerId);
-    if (pointersRef.current.size === 1) {
-      const pt = Array.from(pointersRef.current.values())[0];
-      gestureRef.current.dragging = true;
-      gestureRef.current.lastX = pt.x;
-      gestureRef.current.lastY = pt.y;
-    } else if (pointersRef.current.size === 0) {
-      gestureRef.current.dragging = false;
-    }
+    if (pointersRef.current.size === 0) gestureRef.current.dragging = false;
   };
 
-  // 클릭(탭)
   const onClick = (e: React.MouseEvent) => {
     const id = hitTest(e.clientX, e.clientY);
     setActiveId((prev) => (prev === id ? null : id));
