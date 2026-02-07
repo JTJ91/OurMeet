@@ -20,7 +20,7 @@ export const metadata = {
 
 export default function CognitiveFunctionsGuidePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-pink-50 via-sky-50 to-emerald-50 text-slate-900">
+    <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
       <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-10">
         {/* 헤더 */}
         <header className="relative overflow-hidden rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
@@ -202,7 +202,7 @@ export default function CognitiveFunctionsGuidePage() {
                 우리 모임 케미 보러가기 →
             </a>
           </div>
-          
+
         </section>
       </div>
     </main>

@@ -230,10 +230,10 @@ export default function EgoGraphCanvasResponsive({
       ctx.clearRect(0, 0, w, h);
 
       // 배경
-      ctx.fillStyle = "#F6FBFF";
+      ctx.fillStyle = "#ffffffb3";
       ctx.fillRect(0, 0, w, h);
       ctx.globalAlpha = 0.55;
-      ctx.fillStyle = "#F4FFF9";
+      ctx.fillStyle = "#ffffffb3";
       ctx.fillRect(0, h * 0.45, w, h * 0.55);
       ctx.globalAlpha = 1;
 

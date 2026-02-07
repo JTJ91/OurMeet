@@ -1,4 +1,6 @@
 import EgoGraphCanvasResponsive, { EgoNode } from "@/components/EgoGraphCanvasResponsive";
+import BottomCTA from "@/components/BottomCTA";
+
 import Link from "next/link";
 
 const sample: EgoNode[] = [
@@ -27,9 +29,9 @@ const sample: EgoNode[] = [
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-pink-50 via-sky-50 to-emerald-50 text-slate-900">
+    <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-36">
       {/* Centered "mobile-like" container */}
-      <div className="mx-auto flex min-h-screen max-w-[420px] flex-col px-5 pt-8 pb-28">
+      <div className="mx-auto flex min-h-screen max-w-[420px] flex-col px-5 pt-8">
         {/* Header */}
         <header className="text-center">
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
@@ -65,18 +67,19 @@ export default function Home() {
           </div>
         </section>
 
-
-        <div style={{ paddingTop: 16 }}>
-          <EgoGraphCanvasResponsive
-            centerName="태주"
-            centerSub="ESTP"
-            nodes={sample}
-            ringCount={3}
-            maxSize={420}
-            minSize={300}
-            aspect={1}  // 정사각
-           />
-        </div>
+        <section className="mt-10">
+          <div className="rounded-3xl bg-white/70 shadow-sm ring-1 ring-black/5">
+            <EgoGraphCanvasResponsive
+              centerName="태주"
+              centerSub="ESTP"
+              nodes={sample}
+              ringCount={3}
+              maxSize={420}
+              minSize={300}
+              aspect={1}  // 정사각
+            />
+          </div>
+        </section>
 
         {/* Steps */}
         <section className="mt-6">
@@ -117,7 +120,7 @@ export default function Home() {
 
         {/* Trust/Note */}
         <section className="mt-6">
-          <div className="rounded-3xl bg-white/60 p-5 ring-1 ring-black/5">
+          <div className="rounded-3xl bg-white/70 p-5 ring-1 ring-black/5">
             <p className="text-xs leading-relaxed text-slate-500">
               ※ 결과는 재미를 위한 참고용이에요. 관계 판단/결정의 근거로 사용하지 마세요.
             </p>
@@ -125,22 +128,28 @@ export default function Home() {
         </section>
       </div>
 
-      {/* Sticky bottom CTA (follows scroll) */}
-      <div className="fixed inset-x-0 bottom-0 z-50">
-        {/* Blur backdrop */}
-        <div className="mx-auto max-w-[420px] px-5 pb-5">
-          <div className="rounded-3xl bg-white/75 p-3 shadow-lg ring-1 ring-black/5 backdrop-blur">
-            <div className="grid grid-cols-2 gap-3">
-              <button className="w-full rounded-2xl bg-[#FDD835] hover:bg-[#FDD835]/90 px-4 py-4 text-sm font-extrabold text-slate-900 active:scale-[0.99]">
-                모임 생성하기
-              </button>
-              <button className="w-full rounded-2xl bg-slate-900/10 px-4 py-4 text-sm font-bold text-slate-900 ring-1 ring-black/5 active:scale-[0.99]">
-                모임 참가하기
-              </button>
-            </div>
-          </div>
+      <BottomCTA />
+
+      <footer className="border-black/5 py-10 text-center text-xs text-slate-500">
+        <div className="space-x-3">
+          <a href="/faq" className="hover:text-slate-700 transition">
+            자주 묻는 질문
+          </a>
+          <span className="text-slate-300">·</span>
+          <a href="/terms" className="hover:text-slate-700 transition">
+            이용약관
+          </a>
+          <span className="text-slate-300">·</span>
+          <a href="/privacy" className="hover:text-slate-700 transition">
+            개인정보처리방침
+          </a>
         </div>
-      </div>
+
+        <div className="mt-4 text-[11px] text-slate-400">
+          © 2026 모임랭크. All rights reserved.
+        </div>
+      </footer>
+
     </main>
   );
 }
