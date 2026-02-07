@@ -20,7 +20,7 @@ type Props = {
   maxSize?: number;      // 기본 420
   minSize?: number;      // 기본 280
   aspect?: number;       // 정사각=1, 0.9면 약간 납작
-};
+}; 
 
 const LEVEL_META: Record<Level, { label: string; color: string }> = {
   4: { label: "좋음", color: "#2ECC71" },
