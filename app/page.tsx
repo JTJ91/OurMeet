@@ -1,8 +1,8 @@
 import EgoGraphCanvasResponsive, { EgoNode } from "@/components/EgoGraphCanvasResponsive";
 
 const sample: EgoNode[] = [
-  { id: "1", name: "지수", level: 4 },
-  { id: "2", name: "서안", level: 4 },
+  { id: "1", name: "지수", level: 5 },
+  { id: "2", name: "서안", level: 5 },
   { id: "3", name: "하린", level: 4 },
   { id: "4", name: "도윤", level: 4 },
   { id: "5", name: "수아", level: 4 },
