@@ -14,11 +14,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "moimrank",
-  description: "우리 모임 순위 확인!",
+  description: "우리 모임에서 누가 제일 잘 맞을까?",
   openGraph: {
     type: "website",
     title: "moimrank - 모임 랭킹",
-    description: "우리 모임 순위 지금 확인해보세요!",
+    description: "관계 랭킹 바로 확인!",
     url: "https://www.moimrank.com/",
     images: [
       {
