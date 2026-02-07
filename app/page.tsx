@@ -1,4 +1,5 @@
 import EgoGraphCanvasResponsive, { EgoNode } from "@/components/EgoGraphCanvasResponsive";
+import Link from "next/link";
 
 const sample: EgoNode[] = [
   { id: "1", name: "지수", level: 5 },
@@ -31,11 +32,18 @@ export default function Home() {
       <div className="mx-auto flex min-h-screen max-w-[420px] flex-col px-5 pt-8 pb-28">
         {/* Header */}
         <header className="text-center">
-          <div className="inline-flex items-center justify-center rounded-2xl bg-white/70 px-4 py-2 shadow-sm ring-1 ring-black/5">
-            <span className="text-2xl font-extrabold tracking-tight">모임랭킹</span>
-          </div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
+            모임<span className="text-[#1E88E5]">랭킹</span>
+          </h1>
           <p className="mt-3 text-sm text-slate-600">
-            모임 안에서 서로의 <b className="text-slate-800">관계 케미</b>를 재미로 확인해요
+            모임 안에서 <b className="text-[#1E88E5]">MBTI 인지기능</b>을 활용해 <br/>서로의 관계 케미를 재미로 살펴봐요
+          </p>
+
+          <br/>
+          <p>
+            <Link href="/guide/cognitive-functions" className="text-sm text-slate-500 underline underline-offset-4 hover:text-slate-700">
+              MBTI 인지기능이란?
+            </Link>
           </p>
         </header>
 
@@ -43,31 +51,22 @@ export default function Home() {
         <section className="mt-10">
           <div className="rounded-3xl bg-white/70 p-6 shadow-sm ring-1 ring-black/5">
             <h1 className="text-3xl font-extrabold leading-tight">
-              우리 모임<br/> <span className="underline decoration-yellow-300/70">누가 제일 잘 맞을까?</span>
+              우리 모임<br />
+              <span className="underline decoration-[#FDD835]/70">
+                누가 제일 잘 맞을까?
+              </span>
             </h1>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600">
-              지금은 <b className="text-slate-800">MBTI</b>로 시작해요.
-              <br />
-              앞으로 사주 등 다른 기준도 추가할 예정이에요.
-              <span className="text-slate-500"> (재미로만 🙂)</span>
-            </p>
 
-            {/* Mini badges */}
-            <div className="mt-4 flex flex-wrap gap-2">
-              <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
-                MBTI
-              </span>
-              <span className="rounded-full bg-pink-100 px-3 py-1 text-xs font-semibold text-pink-700">
-                관계 단계
-              </span>
-              <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                모임별 참여
-              </span>
-            </div>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              <b className="text-[#1E88E5]">MBTI 인지기능</b>을 바탕으로<br />
+              서로의 <b className="text-slate-800">생각 방식과 대화 리듬</b>을 비교해
+              관계 케미를 확인해요.
+            </p>
           </div>
         </section>
 
-        <div style={{ padding: 16 }}>
+
+        <div style={{ paddingTop: 16 }}>
           <EgoGraphCanvasResponsive
             centerName="태주"
             centerSub="ESTP"
@@ -83,34 +82,38 @@ export default function Home() {
         <section className="mt-6">
           <div className="rounded-3xl bg-white/70 p-5 shadow-sm ring-1 ring-black/5">
             <div className="text-sm font-bold text-slate-800">사용 방법</div>
-            <ul className="mt-3 space-y-3 text-sm text-slate-600">
+
+            <ul className="mt-4 space-y-4 text-sm text-slate-600">
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900/5 text-xs font-bold text-slate-700">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FDD835]/30 text-xs font-bold text-slate-800">
                   1
                 </span>
-                <span>
+                <span className="leading-6">
                   <b className="text-slate-800">모임 생성</b> 후 초대 링크를 공유해요
                 </span>
               </li>
+
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900/5 text-xs font-bold text-slate-700">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FDD835]/30 text-xs font-bold text-slate-800">
                   2
                 </span>
-                <span>
+                <span className="leading-6">
                   멤버들이 <b className="text-slate-800">MBTI</b>를 입력해요
                 </span>
               </li>
+
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900/5 text-xs font-bold text-slate-700">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FDD835]/30 text-xs font-bold text-slate-800">
                   3
                 </span>
-                <span>
+                <span className="leading-6">
                   관계 궁합을 <b className="text-slate-800">단계별</b>로 보고, 케미 랭킹도 확인해요
                 </span>
               </li>
             </ul>
           </div>
         </section>
+
 
         {/* Trust/Note */}
         <section className="mt-6">
@@ -128,7 +131,7 @@ export default function Home() {
         <div className="mx-auto max-w-[420px] px-5 pb-5">
           <div className="rounded-3xl bg-white/75 p-3 shadow-lg ring-1 ring-black/5 backdrop-blur">
             <div className="grid grid-cols-2 gap-3">
-              <button className="w-full rounded-2xl bg-yellow-300 px-4 py-4 text-sm font-extrabold text-slate-900 active:scale-[0.99]">
+              <button className="w-full rounded-2xl bg-[#FDD835] hover:bg-[#FDD835]/90 px-4 py-4 text-sm font-extrabold text-slate-900 active:scale-[0.99]">
                 모임 생성하기
               </button>
               <button className="w-full rounded-2xl bg-slate-900/10 px-4 py-4 text-sm font-bold text-slate-900 ring-1 ring-black/5 active:scale-[0.99]">
