@@ -1,4 +1,19 @@
 import EgoGraphPreview from "@/components/EgoGraphPreview";
+import EgoGraphCanvas, { EgoNode } from "@/components/EgoGraphCanvas";
+
+const sample: EgoNode[] = [
+  { id: "1", name: "태주", level: 4 },
+  { id: "2", name: "서안", level: 4 },
+  { id: "3", name: "하린", level: 4 },
+  { id: "4", name: "도윤", level: 3 },
+  { id: "5", name: "수아", level: 3 },
+  { id: "6", name: "현우", level: 3 },
+  { id: "7", name: "유진", level: 2 },
+  { id: "8", name: "나영", level: 2 },
+  { id: "9", name: "지훈", level: 1 },
+  { id: "10", name: "다혜", level: 1 },
+  { id: "11", name: "준호", level: 1 },
+];
 
 export default function Home() {
   return (
@@ -44,6 +59,10 @@ export default function Home() {
         </section>
 
         <EgoGraphPreview />
+
+        <div style={{ padding: 24, display: "grid", placeItems: "center" }}>
+          <EgoGraphCanvas centerName="민지" centerSub="ENFP" nodes={sample} size={520} ringCount={3} />
+        </div>
 
         {/* Steps */}
         <section className="mt-6">
