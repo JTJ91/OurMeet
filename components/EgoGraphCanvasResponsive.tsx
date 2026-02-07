@@ -292,12 +292,6 @@ export default function EgoGraphCanvasResponsive({
         ctx.fill();
         ctx.stroke();
 
-        // 작은 점
-        ctx.fillStyle = "rgba(31,41,55,0.8)";
-        ctx.beginPath();
-        ctx.arc(p.x + nodeR * 0.62, p.y - nodeR * 0.62, nodeR * 0.22, 0, Math.PI * 2);
-        ctx.fill();
-
         // 라벨
         const label = n.name.length > 4 ? `${n.name.slice(0, 3)}…` : n.name;
         ctx.fillStyle = "#111827";
