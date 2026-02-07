@@ -197,9 +197,9 @@ export default function EgoGraphCanvasResponsive({
     if (!ctx) return;
 
     // 리사이즈 때마다 보기 좋은 기본값으로 살짝 리셋(과한 확대/이동 방지)
-    viewRef.current.panX = 0;
-    viewRef.current.panY = 0;
-    viewRef.current.scale = 1;
+    //viewRef.current.panX = 0;
+    //viewRef.current.panY = 0;
+    //viewRef.current.scale = 1;
 
     const draw = () => {
       const { panX, panY, scale } = viewRef.current;
