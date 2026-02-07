@@ -1,4 +1,3 @@
-import EgoGraphPreview from "@/components/EgoGraphPreview";
 import EgoGraphCanvas, { EgoNode } from "@/components/EgoGraphCanvas";
 
 const sample: EgoNode[] = [
@@ -57,8 +56,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        /*<EgoGraphPreview />*/
 
         <div style={{ padding: 24, display: "grid", placeItems: "center" }}>
           <EgoGraphCanvas centerName="민지" centerSub="ENFP" nodes={sample} size={520} ringCount={3} />
