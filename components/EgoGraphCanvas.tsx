@@ -209,8 +209,8 @@ export default function EgoGraphCanvas({
       });
 
       // 크기(스케일에 따라 시각적으로 같이 커지게)
-      const centerR = size * 0.085 * scale * dpr;
-      const nodeR = size * 0.06 * scale * dpr;
+      const centerR = size * 0.048 * scale * dpr;
+      const nodeR = size * 0.07 * scale * dpr;
 
       // 링 가이드
       const ringsR = Array.from(new Set(placed.map((p) => p.r))).sort((a, b) => a - b);
@@ -317,7 +317,7 @@ export default function EgoGraphCanvas({
     };
 
     // 초기 스케일 살짝 키워서 “원이 작아” 문제 줄임
-    if (viewRef.current.scale === 1) viewRef.current.scale = 1.02;
+    viewRef.current.scale = 1;
 
     let raf = 0;
     const tick = () => {
