@@ -1,4 +1,4 @@
-import EgoGraphCanvas, { EgoNode } from "@/components/EgoGraphCanvas";
+import EgoGraphCanvasResponsive, { EgoNode } from "@/components/EgoGraphCanvasResponsive";
 
 const sample: EgoNode[] = [
   { id: "1", name: "태주", level: 4 },
@@ -9,10 +9,9 @@ const sample: EgoNode[] = [
   { id: "6", name: "현우", level: 3 },
   { id: "7", name: "유진", level: 2 },
   { id: "8", name: "나영", level: 2 },
-  { id: "9", name: "지훈", level: 1 },
-  { id: "10", name: "다혜", level: 1 },
-  { id: "11", name: "준호", level: 1 },
+  { id: "9", name: "다혜", level: 1 },
 ];
+
 
 export default function Home() {
   return (
@@ -57,8 +56,16 @@ export default function Home() {
           </div>
         </section>
 
-        <div style={{ padding: 24, display: "grid", placeItems: "center" }}>
-          <EgoGraphCanvas centerName="민지" centerSub="ENFP" nodes={sample} size={380} ringCount={3} />
+        <div style={{ padding: 16 }}>
+          <EgoGraphCanvasResponsive
+            centerName="민지"
+            centerSub="ENFP"
+            nodes={sample}
+            ringCount={3}
+            maxSize={420}
+            minSize={300}
+            aspect={1}  // 정사각
+           />
         </div>
 
         {/* Steps */}
