@@ -58,7 +58,7 @@ export default function Home() {
           </div>
         </section>
 
-        <EgoGraphPreview />
+        /*<EgoGraphPreview />*/
 
         <div style={{ padding: 24, display: "grid", placeItems: "center" }}>
           <EgoGraphCanvas centerName="민지" centerSub="ENFP" nodes={sample} size={520} ringCount={3} />
