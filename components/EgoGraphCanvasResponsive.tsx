@@ -335,7 +335,7 @@ export default function EgoGraphCanvasResponsive({
 
         ctx.fillStyle = "#111827";
         ctx.font = `${Math.round(size * 0.03 * dpr)}px ui-sans-serif, system-ui, -apple-system`;
-        ctx.fillText(`${active.name} · ${active.level} ${LEVEL_META[active.level].label}`, w / 2, y + boxH / 2);
+        ctx.fillText(`${active.name} · ${active.mbti} ${LEVEL_META[active.level].label}`, w / 2, y + boxH / 2);
       }
     };
 
