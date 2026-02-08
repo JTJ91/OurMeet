@@ -419,7 +419,9 @@ export default function EgoGraphCanvasResponsive({
           <div className="mx-auto w-fit max-w-[320px] rounded-2xl border border-black/10 bg-white/95 p-2 pl-5 pr-5 shadow-sm backdrop-blur">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <span className="font-semibold text-slate-900">{activeNode.name}</span>
+              <span className="h-3 w-px bg-slate-300 mx-2 inline-block" />
               <span className="font-semibold text-slate-600">{activeNode.mbti}</span>
+              <span className="h-3 w-px bg-slate-300 mx-2 inline-block" />
               <span className="font-semibold" style={{ color: LEVEL_META[activeNode.level].color }}>
                 {LEVEL_META[activeNode.level].label}
               </span>
