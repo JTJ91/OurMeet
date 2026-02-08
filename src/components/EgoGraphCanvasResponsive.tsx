@@ -31,6 +31,62 @@ const LEVEL_META: Record<Level, { label: string; color: string }> = {
   1: { label: "한계임박", color: "#D50000" },
 };
 
+function hexToRgba(hex: string, a: number) {
+  const h = hex.replace("#", "");
+  const v = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
+  const r = (v >> 16) & 255;
+  const g = (v >> 8) & 255;
+  const b = v & 255;
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function drawSoftShadowCircle(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  r: number,
+  fill: string,
+  shadowColor: string,
+  shadowBlur: number,
+  shadowOffsetY = 0
+) {
+  ctx.save();
+  ctx.shadowColor = shadowColor;
+  ctx.shadowBlur = shadowBlur;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = shadowOffsetY;
+  ctx.fillStyle = fill;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawCurvedLine(
+  ctx: CanvasRenderingContext2D,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  bend: number // 0.10 ~ 0.22 추천
+) {
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  // 수직 벡터
+  const nx = -dy;
+  const ny = dx;
+  const len = Math.hypot(nx, ny) || 1;
+  const cx = mx + (nx / len) * (Math.hypot(dx, dy) * bend);
+  const cy = my + (ny / len) * (Math.hypot(dx, dy) * bend);
+
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.quadraticCurveTo(cx, cy, x2, y2);
+  ctx.stroke();
+}
+
 function clampNodes(nodes: EgoNode[], max = 20) {
   return nodes.length <= max ? nodes : nodes.slice(0, max);
 }
@@ -121,6 +177,7 @@ export default function EgoGraphCanvasResponsive({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [hoverId, setHoverId] = useState<string | null>(null);
   // ✅ 범례 강조(필터): null이면 전체 동일 강도
   const [focusLevel, setFocusLevel] = useState<Level | null>(null);
 
@@ -204,6 +261,13 @@ export default function EgoGraphCanvasResponsive({
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, w, h);
 
+      // ✅ 은은한 배경 그라데이션
+      const bg = ctx.createRadialGradient(w / 2, h / 2, 10 * dpr, w / 2, h / 2, Math.min(w, h) * 0.55);
+      bg.addColorStop(0, "rgba(255,255,255,1)");
+      bg.addColorStop(1, "rgba(248,250,252,1)");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+
       // hint (top-center)
       if (!activeId) {
         const msg = "이름을 클릭해보세요";
@@ -235,91 +299,135 @@ export default function EgoGraphCanvasResponsive({
 
       // 링 가이드
       const ringsR = Array.from(new Set(placed.map((p) => p.r))).sort((a, b) => a - b);
-      ctx.strokeStyle = "rgba(0,0,0,0.04)";
-      ctx.lineWidth = 2 * dpr;
-      ringsR.forEach((rr) => {
+      // ✅ 링 가이드(더 얇고 은은, 점선 느낌)
+      ringsR.forEach((rr, idx) => {
+        const rpx = rr * fitScale * dpr;
+      
+        ctx.save();
+        ctx.strokeStyle = idx === 0 ? "rgba(15,23,42,0.06)" : "rgba(15,23,42,0.045)";
+        ctx.lineWidth = 1.4 * dpr;
+        ctx.setLineDash([6 * dpr, 10 * dpr]); // 점선
+        ctx.lineDashOffset = idx * 2 * dpr;
+      
         ctx.beginPath();
-        ctx.arc(cx, cy, rr * fitScale * dpr, 0, Math.PI * 2);
+        ctx.arc(cx, cy, rpx, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.restore();
       });
 
       // ✅ focusLevel일 때 나머지 흐리게
       const isFocused = (lv: Level) => (focusLevel ? lv === focusLevel : true);
 
       // 선
+      // ✅ focusLevel일 때 나머지 흐리게
+      const isFocused = (lv: Level) => (focusLevel ? lv === focusLevel : true);
+      
+      // 선(곡선 + 그라데이션)
       placed.forEach((n) => {
         const p = toScreen(n.x, n.y);
         const isActive = activeId === n.id;
+        const isHover = hoverId === n.id;
+      
         const col = LEVEL_META[n.level].color;
-
         const focused = isFocused(n.level);
         const hasFocus = focusLevel !== null;
-
-        // ✅ 범례 선택 시: 해당 레벨은 강하게, 나머지는 매우 연하게
-        const alpha = isActive ? 1 : hasFocus ? (focused ? 0.95 : 0.05) : 0.32;
-        const lw = isActive ? 5.6 : hasFocus ? (focused ? 4.4 : 2.0) : 3.0;
-
-        ctx.strokeStyle = col;
-        ctx.globalAlpha = alpha;
-        ctx.lineWidth = lw * dpr;
-
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(p.x, p.y);
-        ctx.stroke();
-
-        ctx.globalAlpha = 1;
+      
+        const alpha = isActive ? 1 : hasFocus ? (focused ? 0.92 : 0.05) : 0.30;
+        const baseLW = isActive ? 5.8 : isHover ? 5.0 : hasFocus ? (focused ? 4.2 : 2.0) : 3.0;
+      
+        // 중앙 -> 바깥으로 갈수록 투명해지는 그라데이션
+        const grad = ctx.createLinearGradient(cx, cy, p.x, p.y);
+        grad.addColorStop(0, hexToRgba(col, Math.min(0.55, alpha)));
+        grad.addColorStop(1, hexToRgba(col, Math.min(0.95, alpha)));
+      
+        ctx.save();
+        ctx.strokeStyle = grad;
+        ctx.globalAlpha = 1; // grad 자체에 alpha를 넣었으니 1로 두는 게 깔끔
+        ctx.lineWidth = baseLW * dpr;
+        ctx.lineCap = "round";
+      
+        // 레벨 낮을수록 살짝 점선 느낌(조율/한계)
+        if (n.level <= 2) ctx.setLineDash([7 * dpr, 10 * dpr]);
+        else ctx.setLineDash([]);
+      
+        // 곡률: 많을수록 더 휘어짐
+        const bend = isActive ? 0.18 : 0.12;
+        drawCurvedLine(ctx, cx, cy, p.x, p.y, bend);
+      
+        ctx.restore();
       });
 
-      // 중앙
-      ctx.fillStyle = "#FFFFFF";
-      ctx.strokeStyle = "rgba(0,0,0,0.12)";
+      // 중앙(입체감)
+      drawSoftShadowCircle(ctx, cx, cy, centerR, "#FFFFFF", "rgba(15,23,42,0.18)", 18 * dpr, 6 * dpr);
+      
+      // 테두리
+      ctx.strokeStyle = "rgba(15,23,42,0.10)";
       ctx.lineWidth = 2 * dpr;
       ctx.beginPath();
       ctx.arc(cx, cy, centerR, 0, Math.PI * 2);
-      ctx.fill();
       ctx.stroke();
-
+      
+      // 중앙 텍스트
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "#111827";
-      ctx.font = `${Math.round(size * 0.04 * fitScale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
+      ctx.fillStyle = "#0F172A";
+      ctx.font = `${Math.round(size * 0.042 * fitScale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
       ctx.fillText(centerName, cx, cy - 2 * dpr);
-
+      
       if (centerSub) {
-        ctx.fillStyle = "rgba(17,24,39,0.55)";
+        ctx.fillStyle = "rgba(15,23,42,0.55)";
         ctx.font = `${Math.round(size * 0.028 * fitScale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
         ctx.fillText(centerSub, cx, cy + centerR * 0.55);
       }
 
-      // 노드
+      // 노드(입체감 + hover)
       placed.forEach((n) => {
         const p = toScreen(n.x, n.y);
         const isActive = activeId === n.id;
+        const isHover = hoverId === n.id;
         const meta = LEVEL_META[n.level];
-
+      
         const dim = focusLevel && !isFocused(n.level);
-        const strokeAlpha = dim ? 0.22 : 1;
-        const fillAlpha = dim ? 0.78 : 1;
-
-        ctx.globalAlpha = fillAlpha;
+      
+        const scale = isActive ? 1.10 : isHover ? 1.06 : 1.0;
+        const r = nodeR * scale;
+      
+        // 바디(그림자)
+        drawSoftShadowCircle(
+          ctx,
+          p.x,
+          p.y,
+          r,
+          "#FFFFFF",
+          dim ? "rgba(15,23,42,0.05)" : "rgba(15,23,42,0.14)",
+          (isActive ? 16 : isHover ? 14 : 12) * dpr,
+          (isActive ? 6 : 4) * dpr
+        );
+      
+        // 하이라이트(살짝 광택 느낌)
+        ctx.save();
+        ctx.globalAlpha = dim ? 0.12 : 0.18;
         ctx.fillStyle = "#FFFFFF";
         ctx.beginPath();
-        ctx.arc(p.x, p.y, nodeR, 0, Math.PI * 2);
+        ctx.arc(p.x - r * 0.25, p.y - r * 0.25, r * 0.45, 0, Math.PI * 2);
         ctx.fill();
-        ctx.globalAlpha = 1;
-
-        ctx.strokeStyle = meta.color;
-        ctx.globalAlpha = strokeAlpha;
-        ctx.lineWidth = (isActive ? 6 : 4) * dpr;
+        ctx.restore();
+      
+        // 테두리
+        ctx.save();
+        ctx.strokeStyle = dim ? hexToRgba(meta.color, 0.22) : meta.color;
+        ctx.lineWidth = (isActive ? 6 : isHover ? 5 : 4) * dpr;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, nodeR, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
         ctx.stroke();
-        ctx.globalAlpha = 1;
-
+        ctx.restore();
+      
+        // 이름
         const label = n.name.length > 4 ? `${n.name.slice(0, 3)}…` : n.name;
-        ctx.fillStyle = dim ? "rgba(17,24,39,0.45)" : "#111827";
+        ctx.fillStyle = dim ? "rgba(15,23,42,0.40)" : "#0F172A";
         ctx.font = `${Math.round(size * 0.032 * fitScale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
         ctx.fillText(label, p.x, p.y + 0.5 * dpr);
       });
 
@@ -373,7 +481,7 @@ export default function EgoGraphCanvasResponsive({
     };
 
     draw();
-  }, [activeId, placed, centerName, centerSub, size, height, focusLevel]);
+  }, [activeId, hoverId, placed, centerName, centerSub, size, height, focusLevel]);
 
   const hitTest = (clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
@@ -408,11 +516,32 @@ export default function EgoGraphCanvasResponsive({
     setActiveId((prev) => (prev === id ? null : id));
   };
 
+  const onMouseMove = (e: React.MouseEvent) => {
+  const id = hitTest(e.clientX, e.clientY);
+  setHoverId(id);
+
+  // 캔버스 커서 변경(이게 체감 큼)
+  const canvas = canvasRef.current;
+  if (canvas) canvas.style.cursor = id ? "pointer" : "default";
+};
+
+const onMouseLeave = () => {
+  setHoverId(null);
+  const canvas = canvasRef.current;
+  if (canvas) canvas.style.cursor = "default";
+};
+
   const activeNode = useMemo(() => (activeId ? placed.find((p) => p.id === activeId) : null), [activeId, placed]);
 
   return (
     <div ref={wrapRef} style={{ width: "100%" }}>
-      <canvas ref={canvasRef} onClick={onClick} style={{ width: "100%", height: `${height}px`, display: "block", touchAction: "manipulation" }} />
+      <canvas
+          ref={canvasRef}
+          onClick={onClick}
+          onMouseMove={onMouseMove}
+          onMouseLeave={onMouseLeave}
+          style={{ width: "100%", height: `${height}px`, display: "block", touchAction: "manipulation" }}
+        />
       
       {activeNode && (
         <div className="sticky bottom-2 z-10 mt-2 px-2">
