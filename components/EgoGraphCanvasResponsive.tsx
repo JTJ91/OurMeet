@@ -324,52 +324,52 @@ export default function EgoGraphCanvasResponsive({
       });
 
       // 툴팁
-      const active = activeId ? placed.find((p) => p.id === activeId) : null;
-      if (active) {
-        const meta = LEVEL_META[active.level];
-        const baseText = `${active.name} (${active.mbti}) · `;
-        const levelText = meta.label;
+      // const active = activeId ? placed.find((p) => p.id === activeId) : null;
+      // if (active) {
+      //   const meta = LEVEL_META[active.level];
+      //   const baseText = `${active.name} (${active.mbti}) · `;
+      //   const levelText = meta.label;
 
-        const fontSize = Math.round(size * 0.032 * dpr);
-        const paddingX = 18 * dpr;
-        const paddingY = 12 * dpr;
-        const radius = 20 * dpr;
+      //   const fontSize = Math.round(size * 0.032 * dpr);
+      //   const paddingX = 18 * dpr;
+      //   const paddingY = 12 * dpr;
+      //   const radius = 20 * dpr;
 
-        ctx.font = `600 ${fontSize}px ui-sans-serif, system-ui`;
-        const fullText = baseText + levelText;
-        const textWidth = ctx.measureText(fullText).width;
+      //   ctx.font = `600 ${fontSize}px ui-sans-serif, system-ui`;
+      //   const fullText = baseText + levelText;
+      //   const textWidth = ctx.measureText(fullText).width;
 
-        const boxW = textWidth + paddingX * 2;
-        const boxH = fontSize + paddingY * 2;
+      //   const boxW = textWidth + paddingX * 2;
+      //   const boxH = fontSize + paddingY * 2;
 
-        const x = (w - boxW) / 2;
-        const y = h - boxH - 24 * dpr;
+      //   const x = (w - boxW) / 2;
+      //   const y = h - boxH - 24 * dpr;
 
-        ctx.beginPath();
-        if ("roundRect" in ctx) (ctx as any).roundRect(x, y, boxW, boxH, radius);
-        else roundRect(ctx, x, y, boxW, boxH, radius);
-        ctx.fillStyle = "rgba(255,255,255,0.95)";
-        ctx.fill();
-        ctx.strokeStyle = "rgba(0,0,0,0.08)";
-        ctx.stroke();
+      //   ctx.beginPath();
+      //   if ("roundRect" in ctx) (ctx as any).roundRect(x, y, boxW, boxH, radius);
+      //   else roundRect(ctx, x, y, boxW, boxH, radius);
+      //   ctx.fillStyle = "rgba(255,255,255,0.95)";
+      //   ctx.fill();
+      //   ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      //   ctx.stroke();
 
-        const centerX = w / 2;
-        const textY = y + boxH / 2;
+      //   const centerX = w / 2;
+      //   const textY = y + boxH / 2;
 
-        ctx.textBaseline = "middle";
-        ctx.font = `600 ${fontSize}px ui-sans-serif, system-ui`;
-        const totalWidth = ctx.measureText(fullText).width;
-        let startX = centerX - totalWidth / 2;
+      //   ctx.textBaseline = "middle";
+      //   ctx.font = `600 ${fontSize}px ui-sans-serif, system-ui`;
+      //   const totalWidth = ctx.measureText(fullText).width;
+      //   let startX = centerX - totalWidth / 2;
 
-        ctx.textAlign = "left";
-        ctx.fillStyle = "#111827";
-        ctx.fillText(baseText, startX, textY);
-        startX += ctx.measureText(baseText).width;
+      //   ctx.textAlign = "left";
+      //   ctx.fillStyle = "#111827";
+      //   ctx.fillText(baseText, startX, textY);
+      //   startX += ctx.measureText(baseText).width;
 
-        ctx.font = `800 ${fontSize}px ui-sans-serif, system-ui`;
-        ctx.fillStyle = meta.color;
-        ctx.fillText(levelText, startX, textY);
-      }
+      //   ctx.font = `800 ${fontSize}px ui-sans-serif, system-ui`;
+      //   ctx.fillStyle = meta.color;
+      //   ctx.fillText(levelText, startX, textY);
+      // }
     };
 
     draw();
@@ -414,27 +414,30 @@ export default function EgoGraphCanvasResponsive({
     <div ref={wrapRef} style={{ width: "100%" }}>
       <canvas ref={canvasRef} onClick={onClick} style={{ width: "100%", height: `${height}px`, display: "block", touchAction: "manipulation" }} />
       
-      {activeNode && onCenterChange && (
-        <div className="mt-2 flex items-center justify-center">
-          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs">
-            <span className="font-semibold text-slate-900">{activeNode.name}</span>
-            <span className="text-slate-500">{activeNode.mbti}</span>
-            <span className="text-slate-400">·</span>
-            <span className="font-semibold" style={{ color: LEVEL_META[activeNode.level].color }}>
-              {LEVEL_META[activeNode.level].label}
-            </span>
+      {activeNode && (
+        <div className="sticky bottom-2 z-10 mt-2 px-2">
+          <div className="mx-auto w-fit max-w-[320px] rounded-2xl border border-black/10 bg-white/95 p-2 pl-5 pr-5 shadow-sm backdrop-blur">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span className="font-semibold text-slate-900">{activeNode.name}</span>
+              <span className="font-semibold text-slate-600">{activeNode.mbti}</span>
+              <span className="font-semibold" style={{ color: LEVEL_META[activeNode.level].color }}>
+                {LEVEL_META[activeNode.level].label}
+              </span>
 
-            <button
-              type="button"
-              className="ml-2 font-semibold text-slate-600 underline underline-offset-4 hover:text-slate-900"
-              onClick={() => {
-                onCenterChange(activeNode.id);
-                setActiveId(null);
-                setFocusLevel(null);
-              }}
-            >
-              센터로 보기
-            </button>
+              {onCenterChange && (
+                <button
+                  type="button"
+                  className="ml-2 text-xs font-semibold text-slate-500 hover:text-slate-900 underline underline-offset-4"
+                  onClick={() => {
+                    onCenterChange(activeNode.id);
+                    setActiveId(null);
+                    setFocusLevel(null);
+                  }}
+                >
+                  센터로 보기
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
