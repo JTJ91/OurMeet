@@ -322,21 +322,44 @@ export default function EgoGraphCanvasResponsive({
       // 툴팁
       const active = activeId ? placed.find((p) => p.id === activeId) : null;
       if (active) {
-        const boxW = size * 0.42 * dpr;
-        const boxH = size * 0.095 * dpr;
+        const boxW = size * 0.48 * dpr;
+        const boxH = size * 0.11 * dpr;
         const x = w / 2 - boxW / 2;
-        const y = h - size * 0.14 * dpr;
-
+        const y = h - size * 0.16 * dpr;
+      
         ctx.fillStyle = "#FFFFFF";
         ctx.strokeStyle = "rgba(0,0,0,0.10)";
         ctx.lineWidth = 2 * dpr;
         roundRect(ctx, x, y, boxW, boxH, 14 * dpr);
         ctx.fill();
         ctx.stroke();
-
+      
+        const meta = LEVEL_META[active.level];
+      
+        const baseText = `${active.name} (${active.mbti}) · `;
+        const levelText = meta.label;
+      
+        ctx.font = `${Math.round(size * 0.032 * dpr)}px ui-sans-serif, system-ui`;
+        ctx.textBaseline = "middle";
+      
+        const centerX = w / 2;
+        const textY = y + boxH / 2;
+      
+        // 전체 텍스트 길이 계산
+        const baseWidth = ctx.measureText(baseText).width;
+        const levelWidth = ctx.measureText(levelText).width;
+        const totalWidth = baseWidth + levelWidth;
+      
+        let startX = centerX - totalWidth / 2;
+      
+        // 이름 + MBTI (기본색)
         ctx.fillStyle = "#111827";
-        ctx.font = `${Math.round(size * 0.03 * dpr)}px ui-sans-serif, system-ui, -apple-system`;
-        ctx.fillText(`${active.name} · ${active.mbti} ${LEVEL_META[active.level].label}`, w / 2, y + boxH / 2);
+        ctx.fillText(baseText, startX, textY);
+        startX += baseWidth;
+      
+        // 관계 단계 (레벨 색상 적용)
+        ctx.fillStyle = meta.color;
+        ctx.fillText(levelText, startX, textY);
       }
     };
 
