@@ -322,42 +322,54 @@ export default function EgoGraphCanvasResponsive({
       // 툴팁
       const active = activeId ? placed.find((p) => p.id === activeId) : null;
       if (active) {
-        const boxW = size * 0.48 * dpr;
-        const boxH = size * 0.11 * dpr;
-        const x = w / 2 - boxW / 2;
-        const y = h - size * 0.16 * dpr;
-      
-        ctx.fillStyle = "#FFFFFF";
-        ctx.strokeStyle = "rgba(0,0,0,0.10)";
-        ctx.lineWidth = 2 * dpr;
-        roundRect(ctx, x, y, boxW, boxH, 14 * dpr);
-        ctx.fill();
-        ctx.stroke();
-      
         const meta = LEVEL_META[active.level];
       
         const baseText = `${active.name} (${active.mbti}) · `;
         const levelText = meta.label;
       
-        ctx.font = `${Math.round(size * 0.032 * dpr)}px ui-sans-serif, system-ui`;
-        ctx.textBaseline = "middle";
+        const fontSize = Math.round(size * 0.032 * dpr);
+        const paddingX = 18 * dpr;
+        const paddingY = 12 * dpr;
+        const radius = 20 * dpr;
+      
+        ctx.font = `600 ${fontSize}px ui-sans-serif, system-ui`;
+      
+        const fullText = baseText + levelText;
+        const textWidth = ctx.measureText(fullText).width;
+      
+        const boxW = textWidth + paddingX * 2;
+        const boxH = fontSize + paddingY * 2;
+      
+        const x = (w - boxW) / 2;
+        const y = h - boxH - 24 * dpr;
+      
+        // 박스
+        ctx.beginPath();
+        ctx.roundRect(x, y, boxW, boxH, radius);
+        ctx.fillStyle = "rgba(255,255,255,0.95)";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(0,0,0,0.08)";
+        ctx.stroke();
       
         const centerX = w / 2;
         const textY = y + boxH / 2;
       
-        // 전체 텍스트 길이 계산
-        const baseWidth = ctx.measureText(baseText).width;
-        const levelWidth = ctx.measureText(levelText).width;
-        const totalWidth = baseWidth + levelWidth;
+        ctx.textBaseline = "middle";
       
+        // 중앙 정렬 계산
+        ctx.font = `600 ${fontSize}px ui-sans-serif, system-ui`;
+        const totalWidth = ctx.measureText(fullText).width;
         let startX = centerX - totalWidth / 2;
       
-        // 이름 + MBTI (기본색)
+        ctx.textAlign = "left";
+      
+        // 이름 + MBTI
         ctx.fillStyle = "#111827";
         ctx.fillText(baseText, startX, textY);
-        startX += baseWidth;
+        startX += ctx.measureText(baseText).width;
       
-        // 관계 단계 (레벨 색상 적용)
+        // 관계 단계 (더 진하게 + 컬러 적용)
+        ctx.font = `800 ${fontSize}px ui-sans-serif, system-ui`;
         ctx.fillStyle = meta.color;
         ctx.fillText(levelText, startX, textY);
       }
