@@ -16,7 +16,6 @@ type Props = {
   centerSub?: string;
   nodes: EgoNode[];
   ringCount?: 2 | 3;
-
   maxSize?: number;
   minSize?: number;
   aspect?: number;
@@ -24,8 +23,8 @@ type Props = {
 };
 
 const LEVEL_META: Record<Level, { label: string; color: string }> = {
-  5: { label: "찰떡궁합", color: "#1E88E5" }, // (네가 바꾼 룰: 5=파랑)
-  4: { label: "합좋은편", color: "#00C853" }, // 4=초록
+  5: { label: "찰떡궁합", color: "#1E88E5" },
+  4: { label: "합좋은편", color: "#00C853" },
   3: { label: "그럭저럭", color: "#FDD835" },
   2: { label: "조율필요", color: "#FB8C00" },
   1: { label: "한계임박", color: "#D50000" },
@@ -43,45 +42,27 @@ function groupByLevel(nodes: EgoNode[]) {
 
 function mapToRings(nodes: EgoNode[], ringCount: 2 | 3) {
   const by = groupByLevel(nodes);
-
-  if (ringCount === 3) {
-    return [
-      [...by[5], ...by[4]],
-      [...by[3]],
-      [...by[2], ...by[1]],
-    ];
-  }
+  if (ringCount === 3) return [[...by[5], ...by[4]], [...by[3]], [...by[2], ...by[1]]];
   return [[...by[5], ...by[4], ...by[3]], [...by[2], ...by[1]]];
 }
 
 function layoutOnRing(items: EgoNode[], radius: number, startAngle: number) {
   if (!items.length) return [];
-  const sorted = [...items].sort((a, b) => {
-    if (b.level !== a.level) return b.level - a.level;
-    return a.name.localeCompare(b.name);
-  });
-
+  const sorted = [...items].sort((a, b) => (b.level !== a.level ? b.level - a.level : a.name.localeCompare(b.name)));
   const weights = sorted.map((n) => {
     const len = n.name.length;
     return Math.min(1.8, Math.max(1, 0.85 + len * 0.12));
   });
   const totalW = weights.reduce((a, b) => a + b, 0);
   const twoPi = Math.PI * 2;
-
   const crowdBoost = Math.min(0.35, sorted.length * 0.012);
   const gaps = weights.map((w) => (w / totalW) * twoPi);
-
   let a = startAngle;
   const out: Array<EgoNode & { x: number; y: number; angle: number }> = [];
   for (let i = 0; i < sorted.length; i++) {
     const delta = gaps[i] * (1 - crowdBoost);
     const mid = a + delta / 2;
-    out.push({
-      ...sorted[i],
-      angle: mid,
-      x: Math.cos(mid) * radius,
-      y: Math.sin(mid) * radius,
-    });
+    out.push({ ...sorted[i], angle: mid, x: Math.cos(mid) * radius, y: Math.sin(mid) * radius });
     a += delta;
   }
   return out;
@@ -89,14 +70,7 @@ function layoutOnRing(items: EgoNode[], radius: number, startAngle: number) {
 
 type Placed = EgoNode & { x: number; y: number; ringIndex: number; r: number };
 
-function roundRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number
-) {
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   const rr = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
   ctx.moveTo(x + rr, y);
@@ -116,23 +90,18 @@ function dist2(ax: number, ay: number, bx: number, by: number) {
 function useElementSize<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
   const [w, setW] = useState(0);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
     const ro = new ResizeObserver((entries) => {
       const cr = entries[0].contentRect;
       setW(cr.width);
     });
     ro.observe(el);
-
     const rect = el.getBoundingClientRect();
     setW(rect.width);
-
     return () => ro.disconnect();
   }, []);
-
   return { ref, w };
 }
 
@@ -141,7 +110,7 @@ export default function EgoGraphCanvasResponsive({
   centerSub,
   nodes,
   ringCount = 3,
-  maxSize = 420,
+  maxSize = 760,
   minSize = 280,
   aspect = 1,
   showLegend = true,
@@ -150,31 +119,29 @@ export default function EgoGraphCanvasResponsive({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const [activeId, setActiveId] = useState<string | null>(null);
+  // ✅ 범례 강조(필터): null이면 전체 동일 강도
+  const [focusLevel, setFocusLevel] = useState<Level | null>(null);
 
   const safeNodes = useMemo(() => clampNodes(nodes, 20), [nodes]);
 
   const size = useMemo(() => {
-    const raw = Math.floor(wrapW || maxSize);
-    return Math.max(minSize, Math.min(maxSize, raw));
-  }, [wrapW, maxSize, minSize]);
+  const raw = Math.floor(wrapW);
+
+  if (raw > 768) {
+    return Math.min(900, raw);   // PC에서는 900까지 허용
+  }
+
+  return Math.max(280, Math.min(420, raw)); // 모바일은 기존 유지
+}, [wrapW]);
 
   const height = Math.floor(size * aspect);
 
   const placed: Placed[] = useMemo(() => {
     const rings = mapToRings(safeNodes, ringCount);
-
     const base = size * 0.19;
     const step = size * 0.18;
-    const ringR =
-      ringCount === 3
-        ? [base, base + step, base + step * 2]
-        : [base, base + step * 1.4];
-
-    const starts =
-      ringCount === 3
-        ? [-Math.PI / 2, -Math.PI / 2 + 0.4, -Math.PI / 2 + 0.15]
-        : [-Math.PI / 2, -Math.PI / 2 + 0.25];
-
+    const ringR = ringCount === 3 ? [base, base + step, base + step * 2] : [base, base + step * 1.4];
+    const starts = ringCount === 3 ? [-Math.PI / 2, -Math.PI / 2 + 0.4, -Math.PI / 2 + 0.15] : [-Math.PI / 2, -Math.PI / 2 + 0.25];
     const all: Placed[] = [];
     rings.forEach((items, idx) => {
       const p = layoutOnRing(items, ringR[idx], starts[idx]);
@@ -183,29 +150,18 @@ export default function EgoGraphCanvasResponsive({
     return all;
   }, [safeNodes, ringCount, size]);
 
-  // ✅ “바깥 노드까지 딱 들어오게” 자동 스케일 계산
+  // ✅ “바깥 노드까지 딱 들어오게” 자동 스케일 (전체 placed 기준 유지)
   const getFitScale = (canvasWpx: number, canvasHpx: number, dpr: number) => {
-    // 노드 반지름(월드 기준)을 먼저 계산
-    const nodeR_world = size * 0.048; // draw에서 scale*dpr로 곱해지는 값의 "scale 이전" 기준
-    const margin_world = size * 0.06; // 여백 (너무 꽉차지 않게)
-
-    // 가장 멀리 있는 점까지의 거리(월드)
+    const nodeR_world = size * 0.048;
+    const margin_world = size * 0.06;
     let maxDist = 0;
     for (const n of placed) {
       const dist = Math.hypot(n.x, n.y);
       if (dist > maxDist) maxDist = dist;
     }
-
-    // 콘텐츠가 차지해야 하는 월드 반지름
     const contentR_world = maxDist + nodeR_world + margin_world;
-
-    // 화면에 허용되는 스크린 반지름(px)
-    const availR_px = (Math.min(canvasWpx, canvasHpx) / 2) / dpr;
-
-    // scale = (스크린 허용 반지름) / (월드 반지름)
+    const availR_px = Math.min(canvasWpx, canvasHpx) / 2 / dpr;
     const s = availR_px / Math.max(1, contentR_world);
-
-    // 너무 커지지 않게(원하면 1.0 상한 제거 가능)
     return Math.min(1, Math.max(0.5, s));
   };
 
@@ -217,8 +173,22 @@ export default function EgoGraphCanvasResponsive({
 
     canvas.style.width = "100%";
     canvas.style.height = `${height}px`;
-    canvas.width = Math.floor(size * dpr);
-    canvas.height = Math.floor(height * dpr);
+
+    // ✅ 실제 표시 크기를 가져온 뒤 "정수 px"로 고정
+    const rect = canvas.getBoundingClientRect();
+    const cssW = Math.round(rect.width);
+    const cssH = Math.round(rect.height);
+
+    // ✅ CSS 크기를 정수로 강제(미세 스케일링 방지)
+    canvas.style.width = `${cssW}px`;
+    canvas.style.height = `${cssH}px`;
+
+    // ✅ 내부 버퍼는 css * dpr로 정확히 맞춤
+    const bufW = Math.round(cssW * dpr);
+    const bufH = Math.round(cssH * dpr);
+
+    canvas.width = bufW;
+    canvas.height = bufH;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -232,51 +202,31 @@ export default function EgoGraphCanvasResponsive({
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, w, h);
 
-      // 배경
-      ctx.fillStyle = "#ffffffb3";
-      ctx.fillRect(0, 0, w, h);
-      ctx.globalAlpha = 0.55;
-      ctx.fillStyle = "#ffffffb3";
-      ctx.fillRect(0, h * 0.45, w, h * 0.55);
-      ctx.globalAlpha = 1;
-
-      // ====== hint (top-center, subtle) ======
+      // hint (top-center)
       if (!activeId) {
         const msg = "이름을 클릭해보세요";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.font = `600 ${Math.round(size * 0.028 * dpr)}px ui-sans-serif, system-ui, -apple-system`;
-      
-        // 살짝 투명한 글씨 + 얇은 배경 pill
         const padX = 10 * dpr;
-        const padY = 7 * dpr;
         const textW = ctx.measureText(msg).width;
         const boxW = textW + padX * 2;
         const boxH = Math.round(size * 0.05 * dpr);
-      
         const x = w / 2 - boxW / 2;
         const y = 14 * dpr;
-      
         ctx.fillStyle = "rgba(255,255,255,0.65)";
         ctx.strokeStyle = "rgba(0,0,0,0.05)";
         ctx.lineWidth = 1.2 * dpr;
         roundRect(ctx, x, y, boxW, boxH, 999 * dpr);
         ctx.fill();
         ctx.stroke();
-      
         ctx.fillStyle = "rgba(17,24,39,0.55)";
         ctx.fillText(msg, w / 2, y + boxH / 2);
       }
-      // ====== /hint ======
 
-      // ✅ 항상 중앙 고정 (panX/panY 없음)
       const cx = w / 2;
       const cy = h / 2;
-
-      const toScreen = (wx: number, wy: number) => ({
-        x: cx + wx * fitScale * dpr,
-        y: cy + wy * fitScale * dpr,
-      });
+      const toScreen = (wx: number, wy: number) => ({ x: cx + wx * fitScale * dpr, y: cy + wy * fitScale * dpr });
 
       const centerR = size * 0.07 * fitScale * dpr;
       const nodeR = size * 0.048 * fitScale * dpr;
@@ -291,15 +241,23 @@ export default function EgoGraphCanvasResponsive({
         ctx.stroke();
       });
 
+      // ✅ focusLevel일 때 나머지 흐리게
+      const isFocused = (lv: Level) => (focusLevel ? lv === focusLevel : true);
+
       // 선
       placed.forEach((n) => {
         const p = toScreen(n.x, n.y);
         const isActive = activeId === n.id;
         const col = LEVEL_META[n.level].color;
 
+        // focus 우선, active는 추가로 강조
+        const baseAlpha = isFocused(n.level) ? 0.34 : 0.08;
+        const alpha = isActive ? 0.95 : baseAlpha;
+        const lw = isActive ? 5 : isFocused(n.level) ? 3.2 : 2.2;
+
         ctx.strokeStyle = col;
-        ctx.globalAlpha = isActive ? 0.95 : 0.30;
-        ctx.lineWidth = (isActive ? 5 : 3) * dpr;
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth = lw * dpr;
 
         ctx.beginPath();
         ctx.moveTo(cx, cy);
@@ -335,93 +293,95 @@ export default function EgoGraphCanvasResponsive({
         const isActive = activeId === n.id;
         const meta = LEVEL_META[n.level];
 
-        ctx.fillStyle = "#FFFFFF";
-        ctx.strokeStyle = meta.color;
-        ctx.lineWidth = (isActive ? 6 : 4) * dpr;
+        const dim = focusLevel && !isFocused(n.level);
+        const strokeAlpha = dim ? 0.22 : 1;
+        const fillAlpha = dim ? 0.78 : 1;
 
+        ctx.globalAlpha = fillAlpha;
+        ctx.fillStyle = "#FFFFFF";
         ctx.beginPath();
         ctx.arc(p.x, p.y, nodeR, 0, Math.PI * 2);
         ctx.fill();
+        ctx.globalAlpha = 1;
+
+        ctx.strokeStyle = meta.color;
+        ctx.globalAlpha = strokeAlpha;
+        ctx.lineWidth = (isActive ? 6 : 4) * dpr;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, nodeR, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.globalAlpha = 1;
 
         const label = n.name.length > 4 ? `${n.name.slice(0, 3)}…` : n.name;
-        ctx.fillStyle = "#111827";
+        ctx.fillStyle = dim ? "rgba(17,24,39,0.45)" : "#111827";
         ctx.font = `${Math.round(size * 0.032 * fitScale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
         ctx.fillText(label, p.x, p.y + 0.5 * dpr);
       });
-
-
 
       // 툴팁
       const active = activeId ? placed.find((p) => p.id === activeId) : null;
       if (active) {
         const meta = LEVEL_META[active.level];
-      
         const baseText = `${active.name} (${active.mbti}) · `;
         const levelText = meta.label;
-      
+
         const fontSize = Math.round(size * 0.032 * dpr);
         const paddingX = 18 * dpr;
         const paddingY = 12 * dpr;
         const radius = 20 * dpr;
-      
+
         ctx.font = `600 ${fontSize}px ui-sans-serif, system-ui`;
-      
         const fullText = baseText + levelText;
         const textWidth = ctx.measureText(fullText).width;
-      
+
         const boxW = textWidth + paddingX * 2;
         const boxH = fontSize + paddingY * 2;
-      
+
         const x = (w - boxW) / 2;
         const y = h - boxH - 24 * dpr;
-      
-        // 박스
+
         ctx.beginPath();
-        ctx.roundRect(x, y, boxW, boxH, radius);
+        if ("roundRect" in ctx) (ctx as any).roundRect(x, y, boxW, boxH, radius);
+        else roundRect(ctx, x, y, boxW, boxH, radius);
         ctx.fillStyle = "rgba(255,255,255,0.95)";
         ctx.fill();
         ctx.strokeStyle = "rgba(0,0,0,0.08)";
         ctx.stroke();
-      
+
         const centerX = w / 2;
         const textY = y + boxH / 2;
-      
+
         ctx.textBaseline = "middle";
-      
-        // 중앙 정렬 계산
         ctx.font = `600 ${fontSize}px ui-sans-serif, system-ui`;
         const totalWidth = ctx.measureText(fullText).width;
         let startX = centerX - totalWidth / 2;
-      
+
         ctx.textAlign = "left";
-      
-        // 이름 + MBTI
         ctx.fillStyle = "#111827";
         ctx.fillText(baseText, startX, textY);
         startX += ctx.measureText(baseText).width;
-      
-        // 관계 단계 (더 진하게 + 컬러 적용)
+
         ctx.font = `800 ${fontSize}px ui-sans-serif, system-ui`;
         ctx.fillStyle = meta.color;
         ctx.fillText(levelText, startX, textY);
       }
     };
 
-    // ✅ 굳이 RAF 무한루프 필요 없어서(배터리/성능) 한 번만 그려도 충분
     draw();
-  }, [activeId, placed, centerName, centerSub, size, height]);
+  }, [activeId, placed, centerName, centerSub, size, height, focusLevel]);
 
-  // hit test (fitScale 기준)
   const hitTest = (clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
+
     const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const sx = (clientX - rect.left) * scaleX;
+    const sy = (clientY - rect.top) * scaleY;
+
     const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-
-    const sx = (clientX - rect.left) * dpr;
-    const sy = (clientY - rect.top) * dpr;
-
     const fitScale = getFitScale(canvas.width, canvas.height, dpr);
 
     const cx = canvas.width / 2;
@@ -444,35 +404,26 @@ export default function EgoGraphCanvasResponsive({
   };
 
   return (
-    <div
-      ref={wrapRef}
-      style={{
-        width: "100%",
-        maxWidth: maxSize,
-        minWidth: minSize,
-        margin: "0 auto",
-      }}
-    >
-      <canvas
-        ref={canvasRef}
-        onClick={onClick}
-        style={{
-          width: "100%",
-          height: `${height}px`,
-          borderRadius: 18,
-          display: "block",
-          // ✅ 팬/줌 안 쓰니까 굳이 none 필요 없지만, 모바일 더블탭/스크롤 오작동 방지용으로 유지 가능
-          touchAction: "manipulation",
-        }}
-      />
+    <div ref={wrapRef} style={{ width: "100%" }}>
+      <canvas ref={canvasRef} onClick={onClick} style={{ width: "100%", height: `${height}px`, display: "block", touchAction: "manipulation" }} />
       {showLegend && (
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-2xl bg-white/70 px-4 py-3 ring-1 ring-black/5">
-          {([5, 4, 3, 2, 1] as const).map((lv) => (
-            <div key={lv} className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ background: LEVEL_META[lv].color }} />
-              <span>{LEVEL_META[lv].label}</span>
-            </div>
-          ))}
+        <div className="mt-3 pb-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-2">
+          {([5, 4, 3, 2, 1] as const).map((lv) => {
+            const isOn = focusLevel === lv;
+            const c = LEVEL_META[lv].color;
+            return (
+              <button
+                key={lv}
+                type="button"
+                onClick={() => { setActiveId(null); setFocusLevel((prev) => (prev === lv ? null : lv)); }}
+                className={["inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold transition ring-1", isOn ? "bg-white text-slate-900 ring-black/10" : "bg-transparent text-slate-600 ring-transparent hover:bg-black/[0.03]"].join(" ")}
+                style={isOn ? { boxShadow: `0 0 0 2px ${c}22 inset` } : undefined}
+              >
+                <span className="h-2.5 w-2.5 rounded-full" style={{ background: c }} />
+                <span>{LEVEL_META[lv].label}</span>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

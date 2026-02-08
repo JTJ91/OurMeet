@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-36">
       {/* Centered "mobile-like" container */}
-      <div className="mx-auto flex min-h-screen max-w-[420px] flex-col px-5 pt-8">
+      <div className="mx-auto flex min-h-screen max-w-[760px] flex-col px-5 pt-8">
         {/* Header */}
         <header className="text-center">
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
@@ -67,16 +67,8 @@ export default function Home() {
         </section>
 
         <section className="mt-10">
-          <div className="rounded-3xl bg-white/70 shadow-sm ring-1 ring-black/5">
-            <EgoGraphCanvasResponsive
-              centerName="태주"
-              centerSub="ESTP"
-              nodes={sample}
-              ringCount={3}
-              maxSize={420}
-              minSize={300}
-              aspect={1}  // 정사각
-            />
+          <div className="mx-auto w-full max-w-[400px] md:max-w-[640px] lg:max-w-[760px] rounded-3xl bg-white/70 shadow-sm ring-1 ring-black/5 overflow-hidden">
+            <EgoGraphCanvasResponsive centerName="태주" centerSub="ESTP" nodes={sample} ringCount={3} maxSize={760} minSize={300} aspect={1} />
           </div>
         </section>
 
