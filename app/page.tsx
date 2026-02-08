@@ -1,34 +1,42 @@
+"use client";
+
 import EgoGraphCanvasResponsive, { EgoNode } from "@/components/EgoGraphCanvasResponsive";
 import BottomCTA from "@/components/BottomCTA";
-
+import { useMemo, useState } from "react";
 import Link from "next/link";
 
-const sample: EgoNode[] = [
-  { id: "1", name: "지수", mbti: "ENFP", level: 5 },
-  { id: "2", name: "서안", mbti: "ESTP", level: 5 },
-  { id: "3", name: "하린", mbti: "INFJ", level: 4 },
-  { id: "4", name: "도윤", mbti: "ENTJ", level: 4 },
-  { id: "5", name: "수아", mbti: "ISFP", level: 4 },
-  { id: "6", name: "현우", mbti: "INTP", level: 3 },
-  { id: "7", name: "유진", mbti: "ESFJ", level: 3 },
-  { id: "8", name: "나영", mbti: "ISTJ", level: 3 },
-  { id: "9", name: "다혜", mbti: "INFP", level: 3 },
-  { id: "10", name: "둘리", mbti: "ENTP", level: 3 },
-  { id: "11", name: "또치", mbti: "ISFJ", level: 2 },
-  { id: "12", name: "도우", mbti: "ESTJ", level: 2 },
-  { id: "13", name: "기현", mbti: "INTJ", level: 2 },
-  { id: "14", name: "세아", mbti: "ENFJ", level: 2 },
-  { id: "15", name: "수현", mbti: "ISTP", level: 2 },
-  { id: "16", name: "진아", mbti: "ESFP", level: 2 },
-  { id: "17", name: "덕칠", mbti: "ISTP", level: 1 },
-  { id: "18", name: "유미", mbti: "ENFP", level: 5 },
-  { id: "19", name: "원호", mbti: "INTJ", level: 1 },
-  { id: "20", name: "대겸", mbti: "ESTJ", level: 1 },
-];
-
 export default function Home() {
+  const sample: EgoNode[] = [
+    { id: "1", name: "태주", mbti: "ESTP", level: 5 },
+    { id: "2", name: "서안", mbti: "ESTP", level: 5 },
+    { id: "3", name: "하린", mbti: "INFJ", level: 4 },
+    { id: "4", name: "도윤", mbti: "ENTJ", level: 4 },
+    { id: "5", name: "수아", mbti: "ISFP", level: 4 },
+    { id: "6", name: "현우", mbti: "INTP", level: 3 },
+    { id: "7", name: "유진", mbti: "ESFJ", level: 3 },
+    { id: "8", name: "나영", mbti: "ISTJ", level: 3 },
+    { id: "9", name: "다혜", mbti: "INFP", level: 3 },
+    { id: "10", name: "둘리", mbti: "ENTP", level: 3 },
+    { id: "11", name: "또치", mbti: "ISFJ", level: 2 },
+    { id: "12", name: "도우", mbti: "ESTJ", level: 2 },
+    { id: "13", name: "기현", mbti: "INTJ", level: 2 },
+    { id: "14", name: "세아", mbti: "ENFJ", level: 2 },
+    { id: "15", name: "수현", mbti: "ISTP", level: 2 },
+    { id: "16", name: "진아", mbti: "ESFP", level: 2 },
+    { id: "17", name: "덕칠", mbti: "ISTP", level: 1 },
+    { id: "18", name: "유미", mbti: "ENFP", level: 5 },
+    { id: "19", name: "원호", mbti: "INTJ", level: 1 },
+    { id: "20", name: "대겸", mbti: "ESTJ", level: 1 },
+  ];
+  const initialCenterId = sample[1].id; //
+
+  const [centerId, setCenterId] = useState<string>(initialCenterId);
+
+  const center = useMemo(() => sample.find((m) => m.id === centerId) ?? sample[0], [centerId]);
+  const otherNodes = useMemo(() => sample.filter((m) => m.id !== centerId), [centerId]);
+
   return (
-    <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-36">
+    <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-26">
       {/* Centered "mobile-like" container */}
       <div className="mx-auto flex min-h-screen max-w-[760px] flex-col px-5 pt-8">
         {/* Header */}
@@ -68,7 +76,16 @@ export default function Home() {
 
         <section className="mt-10">
           <div className="mx-auto w-full max-w-[400px] md:max-w-[640px] lg:max-w-[760px] rounded-3xl bg-white/70 shadow-sm ring-1 ring-black/5 overflow-hidden">
-            <EgoGraphCanvasResponsive centerName="태주" centerSub="ESTP" nodes={sample} ringCount={3} maxSize={760} minSize={300} aspect={1} />
+            <EgoGraphCanvasResponsive
+              centerName={center.name}
+              centerSub={center.mbti}
+              nodes={otherNodes}
+              ringCount={3}
+              maxSize={760}
+              minSize={300}
+              aspect={1}
+              onCenterChange={(id) => setCenterId(id)}
+            />
           </div>
         </section>
 

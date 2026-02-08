@@ -20,6 +20,7 @@ type Props = {
   minSize?: number;
   aspect?: number;
   showLegend?: boolean;
+  onCenterChange?: (id: string) => void;
 };
 
 const LEVEL_META: Record<Level, { label: string; color: string }> = {
@@ -114,6 +115,7 @@ export default function EgoGraphCanvasResponsive({
   minSize = 280,
   aspect = 1,
   showLegend = true,
+  onCenterChange,
 }: Props) {
   const { ref: wrapRef, w: wrapW } = useElementSize<HTMLDivElement>();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -406,9 +408,37 @@ export default function EgoGraphCanvasResponsive({
     setActiveId((prev) => (prev === id ? null : id));
   };
 
+  const activeNode = useMemo(() => (activeId ? placed.find((p) => p.id === activeId) : null), [activeId, placed]);
+
   return (
     <div ref={wrapRef} style={{ width: "100%" }}>
       <canvas ref={canvasRef} onClick={onClick} style={{ width: "100%", height: `${height}px`, display: "block", touchAction: "manipulation" }} />
+      
+      {activeNode && onCenterChange && (
+        <div className="mt-2 flex items-center justify-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs">
+            <span className="font-semibold text-slate-900">{activeNode.name}</span>
+            <span className="text-slate-500">{activeNode.mbti}</span>
+            <span className="text-slate-400">·</span>
+            <span className="font-semibold" style={{ color: LEVEL_META[activeNode.level].color }}>
+              {LEVEL_META[activeNode.level].label}
+            </span>
+
+            <button
+              type="button"
+              className="ml-2 font-semibold text-slate-600 underline underline-offset-4 hover:text-slate-900"
+              onClick={() => {
+                onCenterChange(activeNode.id);
+                setActiveId(null);
+                setFocusLevel(null);
+              }}
+            >
+              센터로 보기
+            </button>
+          </div>
+        </div>
+      )}
+
       {showLegend && (
         <div className="mt-3 pb-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-2">
           {([5, 4, 3, 2, 1] as const).map((lv) => {
