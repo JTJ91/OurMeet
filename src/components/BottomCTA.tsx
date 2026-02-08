@@ -191,6 +191,17 @@ export default function BottomCTA() {
                     ))}
                   </ul>
                 )}
+
+                {/* 안내 */}
+                <section className="mt-4">
+                  <div className="rounded-3xl bg-white/70 p-5 ring-1 ring-black/5">
+                    <p className="text-xs leading-relaxed text-slate-500">
+                      ※ 이 목록은 이 기기(브라우저)에만 저장돼요. 시크릿모드/브라우저
+                      초기화 시 사라질 수 있어요.
+                    </p>
+                  </div>
+                </section>
+
               </div>
             </div>
           </div>

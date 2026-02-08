@@ -23,4 +23,6 @@ model Member {
   group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   isOwner Boolean @default(false)
+
+  @@index([groupId])
 }
