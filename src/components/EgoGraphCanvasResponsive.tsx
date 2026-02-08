@@ -315,9 +315,6 @@ export default function EgoGraphCanvasResponsive({
         ctx.restore();
       });
 
-      // ✅ focusLevel일 때 나머지 흐리게
-      const isFocused = (lv: Level) => (focusLevel ? lv === focusLevel : true);
-
       // 선
       // ✅ focusLevel일 때 나머지 흐리게
       const isFocused = (lv: Level) => (focusLevel ? lv === focusLevel : true);
