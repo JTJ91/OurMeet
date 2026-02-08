@@ -20,6 +20,7 @@ type Props = {
   maxSize?: number;
   minSize?: number;
   aspect?: number;
+  showLegend?: boolean;
 };
 
 const LEVEL_META: Record<Level, { label: string; color: string }> = {
@@ -238,6 +239,35 @@ export default function EgoGraphCanvasResponsive({
       ctx.fillRect(0, h * 0.45, w, h * 0.55);
       ctx.globalAlpha = 1;
 
+      // ====== hint (top-center, subtle) ======
+      if (!activeId) {
+        const msg = "이름을 클릭해보세요";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = `600 ${Math.round(size * 0.028 * dpr)}px ui-sans-serif, system-ui, -apple-system`;
+      
+        // 살짝 투명한 글씨 + 얇은 배경 pill
+        const padX = 10 * dpr;
+        const padY = 7 * dpr;
+        const textW = ctx.measureText(msg).width;
+        const boxW = textW + padX * 2;
+        const boxH = Math.round(size * 0.05 * dpr);
+      
+        const x = w / 2 - boxW / 2;
+        const y = 14 * dpr;
+      
+        ctx.fillStyle = "rgba(255,255,255,0.65)";
+        ctx.strokeStyle = "rgba(0,0,0,0.05)";
+        ctx.lineWidth = 1.2 * dpr;
+        roundRect(ctx, x, y, boxW, boxH, 999 * dpr);
+        ctx.fill();
+        ctx.stroke();
+      
+        ctx.fillStyle = "rgba(17,24,39,0.55)";
+        ctx.fillText(msg, w / 2, y + boxH / 2);
+      }
+      // ====== /hint ======
+
       // ✅ 항상 중앙 고정 (panX/panY 없음)
       const cx = w / 2;
       const cy = h / 2;
@@ -319,96 +349,7 @@ export default function EgoGraphCanvasResponsive({
         ctx.fillText(label, p.x, p.y + 0.5 * dpr);
       });
 
-      // ====== Canvas Legend + Hint (캔버스 내 표기) ======
-      const legend = [
-        { level: 5 as const, label: LEVEL_META[5].label, color: LEVEL_META[5].color },
-        { level: 4 as const, label: LEVEL_META[4].label, color: LEVEL_META[4].color },
-        { level: 3 as const, label: LEVEL_META[3].label, color: LEVEL_META[3].color },
-        { level: 2 as const, label: LEVEL_META[2].label, color: LEVEL_META[2].color },
-        { level: 1 as const, label: LEVEL_META[1].label, color: LEVEL_META[1].color },
-      ];
-      
-      // 캔버스 좌상단에 “이름을 클릭해보세요” 힌트 (activeId 없을 때만)
-      if (!activeId) {
-        const hintX = 16 * dpr;
-        const hintY = 18 * dpr;
-        const hintPadX = 12 * dpr;
-        const hintPadY = 8 * dpr;
-        const hintText = "이름을 클릭해보세요";
-      
-        ctx.font = `${Math.round(size * 0.028 * dpr)}px ui-sans-serif, system-ui, -apple-system`;
-        const hintW = ctx.measureText(hintText).width + hintPadX * 2;
-        const hintH = Math.round(size * 0.048 * dpr) + hintPadY; // 대충 높이
-      
-        ctx.fillStyle = "rgba(255,255,255,0.85)";
-        ctx.strokeStyle = "rgba(0,0,0,0.06)";
-        ctx.lineWidth = 1.5 * dpr;
-        roundRect(ctx, hintX, hintY, hintW, hintH, 14 * dpr);
-        ctx.fill();
-        ctx.stroke();
-      
-        ctx.fillStyle = "rgba(17,24,39,0.85)";
-        ctx.textAlign = "left";
-        ctx.textBaseline = "middle";
-        ctx.fillText(hintText, hintX + hintPadX, hintY + hintH / 2);
-      }
-      
-      // 하단 중앙 레전드 (툴팁이 뜨면 레전드는 살짝 위로 올리거나 숨김)
-      {
-        const baseFont = Math.round(size * 0.024 * dpr);
-        ctx.font = `700 ${baseFont}px ui-sans-serif, system-ui, -apple-system`;
-        ctx.textBaseline = "middle";
-        ctx.textAlign = "left";
-      
-        const dotR = 4 * dpr;
-        const gap = 10 * dpr;
-        const itemGap = 14 * dpr;
-      
-        // 레전드 전체 폭 계산
-        let totalW = 0;
-        const itemWs = legend.map((it) => {
-          const w = dotR * 2 + gap + ctx.measureText(it.label).width;
-          totalW += w;
-          return w;
-        });
-        totalW += itemGap * (legend.length - 1);
-      
-        // 위치: 캔버스 하단 중앙 (툴팁 자리 피해 위로)
-        const y = activeId ? h - size * 0.22 * dpr : h - size * 0.12 * dpr;
-        let x = w / 2 - totalW / 2;
-      
-        // 배경 pill (가독성)
-        const padX = 14 * dpr;
-        const padY = 10 * dpr;
-        const boxH = baseFont + padY * 2;
-        const boxW = totalW + padX * 2;
-      
-        ctx.fillStyle = "rgba(255,255,255,0.78)";
-        ctx.strokeStyle = "rgba(0,0,0,0.06)";
-        ctx.lineWidth = 1.5 * dpr;
-        roundRect(ctx, w / 2 - boxW / 2, y - boxH / 2, boxW, boxH, 16 * dpr);
-        ctx.fill();
-        ctx.stroke();
-      
-        x = w / 2 - totalW / 2;
-      
-        // 항목 그리기
-        legend.forEach((it, idx) => {
-          // 색 점
-          ctx.fillStyle = it.color;
-          ctx.beginPath();
-          ctx.arc(x + dotR, y, dotR, 0, Math.PI * 2);
-          ctx.fill();
-      
-          // 텍스트
-          ctx.fillStyle = "rgba(17,24,39,0.80)";
-          ctx.font = `700 ${baseFont}px ui-sans-serif, system-ui, -apple-system`;
-          ctx.fillText(it.label, x + dotR * 2 + gap, y);
-      
-          x += itemWs[idx] + (idx === legend.length - 1 ? 0 : itemGap);
-        });
-      }
-      // ====== /Legend + Hint ======
+
 
       // 툴팁
       const active = activeId ? placed.find((p) => p.id === activeId) : null;
@@ -523,6 +464,16 @@ export default function EgoGraphCanvasResponsive({
           touchAction: "manipulation",
         }}
       />
+      {showLegend && (
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-2xl bg-white/70 px-4 py-3 ring-1 ring-black/5">
+          {([5, 4, 3, 2, 1] as const).map((lv) => (
+            <div key={lv} className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: LEVEL_META[lv].color }} />
+              <span>{LEVEL_META[lv].label}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
