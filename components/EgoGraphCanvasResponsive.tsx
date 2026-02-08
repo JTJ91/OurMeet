@@ -144,6 +144,7 @@ export default function EgoGraphCanvasResponsive({
   maxSize = 420,
   minSize = 280,
   aspect = 1,
+  showLegend = true,
 }: Props) {
   const { ref: wrapRef, w: wrapW } = useElementSize<HTMLDivElement>();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
