@@ -5,10 +5,35 @@ import Link from "next/link";
 import { readSavedGroups, removeSavedGroup, SavedGroup } from "@/lib/groupHistory";
 
 export default function BottomCTA() {
-   const [isScrolling, setIsScrolling] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
 
   const [groups, setGroups] = useState<SavedGroup[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  function formatRelativeTime(ts: number) {
+    const diff = Date.now() - ts;
+    const sec = Math.floor(diff / 1000);
+    if (sec < 10) return "방금";
+    if (sec < 60) return `${sec}초 전`;
+
+    const min = Math.floor(sec / 60);
+    if (min < 60) return `${min}분 전`;
+
+    const hour = Math.floor(min / 60);
+    if (hour < 24) return `${hour}시간 전`;
+
+    const day = Math.floor(hour / 24);
+    if (day < 7) return `${day}일 전`;
+
+    const week = Math.floor(day / 7);
+    if (week < 5) return `${week}주 전`;
+
+    const month = Math.floor(day / 30);
+    if (month < 12) return `${month}개월 전`;
+
+    const year = Math.floor(day / 365);
+    return `${year}년 전`;
+  }
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -135,10 +160,19 @@ export default function BottomCTA() {
                       <li key={g.id} className="flex items-center gap-2">
                         <Link
                           href={`/g/${g.id}`}
-                          className="flex-1 rounded-2xl bg-[#F5F9FF] px-4 py-3 text-sm font-extrabold text-slate-800 hover:bg-[#EAF3FF]"
-                          onClick={() => setSheetOpen(false)}
+                          className="block w-full rounded-2xl bg-[#F5F9FF] px-4 py-3 ring-1 ring-black/5 hover:bg-[#EEF6FF]"
                         >
-                          <div className="truncate">{g.name}</div>
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="truncate text-sm font-extrabold text-slate-800">
+                                {g.name}
+                              </div>
+                            </div>
+
+                            <div className="shrink-0 text-[11px] font-bold text-slate-500">
+                              {formatRelativeTime(g.lastSeenAt)}
+                            </div>
+                          </div>
                         </Link>
 
                         <button
