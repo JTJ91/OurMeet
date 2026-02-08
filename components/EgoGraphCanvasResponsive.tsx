@@ -250,10 +250,12 @@ export default function EgoGraphCanvasResponsive({
         const isActive = activeId === n.id;
         const col = LEVEL_META[n.level].color;
 
-        // focus 우선, active는 추가로 강조
-        const baseAlpha = isFocused(n.level) ? 0.34 : 0.08;
-        const alpha = isActive ? 0.95 : baseAlpha;
-        const lw = isActive ? 5 : isFocused(n.level) ? 3.2 : 2.2;
+        const focused = isFocused(n.level);
+        const hasFocus = focusLevel !== null;
+
+        // ✅ 범례 선택 시: 해당 레벨은 강하게, 나머지는 매우 연하게
+        const alpha = isActive ? 1 : hasFocus ? (focused ? 0.95 : 0.05) : 0.32;
+        const lw = isActive ? 5.6 : hasFocus ? (focused ? 4.4 : 2.0) : 3.0;
 
         ctx.strokeStyle = col;
         ctx.globalAlpha = alpha;
@@ -263,6 +265,7 @@ export default function EgoGraphCanvasResponsive({
         ctx.moveTo(cx, cy);
         ctx.lineTo(p.x, p.y);
         ctx.stroke();
+
         ctx.globalAlpha = 1;
       });
 
