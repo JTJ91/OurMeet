@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Group {
+  id         String   @id @default(cuid())
+  name       String
+  maxMembers Int      @default(10)
+  createdAt  DateTime @default(now())
+  members    Member[]
+}
+
+model Member {
+  id        String   @id @default(cuid())
+  nickname  String
+  mbti      String
+  groupId   String
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  isOwner Boolean @default(false)
+}
