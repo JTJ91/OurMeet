@@ -7,6 +7,7 @@ type Level = 1 | 2 | 3 | 4 | 5;
 export type EgoNode = {
   id: string;
   name: string;
+  mbti: string;
   level: Level;
 };
 
