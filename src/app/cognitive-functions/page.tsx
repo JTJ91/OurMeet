@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export const metadata = {
   title: "케미 점수는 어떻게 계산되나요? | 모임랭크",
   description:
@@ -8,6 +10,17 @@ export default function CognitiveFunctionsGuidePage() {
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
       <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-10">
+        {/* Top left back */}
+        <div className="flex items-center justify-between mb-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 backdrop-blur hover:bg-white"
+          >
+            <span aria-hidden>←</span>
+            <span>메인으로</span>
+          </Link>
+        </div>
+        
         {/* 헤더 */}
         <header className="rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
           <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
