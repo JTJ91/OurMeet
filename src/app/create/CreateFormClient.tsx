@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 import { createGroupAction } from "@/app/actions/group";
+import { upsertSavedGroup } from "@/lib/groupHistory";
+import { useRouter } from "next/navigation";
 
 function isValidMbti(mbti: string) {
   return /^[EI][NS][TF][JP]$/.test(mbti);
@@ -13,12 +15,24 @@ export default function CreateFormClient() {
 
   // ✅ 진짜 잠금 (렌더 틈 방지)
   const lockedRef = useRef(false);
-
+  const router = useRouter();
+  
   return (
     <form
       action={async (fd: FormData) => {
-        await createGroupAction(fd); // 성공 시 redirect
-      }}
+        const result = await createGroupAction(fd);
+
+        upsertSavedGroup({
+        id: result.groupId,
+        name: result.groupName,
+        myMemberId: result.memberId,
+        myNickname: String(fd.get("nickname") || "").replace(/\s/g, ""),
+        myMbti: String(fd.get("mbti") || "").replace(/\s/g, "").toUpperCase(),
+        });
+
+        router.push(`/g/${result.groupId}?center=${result.memberId}`);
+    }}
+
       className={[
         "space-y-4",
         isSubmitting ? "pointer-events-none" : "",

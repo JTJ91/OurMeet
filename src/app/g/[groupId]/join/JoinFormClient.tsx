@@ -2,6 +2,9 @@
 
 import { useRef, useState } from "react";
 import { joinGroupAction } from "@/app/actions/members";
+import { upsertSavedGroup } from "@/lib/groupHistory";
+
+import { useRouter } from "next/navigation";
 
 function isValidMbti(mbti: string) {
   return /^[EI][NS][TF][JP]$/.test(mbti);
@@ -19,14 +22,24 @@ export default function JoinFormClient({
 
   // ✅ 렌더 틈까지 커버하는 “진짜 잠금”
   const lockedRef = useRef(false);
+  const router = useRouter();
 
   return (
     <form
-      action={async (fd: FormData) => {
-        // ✅ 여기서는 그냥 서버액션 호출만
-        // (성공하면 redirect로 이동)
-        await joinGroupAction(fd);
-      }}
+        action={async (fd: FormData) => {
+        const result = await joinGroupAction(fd);
+
+        upsertSavedGroup({
+        id: result.groupId,
+        name: result.groupName,
+        myMemberId: result.memberId,
+        myNickname: String(fd.get("nickname") || ""),
+        myMbti: String(fd.get("mbti") || "").toUpperCase(),
+        });
+
+        router.push(`/g/${result.groupId}?center=${result.memberId}`);
+    }}
+
       className={["mt-5 space-y-4", isSubmitting ? "pointer-events-none" : ""].join(" ")}
       onSubmit={(e) => {
         // 이미 잠겼으면 즉시 차단

@@ -73,14 +73,6 @@ export default async function GroupPage({
 
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-24">
-      <RememberGroupClient
-        groupId={group.id}
-        groupName={group.name}
-        myMemberId={center?.id}
-        myNickname={center?.nickname}
-        myMbti={(center?.mbti || "").toUpperCase()}
-      />
-      
       <div className="mx-auto max-w-[760px] px-5 pt-6">
         {/* Top left back */}
         <div className="flex items-center justify-between">
