@@ -32,7 +32,7 @@ export async function createGroupAction(formData: FormData) {
   const group = await prisma.group.create({
     data: {
       name: groupName,
-      maxMembers: 10,
+      maxMembers: 20,
       members: {
         create: {
           nickname,
