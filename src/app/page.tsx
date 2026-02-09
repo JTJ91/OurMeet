@@ -50,7 +50,7 @@ export default function Home() {
 
           <br/>
           <p>
-            <Link href="/guide/cognitive-functions" className="text-sm text-slate-500 underline underline-offset-4 hover:text-slate-700">
+            <Link href="/cognitive-functions" className="text-sm text-slate-500 underline underline-offset-4 hover:text-slate-700">
               MBTI 인지기능이란?
             </Link>
           </p>
