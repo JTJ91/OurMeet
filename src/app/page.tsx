@@ -8,34 +8,32 @@ import Link from "next/link";
 
 export default function Home() {
   const members = [
-  { id: "1", name: "민준", mbti: "ESTP" },  // 👈 센터
+  // 🎯 센터
+  { id: "1", name: "태주", mbti: "ESTP" },
 
-  // 🔵 5레벨 후보 (찰떡궁합 하나)
-  { id: "2", name: "유나", mbti: "ISFJ" },   // ESTP와 보완 시너지
+  // ⭐ 5단계 (1명)
+  { id: "2", name: "민준", mbti: "ESTJ" },
 
-  // 🔴 1레벨 후보 (한계임박 하나)
-  { id: "3", name: "태윤", mbti: "ESTJ" },   // ESTP와 dom 충돌 가능성 높음
+  // 🟢 4단계 (3명)
+  { id: "3", name: "서연", mbti: "ENTJ" },
+  { id: "4", name: "현우", mbti: "ESFJ" },
+  { id: "5", name: "지우", mbti: "ENTJ" },
 
-  // 🟢 중상위권
-  { id: "4", name: "서연", mbti: "ENFP" },
-  { id: "5", name: "하준", mbti: "ENTP" },
-  { id: "6", name: "수아", mbti: "ENFJ" },
+  // 🟡 3단계 (4명)
+  { id: "6", name: "서준", mbti: "ISTP" },
+  { id: "7", name: "지민", mbti: "ISFP" },
+  { id: "8", name: "하준", mbti: "INTP" },
+  { id: "9", name: "수아", mbti: "ENFJ" },
 
-  // 🟡 중간권
-  { id: "7", name: "지민", mbti: "INFJ" },
-  { id: "8", name: "도윤", mbti: "INTP" },
-  { id: "9", name: "예은", mbti: "ISFP" },
-  { id: "10", name: "현우", mbti: "ESFJ" },
-
-  // 🟠 조율필요권
-  { id: "11", name: "채원", mbti: "INTJ" },
+  // 🟠 2단계 (3명)
+  { id: "10", name: "유나", mbti: "ENTP" },
+  { id: "11", name: "채원", mbti: "ENFP" },
   { id: "12", name: "준호", mbti: "ISTJ" },
 
-  // 균형용
-  { id: "13", name: "아린", mbti: "INFP" },
-  { id: "14", name: "서준", mbti: "ISTP" },
-  { id: "15", name: "지우", mbti: "ESFP" },
+  // 🔴 1단계 (1명)
+  { id: "13", name: "예은", mbti: "ESFP" },
 ];
+
 
 
 
