@@ -89,122 +89,81 @@ function roleTheme(k: RoleKey) {
   }
 }
 
-function roleTitleStyled(role: RoleKey, score: number) {
-  const base = (
-    high: string,
-    midHigh: string,
-    mid: string,
-    low: string
+function roleRankBadge(role: RoleKey, rank: number) {
+  // rank: 0=1등, 1=2등, 2=3등, 3=4등, 4=5등...
+
+  if (rank >= 4) {
+    return null; // ✅ 5등부터는 칭호 없음
+  }
+
+  const pick = (
+    titles: [string, string, string, string],
+    cls: [string, string, string, string]
   ) => {
-    if (score >= 85) return { cls: `${high} font-extrabold`, crown: true };
-    if (score >= 75) return { cls: `${midHigh} font-bold`, crown: false };
-    if (score >= 65) return { cls: mid, crown: false };
-    if (score >= 55) return { cls: low, crown: false };
-    return { cls: "text-slate-400", crown: false };
+    return { title: titles[rank], cls: cls[rank] };
   };
 
-  /* =========================
-     🧠 STRATEGY (보라)
-  ========================== */
   if (role === "STRATEGY") {
-    const style = base(
-      "text-fuchsia-700",
-      "text-fuchsia-600",
-      "text-fuchsia-500",
-      "text-fuchsia-400"
+    return pick(
+      ["전략 설계자", "구조 장인", "아이디어 브레인", "전략 보조"],
+      [
+        "text-fuchsia-700 font-extrabold",
+        "text-fuchsia-600 font-bold",
+        "text-fuchsia-500",
+        "text-fuchsia-400",
+      ]
     );
-
-    let title = "감각형";
-    if (score >= 85) title = "전략 설계자";
-    else if (score >= 75) title = "구조 장인";
-    else if (score >= 65) title = "아이디어 브레인";
-    else if (score >= 55) title = "전략 보조";
-
-    return { ...style, title };
   }
 
-  /* =========================
-     🗂 ORGANIZE (앰버)
-  ========================== */
   if (role === "ORGANIZE") {
-    const style = base(
-      "text-amber-700",
-      "text-amber-600",
-      "text-amber-500",
-      "text-amber-400"
+    return pick(
+      ["정리왕", "결정 장인", "체계 관리자", "보조 정리러"],
+      [
+        "text-amber-700 font-extrabold",
+        "text-amber-600 font-bold",
+        "text-amber-500",
+        "text-amber-400",
+      ]
     );
-
-    let title = "즉흥형";
-    if (score >= 85) title = "정리왕";
-    else if (score >= 75) title = "결정 장인";
-    else if (score >= 65) title = "체계 관리자";
-    else if (score >= 55) title = "보조 정리러";
-
-    return { ...style, title };
   }
 
-  /* =========================
-     💬 VIBE (스카이)
-  ========================== */
   if (role === "VIBE") {
-    const style = base(
-      "text-sky-700",
-      "text-sky-600",
-      "text-sky-500",
-      "text-sky-400"
+    return pick(
+      ["분위기 메이커", "공감 리더", "대화 촉진자", "소통 보조"],
+      [
+        "text-sky-700 font-extrabold",
+        "text-sky-600 font-bold",
+        "text-sky-500",
+        "text-sky-400",
+      ]
     );
-
-    let title = "관찰형";
-    if (score >= 85) title = "분위기 메이커";
-    else if (score >= 75) title = "공감 리더";
-    else if (score >= 65) title = "대화 촉진자";
-    else if (score >= 55) title = "소통 보조";
-
-    return { ...style, title };
   }
 
-  /* =========================
-     🚀 EXEC (에메랄드)
-  ========================== */
   if (role === "EXEC") {
-    const style = base(
-      "text-emerald-700",
-      "text-emerald-600",
-      "text-emerald-500",
-      "text-emerald-400"
+    return pick(
+      ["실행 엔진", "행동 대장", "추진 담당", "참여형"],
+      [
+        "text-emerald-700 font-extrabold",
+        "text-emerald-600 font-bold",
+        "text-emerald-500",
+        "text-emerald-400",
+      ]
     );
-
-    let title = "기획형";
-    if (score >= 85) title = "실행 엔진";
-    else if (score >= 75) title = "행동 대장";
-    else if (score >= 65) title = "추진 담당";
-    else if (score >= 55) title = "참여형";
-
-    return { ...style, title };
   }
 
-  /* =========================
-     🧯 MEDIATOR (로즈)
-  ========================== */
-  if (role === "MEDIATOR") {
-    const style = base(
-      "text-rose-700",
-      "text-rose-600",
+  // MEDIATOR
+  return pick(
+    ["평화 유지군", "조율 장인", "감정 균형자", "중재 보조"],
+    [
+      "text-rose-700 font-extrabold",
+      "text-rose-600 font-bold",
       "text-rose-500",
-      "text-rose-400"
-    );
-
-    let title = "직설형";
-    if (score >= 85) title = "평화 유지군";
-    else if (score >= 75) title = "조율 장인";
-    else if (score >= 65) title = "감정 균형자";
-    else if (score >= 55) title = "중재 보조";
-
-    return { ...style, title };
-  }
-
-  return { cls: "text-slate-400", crown: false, title: "" };
+      "text-rose-400",
+    ]
+  );
 }
+
+
 
 
 function pickRolesForGroup(
@@ -817,57 +776,48 @@ export default async function GroupPage({
                           <div className="mt-3 pl-2">
                             <ul className="divide-y divide-black/5 overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/5">
                               {sorted.slice(0, 5).map((m, idx) => {
-                                const isTop = !!pick1 && pick1.name === m.name && pick1.mbti === m.mbti;
-                                const styled = roleTitleStyled(k, m.fit);
+                                const isTopRank = idx === 0; // ✅ 역할 내 1등만
+                                const badge = roleRankBadge(k, idx);
 
                                 return (
                                   <li
                                     key={`${k}-${m.name}-${m.mbti}`}
                                     className={[
                                       "relative flex items-center justify-between px-3 py-2",
-                                      isTop ? "bg-white/85" : "",
+                                      isTopRank ? "bg-white/85" : "",
                                     ].join(" ")}
                                     title={`적합도 ${m.fit}`}
                                   >
-                                    {/* 대표 강조: 스티커 대신 아주 얇은 라인 */}
-                                    {isTop && <div className={`absolute left-0 top-0 h-full w-1 ${th.leftBar}`} />}
-
+                                    
                                     <div className="min-w-0 flex items-center gap-2">
                                       <span className="w-4 shrink-0 text-[11px] font-extrabold text-slate-400">
                                         {idx + 1}
                                       </span>
 
-                                      <span
-                                        className={[
-                                          "truncate text-xs font-extrabold",
-                                          isTop ? "text-slate-900" : "text-slate-800",
-                                        ].join(" ")}
-                                      >
+                                      <span className="truncate text-xs font-extrabold text-slate-900">
                                         {m.name}
                                       </span>
 
                                       <span className="text-slate-300">·</span>
 
-                                      <span
-                                        className={[
-                                          "shrink-0 text-xs font-extrabold",
-                                          isTop ? "text-slate-700" : "text-slate-600",
-                                        ].join(" ")}
-                                      >
+                                      <span className="shrink-0 text-xs font-extrabold text-slate-600">
                                         {m.mbti}
                                       </span>
                                     </div>
 
-                                    <div className="shrink-0 flex items-center gap-2">
-                                      {/* 스티커/배지 없이 텍스트로만 */}
-                                      <span className={`text-[11px] ${styled.cls}`}>
-                                        {styled.crown && "👑 "}
-                                        {styled.title}
+                                    {/* ✅ 우측: 1등만 왕관 + 순위 칭호(색은 순위에 따라 점점 화려) */}
+                                    <span className="shrink-0 text-[11px]">
+                                    {isTopRank && "👑 "}
+                                    {badge && (
+                                      <span className={badge.cls}>
+                                        {badge.title}
                                       </span>
-                                    </div>
+                                    )}
+                                  </span>
                                   </li>
                                 );
                               })}
+
                             </ul>
 
                             {sorted.length > 5 && (
