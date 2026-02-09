@@ -769,7 +769,6 @@ const onMouseLeave = () => {
           </div>
         </div>
 
-
       <canvas
           ref={canvasRef}
           onClick={onClick}
@@ -819,7 +818,7 @@ const onMouseLeave = () => {
                       setFocusLevel(null);
                     }}
                   >
-                    센터로 가기
+                    센터로 설정
                   </button>
                 )}
               </div>
