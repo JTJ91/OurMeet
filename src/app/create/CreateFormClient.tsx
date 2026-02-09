@@ -16,7 +16,7 @@ export default function CreateFormClient() {
   // ✅ 진짜 잠금 (렌더 틈 방지)
   const lockedRef = useRef(false);
   const router = useRouter();
-  
+
   return (
     <form
       action={async (fd: FormData) => {
@@ -161,7 +161,7 @@ export default function CreateFormClient() {
         </label>
       </div>
 
-      <input type="hidden" name="maxMembers" value="10" />
+      <input type="hidden" name="maxMembers" value="20" />
 
       <button
         type="submit"
