@@ -147,13 +147,16 @@ function scorePair(a: Stack, b: Stack): number {
 // (기존보다 3이 너무 많아지는 걸 방지)
 // -----------------------------
 function levelFromScore(score: number): Level {
-  // 0~100 → 1~5
-  if (score >= 82) return 5; // 찰떡궁합
-  if (score >= 70) return 4; // 합좋은편
+  // 원하는 분포:
+  // - 5/1은 드물게 (양끝 구간을 좁게)
+  // - 4/3/2는 골고루 (중간을 넓게 3등분)
+  if (score >= 88) return 5; // 찰떡궁합 (드물게)
+  if (score >= 73) return 4; // 합좋은편
   if (score >= 56) return 3; // 그럭저럭
-  if (score >= 40) return 2; // 조율필요
-  return 1;                  // 한계임박
+  if (score >= 41) return 2; // 조율필요
+  return 1;                  // 한계임박 (드물게)
 }
+
 
 // -----------------------------
 // ✅ 외부 API
