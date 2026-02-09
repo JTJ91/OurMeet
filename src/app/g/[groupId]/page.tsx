@@ -4,8 +4,60 @@ import InviteActions from "@/components/InviteActions";
 import RememberGroupClient from "@/components/RememberGroupClient";
 import GraphServer from "./GraphServer";
 import { calcCompatScore } from "@/lib/mbtiCompat";
+import { unstable_cache } from "next/cache";
 
 import Link from "next/link";
+
+const getRankings = unstable_cache(
+  async (groupId: string) => {
+    const group = await prisma.group.findUnique({
+      where: { id: groupId },
+      include: { members: true },
+    });
+    if (!group) return null;
+
+    const isValidMbti = (s?: string | null) => /^[EI][NS][TF][JP]$/i.test((s ?? "").trim());
+
+    const membersForRank = group.members
+      .filter((m) => isValidMbti(m.mbti))
+      .map((m) => ({
+        id: m.id,
+        nickname: m.nickname,
+        mbti: (m.mbti ?? "").trim().toUpperCase(),
+      }));
+
+    type PairRow = {
+      aId: string; aName: string; aMbti: string;
+      bId: string; bName: string; bMbti: string;
+      score: number;
+    };
+
+    const pairs: PairRow[] = [];
+    for (let i = 0; i < membersForRank.length; i++) {
+      for (let j = i + 1; j < membersForRank.length; j++) {
+        const a = membersForRank[i];
+        const b = membersForRank[j];
+        pairs.push({
+          aId: a.id,
+          aName: a.nickname,
+          aMbti: a.mbti,
+          bId: b.id,
+          bName: b.nickname,
+          bMbti: b.mbti,
+          score: calcCompatScore(a.mbti, b.mbti),
+        });
+      }
+    }
+
+    const best3 = [...pairs].sort((x, y) => y.score - x.score).slice(0, 3);
+    const worst3 = [...pairs].sort((x, y) => x.score - y.score).slice(0, 3);
+
+    return { group, best3, worst3 };
+  },
+  ["group-rankings"],
+  { revalidate: 60 } // 60초 캐시(원하면 10~300으로 조절)
+);
+
 export default async function GroupPage({
   params,
   searchParams,
@@ -17,53 +69,10 @@ export default async function GroupPage({
   const sp = (await searchParams) ?? {};
   const centerId = sp.center;
 
-  const group = await prisma.group.findUnique({
-    where: { id: groupId },
-    include: { members: true },
-  });
+  const cached = await getRankings(groupId);
+  if (!cached) return notFound();
 
-  if (!group) return notFound();
-
-  const isValidMbti = (s?: string | null) => /^[EI][NS][TF][JP]$/i.test((s ?? "").trim());
-
-  const membersForRank = group.members
-    .filter((m) => isValidMbti(m.mbti))
-    .map((m) => ({
-      id: m.id,
-      nickname: m.nickname,
-      mbti: (m.mbti ?? "").trim().toUpperCase(),
-    }));
-
-  type PairRow = {
-    aId: string;
-    aName: string;
-    aMbti: string;
-    bId: string;
-    bName: string;
-    bMbti: string;
-    score: number;
-  };
-
-  const pairs: PairRow[] = [];
-  for (let i = 0; i < membersForRank.length; i++) {
-    for (let j = i + 1; j < membersForRank.length; j++) {
-      const a = membersForRank[i];
-      const b = membersForRank[j];
-      pairs.push({
-        aId: a.id,
-        aName: a.nickname,
-        aMbti: a.mbti,
-        bId: b.id,
-        bName: b.nickname,
-        bMbti: b.mbti,
-        score: calcCompatScore(a.mbti, b.mbti), // ✅ 여기서 동일 엔진 사용
-      });
-    }
-  }
-
-  const best3 = [...pairs].sort((x, y) => y.score - x.score).slice(0, 3);
-  const worst3 = [...pairs].sort((x, y) => x.score - y.score).slice(0, 3);
-
+  const { group, best3, worst3 } = cached;
 
   const count = group.members.length;
   const max = group.maxMembers;
