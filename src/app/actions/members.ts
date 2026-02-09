@@ -33,7 +33,8 @@ export async function joinGroupAction(formData: FormData) {
     throw new Error("이미 정원이 찼어요.");
   }
 
-  await prisma.member.create({
+  // ✅ 생성된 멤버를 받아서 id를 확보
+  const member = await prisma.member.create({
     data: {
       groupId,
       nickname,
@@ -41,5 +42,6 @@ export async function joinGroupAction(formData: FormData) {
     },
   });
 
-  redirect(`/g/${groupId}`);
+  // ✅ 가입 직후 내가 센터로 보이게 쿼리스트링 붙여서 이동
+  redirect(`/g/${groupId}?center=${member.id}`);
 }
