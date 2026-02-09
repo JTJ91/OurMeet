@@ -156,39 +156,51 @@ export default function BottomCTA() {
                   </div>
                 ) : (
                   <ul className="space-y-2">
-                    {groups.map((g) => (
-                      <li key={g.id} className="flex items-center gap-2">
-                        <Link
-                          href={`/g/${g.id}`}
-                          className="block w-full rounded-2xl bg-[#F5F9FF] px-4 py-3 ring-1 ring-black/5 hover:bg-[#EEF6FF]"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="min-w-0">
-                              <div className="truncate text-sm font-extrabold text-slate-800">
-                                {g.name}
+                    {groups.map((g) => {
+                      const href = g.myMemberId ? `/g/${g.id}?center=${g.myMemberId}` : `/g/${g.id}`;
+
+                      return (
+                        <li key={g.id} className="flex items-center gap-2">
+                          <Link
+                            href={href}
+                            className="block w-full rounded-2xl bg-[#F5F9FF] px-4 py-3 ring-1 ring-black/5 hover:bg-[#EEF6FF]"
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="truncate text-sm font-extrabold text-slate-800">
+                                  {g.name}
+                                </div>
+
+                                {/* (선택) 내 정보 표시 */}
+                                {(g.myNickname || g.myMbti) && (
+                                  <div className="mt-1 truncate text-[11px] font-bold text-slate-500">
+                                    내 정보: {g.myNickname ?? "?"}
+                                    {g.myMbti ? ` · ${g.myMbti.toUpperCase()}` : ""}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="shrink-0 text-[11px] font-bold text-slate-500">
+                                {formatRelativeTime(g.lastSeenAt)}
                               </div>
                             </div>
+                          </Link>
 
-                            <div className="shrink-0 text-[11px] font-bold text-slate-500">
-                              {formatRelativeTime(g.lastSeenAt)}
-                            </div>
-                          </div>
-                        </Link>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            removeSavedGroup(g.id);
-                            setGroups(readSavedGroups());
-                          }}
-                          className="shrink-0 rounded-2xl bg-white px-3 py-3 text-xs font-extrabold text-slate-500 ring-1 ring-black/10 hover:bg-slate-50"
-                          aria-label="remove"
-                          title="목록에서 삭제"
-                        >
-                          삭제
-                        </button>
-                      </li>
-                    ))}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              removeSavedGroup(g.id);
+                              setGroups(readSavedGroups());
+                            }}
+                            className="shrink-0 rounded-2xl bg-white px-3 py-3 text-xs font-extrabold text-slate-500 ring-1 ring-black/10 hover:bg-slate-50"
+                            aria-label="remove"
+                            title="목록에서 삭제"
+                          >
+                            삭제
+                          </button>
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
 

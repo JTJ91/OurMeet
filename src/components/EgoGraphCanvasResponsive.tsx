@@ -107,25 +107,65 @@ function mapToRings(nodes: EgoNode[], ringCount: 2 | 3) {
 
 function layoutOnRing(items: EgoNode[], radius: number, startAngle: number) {
   if (!items.length) return [];
-  const sorted = [...items].sort((a, b) => (b.level !== a.level ? b.level - a.level : a.name.localeCompare(b.name)));
-  const weights = sorted.map((n) => {
-    const len = n.name.length;
-    return Math.min(1.8, Math.max(1, 0.85 + len * 0.12));
-  });
-  const totalW = weights.reduce((a, b) => a + b, 0);
+
+  // (정렬은 유지)
+  const sorted = [...items].sort((a, b) =>
+    b.level !== a.level ? b.level - a.level : a.name.localeCompare(b.name)
+  );
+
+  const N = sorted.length;
   const twoPi = Math.PI * 2;
-  const crowdBoost = Math.min(0.35, sorted.length * 0.012);
-  const gaps = weights.map((w) => (w / totalW) * twoPi);
-  let a = startAngle;
+
+  // ✅ 위쪽(-π/2) 피하기 + 링별로 약간씩 다른 회전
+  const avoidTop = 0.45; // 20~35도 정도
+  const baseRot = startAngle + avoidTop;
+
+  // ✅ N이 적을 때는 강제로 퍼뜨리기(몰림 방지 핵심)
+  const presetAngles = (n: number) => {
+    if (n === 1) return [Math.PI / 4]; // 대각선
+    if (n === 2) return [0, Math.PI]; // 정반대
+    if (n === 3) return [0, (twoPi / 3) * 1, (twoPi / 3) * 2]; // 120도
+    if (n === 4) return [0, Math.PI / 2, Math.PI, (Math.PI / 2) * 3]; // 90도
+    return null;
+  };
+
+  const preset = presetAngles(N);
+
   const out: Array<EgoNode & { x: number; y: number; angle: number }> = [];
-  for (let i = 0; i < sorted.length; i++) {
-    const delta = gaps[i] * (1 - crowdBoost);
-    const mid = a + delta / 2;
-    out.push({ ...sorted[i], angle: mid, x: Math.cos(mid) * radius, y: Math.sin(mid) * radius });
-    a += delta;
+
+  if (preset) {
+    // ✅ 소수 인원: 무조건 분산 배치
+    for (let i = 0; i < N; i++) {
+      const ang = baseRot + preset[i];
+      out.push({
+        ...sorted[i],
+        angle: ang,
+        x: Math.cos(ang) * radius,
+        y: Math.sin(ang) * radius,
+      });
+    }
+    return out;
   }
+
+  // ✅ 일반 케이스: 균등 + 약간의 흔들림(정렬감 감소)
+  const step = twoPi / N;
+  const halfStep = step / 2;
+
+  for (let i = 0; i < N; i++) {
+    const ang = baseRot + halfStep + i * step;
+    out.push({
+      ...sorted[i],
+      angle: ang,
+      x: Math.cos(ang) * radius,
+      y: Math.sin(ang) * radius,
+    });
+  }
+
   return out;
 }
+
+
+
 
 type Placed = EgoNode & { x: number; y: number; ringIndex: number; r: number };
 
@@ -322,36 +362,42 @@ export default function EgoGraphCanvasResponsive({
     const height = Math.floor(size * aspect);
 
     const placed: Placed[] = useMemo(() => {
-    const rings = mapToRings(safeNodes, ringCount);
+      // ✅ 인원 적으면(<=4) 레벨링 무시하고 한 링에 몰아서 배치(몰림 방지)
+      const few = safeNodes.length <= 4;
 
-    // ✅ 인원수에 따라 링 "퍼짐" 자동 조절 (적을수록 덜 퍼짐)
-    const n = safeNodes.length; // 주변 노드 수
-    // n=0~3이면 0.72, n=12 이상이면 1.00 근처
-    const t = Math.max(0, Math.min(1, (n - 3) / 9));
-    const spread = 0.72 + 0.28 * t; // 0.72 ~ 1.00
+      const rings = few ? [safeNodes] : mapToRings(safeNodes, ringCount);
 
-    // 기존 값에 spread만 곱해 링을 안쪽/바깥쪽으로 조절
-    const base = size * 0.19 * spread;
-    const step = size * 0.18 * spread;
+      // ✅ 인원수에 따라 링 "퍼짐" 자동 조절 (기존 유지)
+      const n = safeNodes.length;
+      const t = Math.max(0, Math.min(1, (n - 3) / 9));
+      const spread = 0.72 + 0.28 * t;
 
-    const ringR =
-      ringCount === 3
-        ? [base, base + step, base + step * 2]
-        : [base, base + step * 1.4];
+      const base = size * 0.19 * spread;
+      const step = size * 0.18 * spread;
 
-    const starts =
-      ringCount === 3
-        ? [-Math.PI / 2, -Math.PI / 2 + 0.4, -Math.PI / 2 + 0.15]
-        : [-Math.PI / 2, -Math.PI / 2 + 0.25];
+      // ✅ few면 링 1개만 쓰고, 반지름은 "중간 링" 정도로 고정
+      const ringR = few
+        ? [base + step * 0.9]
+        : ringCount === 3
+          ? [base, base + step, base + step * 2]
+          : [base, base + step * 1.4];
 
-    const all: Placed[] = [];
-    rings.forEach((items, idx) => {
-      const p = layoutOnRing(items, ringR[idx], starts[idx]);
-      p.forEach((node) => all.push({ ...node, ringIndex: idx, r: ringR[idx] }));
-    });
+      // ✅ few면 시작각도도 1개만
+      const starts = few
+        ? [-Math.PI / 2]
+        : ringCount === 3
+          ? [-Math.PI / 2, -Math.PI / 2 + 0.4, -Math.PI / 2 + 0.15]
+          : [-Math.PI / 2, -Math.PI / 2 + 0.25];
 
-    return all;
-  }, [safeNodes, ringCount, size]);
+      const all: Placed[] = [];
+      rings.forEach((items, idx) => {
+        const p = layoutOnRing(items, ringR[idx], starts[idx]);
+        p.forEach((node) => all.push({ ...node, ringIndex: idx, r: ringR[idx] }));
+      });
+
+      return all;
+    }, [safeNodes, ringCount, size]);
+
 
 
   // ✅ “바깥 노드까지 딱 들어오게” 자동 스케일 (전체 placed 기준 유지)

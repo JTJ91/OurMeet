@@ -1,0 +1,131 @@
+"use client";
+
+import { useState } from "react";
+import { joinGroupAction } from "@/app/actions/members";
+
+function isValidMbti(mbti: string) {
+  return /^[EI][NS][TF][JP]$/.test(mbti);
+}
+
+export default function JoinFormClient({
+  groupId,
+  isFull,
+}: {
+  groupId: string;
+  isFull: boolean;
+}) {
+  const [mbtiError, setMbtiError] = useState<string | null>(null);
+
+  return (
+    <form
+      action={joinGroupAction}
+      className="mt-5 space-y-4"
+      onSubmit={(e) => {
+        const form = e.currentTarget;
+
+        const nickEl = form.elements.namedItem("nickname") as HTMLInputElement | null;
+        const mbtiEl = form.elements.namedItem("mbti") as HTMLInputElement | null;
+
+        if (!nickEl || !mbtiEl) return;
+
+        // ✅ 정규화
+        nickEl.value = (nickEl.value || "").replace(/\s/g, "").slice(0, 3);
+        const mbti = (mbtiEl.value || "").replace(/\s/g, "").toUpperCase().slice(0, 4);
+        mbtiEl.value = mbti;
+
+        // ✅ 제출 직전에 최종 검증(형식 틀리면 막기)
+        if (!isValidMbti(mbti)) {
+          e.preventDefault();
+          setMbtiError("MBTI 형식이 올바르지 않아요. 예) ENFP");
+          mbtiEl.focus();
+          return;
+        }
+
+        setMbtiError(null);
+      }}
+    >
+      <input type="hidden" name="groupId" value={groupId} />
+
+      {/* 별명 */}
+      <label className="block">
+        <div className="text-sm font-bold text-slate-800">내 별명</div>
+        <input
+          name="nickname"
+          required
+          maxLength={3}
+          placeholder="예) 태주"
+          disabled={isFull}
+          className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-white px-4 text-sm outline-none focus:border-[#1E88E5]/50"
+          onKeyDown={(e) => {
+            if (e.key === " ") e.preventDefault();
+          }}
+          onChange={(e) => {
+            e.currentTarget.value = e.currentTarget.value
+              .replace(/\s/g, "")
+              .slice(0, 3);
+          }}
+        />
+        <p className="mt-1 text-[11px] text-slate-500">공백 없이 최대 3글자</p>
+      </label>
+
+      {/* MBTI */}
+      <label className="block">
+        <div className="text-sm font-bold text-slate-800">MBTI</div>
+        <input
+          name="mbti"
+          required
+          maxLength={4}
+          placeholder="예) ENFP"
+          disabled={isFull}
+          aria-invalid={!!mbtiError}
+          className={[
+            "mt-2 h-12 w-full rounded-2xl border bg-white px-4 text-sm uppercase outline-none",
+            mbtiError
+              ? "border-red-400 focus:border-red-400"
+              : "border-black/10 focus:border-[#1E88E5]/50",
+          ].join(" ")}
+          onKeyDown={(e) => {
+            if (e.key === " ") e.preventDefault();
+          }}
+          onChange={(e) => {
+            const v = e.currentTarget.value
+              .replace(/\s/g, "")
+              .toUpperCase()
+              .replace(/[^EINSFTJP]/g, "")
+              .slice(0, 4);
+
+            e.currentTarget.value = v;
+
+            // ✅ 4글자면 즉시 검사해서 피드백
+            if (v.length === 4) {
+              setMbtiError(isValidMbti(v) ? null : "MBTI 형식이 올바르지 않아요. 예) ENFP");
+            } else {
+              setMbtiError(null);
+            }
+          }}
+          onBlur={(e) => {
+            const v = (e.currentTarget.value || "").replace(/\s/g, "").toUpperCase();
+            if (v.length === 4 && !isValidMbti(v)) {
+              setMbtiError("MBTI 형식이 올바르지 않아요. 예) ENFP");
+            }
+          }}
+        />
+
+        {mbtiError ? (
+          <p className="mt-1 text-[11px] font-semibold text-red-500">{mbtiError}</p>
+        ) : (
+          <p className="mt-1 text-[11px] text-slate-500">ENFP 형식, 공백 없이 4글자</p>
+        )}
+      </label>
+
+      <button
+        type="submit"
+        disabled={isFull}
+        className={`w-full rounded-2xl px-4 py-4 text-sm font-extrabold text-white transition-all duration-200 active:scale-[0.98]
+        ${isFull ? "bg-slate-300" : "bg-[#1E88E5] hover:bg-[#1E88E5]/90"}`}
+      >
+        {isFull ? "정원이 가득 찼어요" : "🫶 모임에 참가하기"}
+      </button>
+    </form>
+  );
+}

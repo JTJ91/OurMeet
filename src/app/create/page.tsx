@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createGroupAction } from "@/app/actions/group";
+import CreateFormClient from "./CreateFormClient";
 
 export default function CreatePage() {
   return (
@@ -44,70 +45,7 @@ export default function CreatePage() {
         {/* Form 카드 */}
         <section className="mt-6">
           <div className="rounded-3xl bg-white/70 p-5 shadow-sm ring-1 ring-black/5">
-            <form action={createGroupAction} className="space-y-4">
-              <label className="block">
-                <div className="text-sm font-semibold text-slate-800">
-                  모임 이름
-                </div>
-                <input
-                  name="groupName"
-                  placeholder="예) 회사 동기 모임"
-                  required
-                  className="mt-2 w-full rounded-2xl border border-black/10 bg-white/90 px-4 py-3 text-sm outline-none ring-0 placeholder:text-slate-400 focus:border-[#1E88E5]/40 focus:shadow-[0_0_0_3px_rgba(30,136,229,0.12)]"
-                />
-              </label>
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <div className="text-sm font-semibold text-slate-800">
-                    내 별명
-                  </div>
-                  <input
-                    name="nickname"
-                    placeholder="예) 태주"
-                    required
-                    className="mt-2 w-full rounded-2xl border border-black/10 bg-white/90 px-4 py-3 text-sm outline-none placeholder:text-slate-400 focus:border-[#1E88E5]/40 focus:shadow-[0_0_0_3px_rgba(30,136,229,0.12)]"
-                  />
-                </label>
-
-                <label className="block">
-                  <div className="text-sm font-semibold text-slate-800">
-                    내 MBTI
-                  </div>
-                  <input
-                    name="mbti"
-                    placeholder="예) ENFP"
-                    required
-                    inputMode="text"
-                    autoCapitalize="characters"
-                    className="mt-2 w-full rounded-2xl border border-black/10 bg-white/90 px-4 py-3 text-sm uppercase outline-none placeholder:text-slate-400 focus:border-[#1E88E5]/40 focus:shadow-[0_0_0_3px_rgba(30,136,229,0.12)]"
-                  />
-                  <p className="mt-2 text-[12px] leading-relaxed text-slate-500">
-                    대소문자 상관없어요. (enfp / ENFP 모두 OK)
-                  </p>
-                </label>
-              </div>
-
-              {/* maxMembers 안내(현재는 기본 10 고정) */}
-              <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-sm font-semibold text-slate-800">
-                  최대 인원
-                </div>
-                <p className="mt-1 text-sm text-slate-600">
-                  기본 <b className="text-slate-800">10명</b> · (추후 광고 시청 시{" "}
-                  <b className="text-slate-800">20명</b>으로 확장)
-                </p>
-                {/* 지금은 서버액션에서 기본값(10) 쓰면 됨 */}
-                <input type="hidden" name="maxMembers" value="10" />
-              </div>
-
-              <button
-                type="submit"
-                className="mt-2 w-full rounded-2xl bg-[#1E88E5] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 active:scale-[0.99]"
-              >
-                모임 만들기
-              </button>
-            </form>
+            <CreateFormClient />
           </div>
         </section>
 

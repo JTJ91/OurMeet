@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import InviteActions from "@/components/InviteActions";
 import RememberGroupClient from "@/components/RememberGroupClient";
 import GraphServer from "./GraphServer";
+import { calcCompatScore } from "@/lib/mbtiCompat";
 
 import Link from "next/link";
 export default async function GroupPage({
@@ -23,13 +24,62 @@ export default async function GroupPage({
 
   if (!group) return notFound();
 
+  const isValidMbti = (s?: string | null) => /^[EI][NS][TF][JP]$/i.test((s ?? "").trim());
+
+  const membersForRank = group.members
+    .filter((m) => isValidMbti(m.mbti))
+    .map((m) => ({
+      id: m.id,
+      nickname: m.nickname,
+      mbti: (m.mbti ?? "").trim().toUpperCase(),
+    }));
+
+  type PairRow = {
+    aId: string;
+    aName: string;
+    aMbti: string;
+    bId: string;
+    bName: string;
+    bMbti: string;
+    score: number;
+  };
+
+  const pairs: PairRow[] = [];
+  for (let i = 0; i < membersForRank.length; i++) {
+    for (let j = i + 1; j < membersForRank.length; j++) {
+      const a = membersForRank[i];
+      const b = membersForRank[j];
+      pairs.push({
+        aId: a.id,
+        aName: a.nickname,
+        aMbti: a.mbti,
+        bId: b.id,
+        bName: b.nickname,
+        bMbti: b.mbti,
+        score: calcCompatScore(a.mbti, b.mbti), // ✅ 여기서 동일 엔진 사용
+      });
+    }
+  }
+
+  const best3 = [...pairs].sort((x, y) => y.score - x.score).slice(0, 3);
+  const worst3 = [...pairs].sort((x, y) => x.score - y.score).slice(0, 3);
+
+
   const count = group.members.length;
   const max = group.maxMembers;
   const ratio = max > 0 ? Math.min(100, Math.round((count / max) * 100)) : 0;
 
+  const center = (centerId ? group.members.find((m) => m.id === centerId) : null) ?? group.members[0];
+
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-24">
-      <RememberGroupClient groupId={group.id} groupName={group.name} />
+      <RememberGroupClient
+        groupId={group.id}
+        groupName={group.name}
+        myMemberId={center?.id}
+        myNickname={center?.nickname}
+        myMbti={(center?.mbti || "").toUpperCase()}
+      />
       
       <div className="mx-auto max-w-[760px] px-5 pt-6">
         {/* Top left back */}
@@ -86,6 +136,83 @@ export default async function GroupPage({
             </div>
           </div>
         </section>
+
+        <section className="mt-6">
+          <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/5">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-extrabold">🏆 케미 랭킹</div>
+              <div className="text-[11px] text-slate-500">모임 전체 기준</div>
+            </div>
+
+            {best3.length === 0 ? (
+              <p className="mt-2 text-sm text-slate-500">
+                랭킹을 보려면 MBTI를 입력한 멤버가 2명 이상 필요해요.
+              </p>
+            ) : (
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                {/* LEFT: BEST */}
+                <div className="min-w-0">
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="text-[11px] font-extrabold text-[#1E88E5]">🔥 최고</span>
+                    <span className="text-[11px] text-slate-400">TOP 3</span>
+                  </div>
+
+                  <ul className="space-y-2">
+                    {best3.map((p, idx) => (
+                      <li
+                        key={`best-${p.aId}-${p.bId}`}
+                        className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
+                      >
+                        <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
+                          <span className="text-slate-400">{idx + 1}.</span>
+                          <span className="truncate">
+                            {p.aName} × {p.bName}
+                          </span>
+                        </div>
+
+                        <span className="shrink-0 rounded-full bg-[#1E88E5]/10 px-2 py-0.5 text-[11px] font-extrabold text-[#1E88E5]">
+                          {p.score}
+                        </span>
+                      </li>
+
+                    ))}
+                  </ul>
+                </div>
+
+                {/* RIGHT: WORST */}
+                <div className="min-w-0">
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="text-[11px] font-extrabold text-rose-600">🥶 최악</span>
+                    <span className="text-[11px] text-slate-400">WORST 3</span>
+                  </div>
+
+                  <ul className="space-y-2">
+                    {worst3.map((p, idx) => (
+                      <li
+                        key={`worst-${p.aId}-${p.bId}`}
+                        className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
+                      >
+                        <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
+                          <span className="text-slate-400">{idx + 1}.</span>
+                          <span className="truncate">
+                            {p.aName} × {p.bName}
+                          </span>
+                        </div>
+
+                        <span className="shrink-0 rounded-full bg-rose-500/10 px-2 py-0.5 text-[11px] font-extrabold text-rose-600">
+                          {p.score}
+                        </span>
+                      </li>
+
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+        
+          </div>
+        </section>
+
 
         <GraphServer groupId={groupId} centerId={centerId} />
   
