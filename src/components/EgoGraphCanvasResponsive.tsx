@@ -13,6 +13,8 @@ export type EgoNode = {
 };
 
 type Props = {
+  groupName?: string;
+  memberCount?: number;
   centerName: string;
   centerSub?: string;
   nodes: EgoNode[];
@@ -329,6 +331,8 @@ function ScoreBar({
 
 
 export default function EgoGraphCanvasResponsive({
+  groupName,
+  memberCount,
   centerName,
   centerSub,
   nodes,
@@ -349,6 +353,8 @@ export default function EgoGraphCanvasResponsive({
 
   const safeNodes = useMemo(() => clampNodes(nodes, 20), [nodes]);
 
+  const TOP_UI = 44; // px (원하면 40~52 사이로 조절)
+
   const size = useMemo(() => {
     const raw = Math.floor(wrapW);
 
@@ -359,7 +365,8 @@ export default function EgoGraphCanvasResponsive({
     return Math.max(280, Math.min(420, raw)); // 모바일은 기존 유지
   }, [wrapW]);
 
-    const height = Math.floor(size * aspect);
+    const graphH = Math.floor(size * aspect);
+    const height = graphH;
 
     const placed: Placed[] = useMemo(() => {
       // ✅ 인원 적으면(<=4) 레벨링 무시하고 한 링에 몰아서 배치(몰림 방지)
@@ -459,30 +466,9 @@ export default function EgoGraphCanvasResponsive({
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, w, h);
 
-      // hint (top-center)
-      if (!activeId) {
-        const msg = "이름을 클릭해보세요";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.font = `600 ${Math.round(size * 0.028 * dpr)}px ui-sans-serif, system-ui, -apple-system`;
-        const padX = 10 * dpr;
-        const textW = ctx.measureText(msg).width;
-        const boxW = textW + padX * 2;
-        const boxH = Math.round(size * 0.05 * dpr);
-        const x = w / 2 - boxW / 2;
-        const y = 14 * dpr;
-        ctx.fillStyle = "rgba(255,255,255,0.65)";
-        ctx.strokeStyle = "rgba(0,0,0,0.05)";
-        ctx.lineWidth = 1.2 * dpr;
-        roundRect(ctx, x, y, boxW, boxH, 999 * dpr);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = "rgba(17,24,39,0.55)";
-        ctx.fillText(msg, w / 2, y + boxH / 2);
-      }
-
       const cx = w / 2;
-      const cy = h / 2;
+      const cy = h / 2; 
+
       const toScreen = (wx: number, wy: number) => ({ x: cx + wx * fitScale * dpr, y: cy + wy * fitScale * dpr });
 
       const centerR = size * 0.07 * fitScale * dpr;
@@ -770,6 +756,20 @@ const onMouseLeave = () => {
 
   return (
     <div ref={wrapRef} style={{ width: "100%" }}>
+      {/* ✅ 헤더 한 줄: 모임이름 / 안내 / 인원 */}
+        <div className="mb-2 flex items-center justify-between">
+          {/* left: 모임이름 */}
+          <div className="min-w-0 truncate text-sm font-extrabold text-slate-900">
+            {groupName ?? "관계도"}
+          </div>
+
+          {/* right: 인원 */}
+          <div className="shrink-0 text-xs font-bold text-slate-500 tabular-nums">
+            {typeof memberCount === "number" ? `${memberCount}명` : ""}
+          </div>
+        </div>
+
+
       <canvas
           ref={canvasRef}
           onClick={onClick}
@@ -777,6 +777,13 @@ const onMouseLeave = () => {
           onMouseLeave={onMouseLeave}
           style={{ width: "100%", height: `${height}px`, display: "block", touchAction: "manipulation" }}
         />
+
+      {/* ✅ 관계도 안내 메시지 (캔버스 아래, 범례 위) */}
+      {!activeId && (
+        <div className="mt-4 mb-1 text-center text-[12px] font-semibold text-slate-400">
+          이름을 눌러 관계를 확인해보세요
+        </div>
+      )}  
       
       {activeNode && (
         <div className="sticky bottom-2 z-10 mt-2 px-2">

@@ -52,6 +52,7 @@ export default async function GraphServer({
   return (
     <GraphClient
       groupId={group.id}
+      groupName={group.name}
       center={center}
       nodes={nodes}
       memberCount={members.length}

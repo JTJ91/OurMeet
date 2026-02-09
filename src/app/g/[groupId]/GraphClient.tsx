@@ -6,11 +6,13 @@ import EgoGraphCanvasResponsive, { EgoNode } from "@/components/EgoGraphCanvasRe
 
 export default function GraphClient({
   groupId,
+  groupName,
   center,
   nodes,
   memberCount,
 }: {
   groupId: string;
+  groupName : string;
   center: { id: string; nickname: string; mbti: string };
   nodes: EgoNode[];
   memberCount: number;
@@ -20,12 +22,10 @@ export default function GraphClient({
 
   return (
     <section className="mt-4 rounded-3xl bg-white/80 p-5 ring-1 ring-black/5 shadow-sm backdrop-blur-md">
-      <div className="mb-3 flex items-center justify-between">
-        <div className="text-sm font-extrabold text-slate-900">관계도</div>
-        <div className="text-xs font-bold text-slate-500">{memberCount}명</div>
-      </div>
-
+        
       <EgoGraphCanvasResponsive
+        groupName={groupName}
+        memberCount={memberCount}
         centerName={center.nickname}
         centerSub={center.mbti}
         nodes={nodes}
