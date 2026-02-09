@@ -77,43 +77,134 @@ function roleLabel(r: RoleKey) {
 function roleTheme(k: RoleKey) {
   switch (k) {
     case "STRATEGY":
-      return {
-        card: "bg-gradient-to-br from-fuchsia-50 to-white ring-fuchsia-200/60",
-        bar: "bg-fuchsia-400",
-        badge: "bg-fuchsia-500/10 text-fuchsia-700 ring-1 ring-fuchsia-200/70",
-        chip: "bg-fuchsia-500/10 text-fuchsia-800 ring-fuchsia-200/70",
-      };
+      return { card: "bg-white/70 ring-black/5", accent: "text-fuchsia-700", leftBar: "bg-fuchsia-400" };
     case "VIBE":
-      return {
-        card: "bg-gradient-to-br from-sky-50 to-white ring-sky-200/60",
-        bar: "bg-sky-400",
-        badge: "bg-sky-500/10 text-sky-700 ring-1 ring-sky-200/70",
-        chip: "bg-sky-500/10 text-sky-800 ring-sky-200/70",
-      };
+      return { card: "bg-white/70 ring-black/5", accent: "text-sky-700", leftBar: "bg-sky-400" };
     case "EXEC":
-      return {
-        card: "bg-gradient-to-br from-emerald-50 to-white ring-emerald-200/60",
-        bar: "bg-emerald-400",
-        badge: "bg-emerald-500/10 text-emerald-700 ring-1 ring-emerald-200/70",
-        chip: "bg-emerald-500/10 text-emerald-800 ring-emerald-200/70",
-      };
+      return { card: "bg-white/70 ring-black/5", accent: "text-emerald-700", leftBar: "bg-emerald-400" };
     case "ORGANIZE":
-      return {
-        card: "bg-gradient-to-br from-amber-50 to-white ring-amber-200/60",
-        bar: "bg-amber-400",
-        badge: "bg-amber-500/10 text-amber-700 ring-1 ring-amber-200/70",
-        chip: "bg-amber-500/10 text-amber-800 ring-amber-200/70",
-      };
+      return { card: "bg-white/70 ring-black/5", accent: "text-amber-700", leftBar: "bg-amber-400" };
     case "MEDIATOR":
-      return {
-        card: "bg-gradient-to-br from-rose-50 to-white ring-rose-200/60",
-        bar: "bg-rose-400",
-        badge: "bg-rose-500/10 text-rose-700 ring-1 ring-rose-200/70",
-        chip: "bg-rose-500/10 text-rose-800 ring-rose-200/70",
-      };
+      return { card: "bg-white/70 ring-black/5", accent: "text-rose-700", leftBar: "bg-rose-400" };
   }
 }
 
+function roleTitleStyled(role: RoleKey, score: number) {
+  const base = (
+    high: string,
+    midHigh: string,
+    mid: string,
+    low: string
+  ) => {
+    if (score >= 85) return { cls: `${high} font-extrabold`, crown: true };
+    if (score >= 75) return { cls: `${midHigh} font-bold`, crown: false };
+    if (score >= 65) return { cls: mid, crown: false };
+    if (score >= 55) return { cls: low, crown: false };
+    return { cls: "text-slate-400", crown: false };
+  };
+
+  /* =========================
+     🧠 STRATEGY (보라)
+  ========================== */
+  if (role === "STRATEGY") {
+    const style = base(
+      "text-fuchsia-700",
+      "text-fuchsia-600",
+      "text-fuchsia-500",
+      "text-fuchsia-400"
+    );
+
+    let title = "감각형";
+    if (score >= 85) title = "전략 설계자";
+    else if (score >= 75) title = "구조 장인";
+    else if (score >= 65) title = "아이디어 브레인";
+    else if (score >= 55) title = "전략 보조";
+
+    return { ...style, title };
+  }
+
+  /* =========================
+     🗂 ORGANIZE (앰버)
+  ========================== */
+  if (role === "ORGANIZE") {
+    const style = base(
+      "text-amber-700",
+      "text-amber-600",
+      "text-amber-500",
+      "text-amber-400"
+    );
+
+    let title = "즉흥형";
+    if (score >= 85) title = "정리왕";
+    else if (score >= 75) title = "결정 장인";
+    else if (score >= 65) title = "체계 관리자";
+    else if (score >= 55) title = "보조 정리러";
+
+    return { ...style, title };
+  }
+
+  /* =========================
+     💬 VIBE (스카이)
+  ========================== */
+  if (role === "VIBE") {
+    const style = base(
+      "text-sky-700",
+      "text-sky-600",
+      "text-sky-500",
+      "text-sky-400"
+    );
+
+    let title = "관찰형";
+    if (score >= 85) title = "분위기 메이커";
+    else if (score >= 75) title = "공감 리더";
+    else if (score >= 65) title = "대화 촉진자";
+    else if (score >= 55) title = "소통 보조";
+
+    return { ...style, title };
+  }
+
+  /* =========================
+     🚀 EXEC (에메랄드)
+  ========================== */
+  if (role === "EXEC") {
+    const style = base(
+      "text-emerald-700",
+      "text-emerald-600",
+      "text-emerald-500",
+      "text-emerald-400"
+    );
+
+    let title = "기획형";
+    if (score >= 85) title = "실행 엔진";
+    else if (score >= 75) title = "행동 대장";
+    else if (score >= 65) title = "추진 담당";
+    else if (score >= 55) title = "참여형";
+
+    return { ...style, title };
+  }
+
+  /* =========================
+     🧯 MEDIATOR (로즈)
+  ========================== */
+  if (role === "MEDIATOR") {
+    const style = base(
+      "text-rose-700",
+      "text-rose-600",
+      "text-rose-500",
+      "text-rose-400"
+    );
+
+    let title = "직설형";
+    if (score >= 85) title = "평화 유지군";
+    else if (score >= 75) title = "조율 장인";
+    else if (score >= 65) title = "감정 균형자";
+    else if (score >= 55) title = "중재 보조";
+
+    return { ...style, title };
+  }
+
+  return { cls: "text-slate-400", crown: false, title: "" };
+}
 
 
 function pickRolesForGroup(
@@ -678,101 +769,120 @@ export default async function GroupPage({
               <>
                 {/* ✅ Summary card */}
                 <div className="mt-3 rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
-                  <div className="text-xs font-extrabold text-slate-900">
-                    {roles.headline}
-                  </div>
-                  <p className="mt-1 text-xs text-slate-600">{roles.tip}</p>
+                  <div className="text-xs font-extrabold text-slate-900">{roles.headline}</div>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-600">{roles.tip}</p>
                 </div>
 
                 {/* ✅ Role grid cards */}
-                <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {(Object.keys(roles.bucket) as RoleKey[]).map((k) => {
                     const th = roleTheme(k);
-                    const list = roles.bucket[k];     // [{name, mbti, fit}, ...]
-                    const pick1 = roles.topPick?.[k]; // {name, mbti, fit}
+                    const list = roles.bucket[k];
+                    const pick1 = roles.topPick?.[k];
+
+                    const sorted = list
+                      .slice()
+                      .sort((a, b) => b.fit - a.fit);
 
                     return (
-                      <div key={k} className={`rounded-2xl p-3 ring-1 ${th.card}`}>
-                        {/* 1줄: 역할명(좌) / n명(우) */}
-                        <div className="flex items-start justify-between gap-2">
+                      <div
+                        key={k}
+                        className={[
+                          "relative overflow-hidden rounded-2xl bg-white/70 p-3",
+                          "ring-1 ring-black/5",
+                        ].join(" ")}
+                      >
+                        {/* left accent bar */}
+                        <div className={`absolute left-0 top-0 h-full w-1 ${th.leftBar}`} />
+
+                        {/* header */}
+                        <div className="flex items-start justify-between gap-2 pl-2">
                           <div className="min-w-0">
-                            <div className="text-xs font-extrabold text-slate-900 truncate">
+                            <div className={`text-xs font-extrabold truncate ${th.accent}`}>
                               {roleLabel(k)}
+                            </div>
+                            <div className="mt-0.5 text-[11px] text-slate-500">
+                              역할 성향이 비슷한 멤버를 모아봤어요
                             </div>
                           </div>
 
-                          <div className="shrink-0 text-[11px] font-bold text-slate-600">
+                          <div className="shrink-0 pl-2 text-[11px] font-bold text-slate-600">
                             {list.length}명
                           </div>
                         </div>
 
-                        {/* 추천(세련되게): 별/배지 대신, 한 줄 subtle */}
-                        {pick1 && (
-                          <div className="mt-2 text-[11px] font-semibold text-slate-600">
-                            추천: <span className="font-extrabold text-slate-900">{pick1.name}</span>
-                            <span className="text-slate-400"> · </span>
-                            <span className="font-extrabold text-slate-700">{pick1.mbti}</span>
-                          </div>
-                        )}
-
-                        {/* 멤버 리스트(스티커 금지): 라인형 리스트 */}
-                        {list.length === 0 ? (
-                          <div className="mt-2 text-[11px] text-slate-400">해당 성향 없음</div>
-                        ) : (
-                          <ul className="mt-2 space-y-1.5">
-                            {list
-                              .slice()
-                              .sort((a, b) => b.fit - a.fit)
-                              .slice(0, 5)
-                              .map((m) => {
-                                const isTop = pick1?.name === m.name && pick1?.mbti === m.mbti;
+                        {/* 멤버 리스트: 대표는 리스트 안에서만 강조 */}
+                        {sorted.length > 0 && (
+                          
+                          <div className="mt-3 pl-2">
+                            <ul className="divide-y divide-black/5 overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/5">
+                              {sorted.slice(0, 5).map((m, idx) => {
+                                const isTop = !!pick1 && pick1.name === m.name && pick1.mbti === m.mbti;
+                                const styled = roleTitleStyled(k, m.fit);
 
                                 return (
                                   <li
                                     key={`${k}-${m.name}-${m.mbti}`}
                                     className={[
-                                      "flex items-center justify-between rounded-xl px-2.5 py-2",
-                                      "bg-white/60 ring-1 ring-black/5",
-                                      isTop ? "bg-white/75 ring-black/10" : "",
+                                      "relative flex items-center justify-between px-3 py-2",
+                                      isTop ? "bg-white/85" : "",
                                     ].join(" ")}
                                     title={`적합도 ${m.fit}`}
                                   >
+                                    {/* 대표 강조: 스티커 대신 아주 얇은 라인 */}
+                                    {isTop && <div className={`absolute left-0 top-0 h-full w-1 ${th.leftBar}`} />}
+
                                     <div className="min-w-0 flex items-center gap-2">
-                                      <span className="truncate text-xs font-extrabold text-slate-900">
+                                      <span className="w-4 shrink-0 text-[11px] font-extrabold text-slate-400">
+                                        {idx + 1}
+                                      </span>
+
+                                      <span
+                                        className={[
+                                          "truncate text-xs font-extrabold",
+                                          isTop ? "text-slate-900" : "text-slate-800",
+                                        ].join(" ")}
+                                      >
                                         {m.name}
                                       </span>
-                                      <span className="text-slate-300">•</span>
-                                      <span className="text-xs font-extrabold text-slate-600">
+
+                                      <span className="text-slate-300">·</span>
+
+                                      <span
+                                        className={[
+                                          "shrink-0 text-xs font-extrabold",
+                                          isTop ? "text-slate-700" : "text-slate-600",
+                                        ].join(" ")}
+                                      >
                                         {m.mbti}
                                       </span>
                                     </div>
 
                                     <div className="shrink-0 flex items-center gap-2">
-                                      <span className="text-[11px] font-bold text-slate-400">
-                                        {m.fit}
+                                      {/* 스티커/배지 없이 텍스트로만 */}
+                                      <span className={`text-[11px] ${styled.cls}`}>
+                                        {styled.crown && "👑 "}
+                                        {styled.title}
                                       </span>
-                                      {isTop && (
-                                        <span className={`rounded-lg px-2 py-0.5 text-[10px] font-extrabold ${th.badge}`}>
-                                          추천
-                                        </span>
-                                      )}
                                     </div>
                                   </li>
                                 );
                               })}
+                            </ul>
 
-                            {list.length > 5 && (
-                              <li className="pt-1 text-[11px] font-bold text-slate-400">
-                                +{list.length - 5}명 더 있음
-                              </li>
+                            {sorted.length > 5 && (
+                              <div className="mt-2 text-[11px] font-bold text-slate-400">
+                                +{sorted.length - 5}명 더 있음
+                              </div>
                             )}
-                          </ul>
+                          </div>
                         )}
+
                       </div>
                     );
                   })}
-
                 </div>
+
               </>
             )}
           </div>
