@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, startTransition } from "react";
 
 type Level = 1 | 2 | 3 | 4 | 5;
 
@@ -656,7 +656,7 @@ export default function EgoGraphCanvasResponsive({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
     canvas.style.width = "100%";
     canvas.style.height = `${height}px`;
@@ -877,7 +877,7 @@ export default function EgoGraphCanvasResponsive({
     const sx = (clientX - rect.left) * scaleX;
     const sy = (clientY - rect.top) * scaleY;
 
-    const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     const fitScale = getFitScale(canvas.width, canvas.height, dpr);
 
     const cx = canvas.width / 2;
@@ -961,9 +961,14 @@ export default function EgoGraphCanvasResponsive({
                     type="button"
                     className="shrink-0 text-xs font-semibold text-slate-500 hover:text-slate-900 underline underline-offset-4"
                     onClick={() => {
-                      onCenterChange(activeNode.id);
+                      // 먼저 로컬 UI를 즉시 정리(체감 속도 ↑)
                       setActiveId(null);
                       setFocusLevel(null);
+
+                      // 부모 상태 변경은 transition으로(버벅임 ↓)
+                      startTransition(() => {
+                        onCenterChange(activeNode.id);
+                      });
                     }}
                   >
                     센터로 설정
