@@ -11,6 +11,13 @@ import { Suspense } from "react";
 
 const isValidMbti = (s?: string | null) => /^[EI][NS][TF][JP]$/i.test((s ?? "").trim());
 
+type PairRow = {
+      aId: string; aName: string; aMbti: string;
+      bId: string; bName: string; bMbti: string;
+      score: number;
+    };
+
+
 /** ✅ 1) MBTI 분포 분석 */
 function summarizeMbtiDistribution(mbtis: string[]) {
   const cnt = { E: 0, I: 0, N: 0, S: 0, T: 0, F: 0, J: 0, P: 0 };
@@ -89,6 +96,21 @@ function roleTheme(k: RoleKey) {
   }
 }
 
+function chemTheme(t: ChemType) {
+  switch (t) {
+    case "STABLE":
+      return { leftBar: "bg-sky-400", accent: "text-sky-700", chip: "bg-sky-500/10 text-sky-700" };
+    case "COMPLEMENT":
+      return { leftBar: "bg-emerald-400", accent: "text-emerald-700", chip: "bg-emerald-500/10 text-emerald-700" };
+    case "SPARK":
+      return { leftBar: "bg-amber-400", accent: "text-amber-700", chip: "bg-amber-500/10 text-amber-700" };
+    case "EXPLODE":
+      return { leftBar: "bg-rose-400", accent: "text-rose-700", chip: "bg-rose-500/10 text-rose-700" };
+  }
+}
+
+
+
 function roleRankBadge(role: RoleKey, rank: number) {
   // rank: 0=1등, 1=2등, 2=3등, 3=4등, 4=5등...
 
@@ -164,6 +186,20 @@ function roleRankBadge(role: RoleKey, rank: number) {
 }
 
 
+function roleEmptyMessage(role: RoleKey) {
+  switch (role) {
+    case "STRATEGY":
+      return "큰 방향을 잡는 사람이 없어서, 회의가 길어질 수 있어요.";
+    case "VIBE":
+      return "분위기를 잡아주는 사람이 없어서, 말이 조금 딱딱해질 수 있어요.";
+    case "EXEC":
+      return "실행으로 밀어붙일 사람이 없어서, 아이디어가 멈출 수 있어요.";
+    case "ORGANIZE":
+      return "정리/결정 담당이 없어서, 결론이 미뤄질 수 있어요.";
+    case "MEDIATOR":
+      return "중재해줄 사람이 없어서, 작은 오해가 오래 갈 수 있어요.";
+  }
+}
 
 
 function pickRolesForGroup(
@@ -367,6 +403,58 @@ function summarizeChemTypes(pairs: Array<{ aMbti: string; bMbti: string; score: 
   return { avg, dist, headline, tip };
 }
 
+function chemTypeComment(t: ChemType) {
+  switch (t) {
+    case "STABLE": return "기본 예의 + 템포만 맞추면 오래 편해요.";
+    case "COMPLEMENT": return "역할만 나누면 팀플처럼 굴러가요.";
+    case "SPARK": return "친해지기 빠르지만, 말꼬리에서 불이 붙을 수 있어요.";
+    case "EXPLODE": return "피곤한 날엔 ‘말투’ 하나로 분위기 갈릴 수 있어요.";
+  }
+}
+
+function summarizeChemTypesDetailed(pairs: PairRow[]) {
+  const dist: Record<ChemType, number> = { STABLE: 0, COMPLEMENT: 0, SPARK: 0, EXPLODE: 0 };
+  const byType: Record<ChemType, PairRow[]> = { STABLE: [], COMPLEMENT: [], SPARK: [], EXPLODE: [] };
+
+  if (pairs.length === 0) {
+    return {
+      avg: null as number | null,
+      dist,
+      byType,
+      headline: "케미 타입을 보려면 MBTI 입력 멤버가 2명 이상 필요해요.",
+      tip: "MBTI를 입력하면 자동으로 ‘안정/보완/스파크/폭발’ 분포와 예시 커플이 보여요.",
+    };
+  }
+
+  let sum = 0;
+  for (const p of pairs) {
+    sum += p.score;
+    const t = classifyChemType(p.aMbti, p.bMbti, p.score);
+    dist[t]++;
+    byType[t].push(p);
+  }
+
+  const avg = Math.round(sum / pairs.length);
+  const best = (Object.keys(dist) as ChemType[]).sort((x, y) => dist[y] - dist[x])[0];
+
+  const headline = (() => {
+    if (avg >= 72) return `전체 평균이 ${avg}점이에요. 전체적으로 안정적으로 굴러가는 편이에요.`;
+    if (avg >= 62) return `전체 평균이 ${avg}점이에요. 무난하지만 스파크가 가끔 튈 수 있어요.`;
+    if (avg >= 54) return `전체 평균이 ${avg}점이에요. 조율 없으면 갈등이 자주 생길 수 있어요.`;
+    return `전체 평균이 ${avg}점이에요. 방치하면 폭발형이 자주 보일 수 있어요.`;
+  })();
+
+  const tip = (() => {
+    if (best === "STABLE") return "편한 조합이 많아요. 속도만 맞추면 됩니다.";
+    if (best === "COMPLEMENT") return "역할 분배하면 효율이 확 올라가요.";
+    if (best === "SPARK") return "전제부터 맞추면 급싸를 많이 줄일 수 있어요.";
+    return "짧고 명확하게 말하는 게 안전해요.";
+  })();
+
+  return { avg, dist, byType, headline, tip };
+}
+
+
 /** ✅ cached rankings (원본 유지 + pairs도 같이 반환해 3번에 재사용) */
 const getRankings = unstable_cache(
   async (groupId: string) => {
@@ -383,12 +471,6 @@ const getRankings = unstable_cache(
         nickname: m.nickname,
         mbti: (m.mbti ?? "").trim().toUpperCase(),
       }));
-
-    type PairRow = {
-      aId: string; aName: string; aMbti: string;
-      bId: string; bName: string; bMbti: string;
-      score: number;
-    };
 
     const pairs: PairRow[] = [];
     for (let i = 0; i < membersForRank.length; i++) {
@@ -415,6 +497,29 @@ const getRankings = unstable_cache(
   ["group-rankings"],
   { revalidate: 60 }
 );
+
+type Level = 1 | 2 | 3 | 4 | 5;
+
+const LEVEL_META: Record<Level, { label: string; color: string }> = {
+  5: { label: "찰떡궁합", color: "#1E88E5" },
+  4: { label: "합좋은편", color: "#00C853" },
+  3: { label: "그럭저럭", color: "#FDD835" },
+  2: { label: "조율필요", color: "#FB8C00" },
+  1: { label: "위험", color: "#E53935" },
+};
+
+function scoreToLevel(score: number): Level {
+  if (score >= 75) return 5;
+  if (score >= 65) return 4;
+  if (score >= 55) return 3;
+  if (score >= 45) return 2;
+  return 1;
+}
+
+function scoreColor(score: number) {
+  return LEVEL_META[scoreToLevel(score)].color;
+}
+
 
 export default async function GroupPage({
   params,
@@ -462,7 +567,8 @@ export default async function GroupPage({
       }))
   );
 
-  const chem = summarizeChemTypes(pairs.map(p => ({ aMbti: p.aMbti, bMbti: p.bMbti, score: p.score })));
+  const chem = summarizeChemTypesDetailed(pairs as PairRow[]);
+
 
   const totalPairs = pairs.length || 1;
   const pct = (x: number) => Math.round((x / totalPairs) * 100);
@@ -534,80 +640,6 @@ export default async function GroupPage({
           </div>
         </section>
 
-        {/* existing: ranking */}
-        <section className="mt-6">
-          <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/5">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-extrabold">🏆 케미 랭킹</div>
-              <div className="text-[11px] text-slate-500">모임 전체 기준</div>
-            </div>
-
-            {best3.length === 0 ? (
-              <p className="mt-2 text-sm text-slate-500">
-                랭킹을 보려면 MBTI를 입력한 멤버가 2명 이상 필요해요.
-              </p>
-            ) : (
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                {/* LEFT: BEST */}
-                <div className="min-w-0">
-                  <div className="mb-2 flex items-center gap-2">
-                    <span className="text-[11px] font-extrabold text-[#1E88E5]">🔥 최고</span>
-                    <span className="text-[11px] text-slate-400">TOP 3</span>
-                  </div>
-
-                  <ul className="space-y-2">
-                    {best3.map((p, idx) => (
-                      <li
-                        key={`best-${p.aId}-${p.bId}`}
-                        className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
-                      >
-                        <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
-                          <span className="text-slate-400">{idx + 1}.</span>
-                          <span className="truncate">
-                            {p.aName} × {p.bName}
-                          </span>
-                        </div>
-
-                        <span className="shrink-0 rounded-full bg-[#1E88E5]/10 px-2 py-0.5 text-[11px] font-extrabold text-[#1E88E5]">
-                          {p.score}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* RIGHT: WORST */}
-                <div className="min-w-0">
-                  <div className="mb-2 flex items-center gap-2">
-                    <span className="text-[11px] font-extrabold text-rose-600">🥶 최악</span>
-                    <span className="text-[11px] text-slate-400">WORST 3</span>
-                  </div>
-
-                  <ul className="space-y-2">
-                    {worst3.map((p, idx) => (
-                      <li
-                        key={`worst-${p.aId}-${p.bId}`}
-                        className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
-                      >
-                        <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
-                          <span className="text-slate-400">{idx + 1}.</span>
-                          <span className="truncate">
-                            {p.aName} × {p.bName}
-                          </span>
-                        </div>
-
-                        <span className="shrink-0 rounded-full bg-rose-500/10 px-2 py-0.5 text-[11px] font-extrabold text-rose-600">
-                          {p.score}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-
         <Suspense
           fallback={
             <section className="mt-6">
@@ -628,13 +660,207 @@ export default async function GroupPage({
           <GraphServer groupId={groupId} centerId={centerId} />
         </Suspense>
 
+        {/* ✅ 케미 리포트 (랭킹 + 타입요약) */}
+        <section className="mt-6">
+          <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/5">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-extrabold">🏆 케미 리포트</div>
+            </div>
+
+            {/* ✅ 상단 요약 (기존 chem.headline/tip 재사용) */}
+            <div className="mt-3 rounded-2xl bg-white/60 p-3 ring-1 ring-black/5">
+              <div className="text-xs font-extrabold text-slate-800">{chem.headline}</div>
+              <p className="mt-1 text-xs text-slate-600">{chem.tip}</p>
+            </div>
+
+            {pairs.length === 0 ? (
+              <p className="mt-3 text-sm text-slate-500">
+                랭킹을 보려면 MBTI를 입력한 멤버가 2명 이상 필요해요.
+              </p>
+            ) : (
+              <>
+                {/* ✅ 랭킹 (기존 유지) */}
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  {/* LEFT: BEST */}
+                  <div className="min-w-0">
+                    <div className="mb-2 flex items-center gap-2">
+                      <span className="text-[11px] font-extrabold text-[#1E88E5]">🔥 최고</span>
+                      <span className="text-[11px] text-slate-400">TOP 3</span>
+                    </div>
+
+                    <ul className="space-y-2">
+                      {best3.map((p, idx) => (
+                        <li
+                          key={`best-${p.aId}-${p.bId}`}
+                          className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
+                        >
+                          <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
+                            <span className="text-slate-400">{idx + 1}.</span>
+                            <span className="truncate">{p.aName} × {p.bName}</span>
+                          </div>
+                          {(() => {
+                            return (
+                              <span
+                                className="shrink-0 text-[12px] font-extrabold"
+                                style={{ color: scoreColor(p.score) }}
+                              >
+                                {p.score}
+                              </span>
+                            );
+                          })()}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* RIGHT: WORST */}
+                  <div className="min-w-0">
+                    <div className="mb-2 flex items-center gap-2">
+                      <span className="text-[11px] font-extrabold text-rose-600">🥶 최악</span>
+                      <span className="text-[11px] text-slate-400">WORST 3</span>
+                    </div>
+
+                    <ul className="space-y-2">
+                      {worst3.map((p, idx) => (
+                        <li
+                          key={`worst-${p.aId}-${p.bId}`}
+                          className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
+                        >
+                          <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
+                            <span className="text-slate-400">{idx + 1}.</span>
+                            <span className="truncate">{p.aName} × {p.bName}</span>
+                          </div>
+                          {(() => {
+                            return (
+                              <span
+                                className="shrink-0 text-[12px] font-extrabold"
+                                style={{ color: scoreColor(p.score) }}
+                              >
+                                {p.score}
+                              </span>
+                            );
+                          })()}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* ✅ 타입 요약: 숫자/비율만 깔끔하게 */}
+                {pairs.length > 0 && (
+                  <div className="mt-3 space-y-3">
+                    {(["STABLE", "COMPLEMENT", "SPARK", "EXPLODE"] as ChemType[]).map((t) => {
+                      const th = chemTheme(t);
+                      const list = (chem.byType?.[t] ?? []).slice();
+
+                      // ✅ 안정/보완/스파크는 높은 점수 쪽, 폭발은 낮은 점수 쪽
+                      const picks =
+                        t === "EXPLODE"
+                          ? list.sort((a, b) => a.score - b.score).slice(0, 4)
+                          : list.sort((a, b) => b.score - a.score).slice(0, 4);
+
+                      const totalPairs = pairs.length || 1;
+                      const percent = Math.round(((chem.dist[t] ?? 0) / totalPairs) * 100);
+
+                      return (
+                        <div
+                          key={t}
+                          className={[
+                            "relative overflow-hidden rounded-2xl bg-white/70 p-3",
+                            "ring-1 ring-black/5",
+                          ].join(" ")}
+                        >
+                          {/* left accent bar (역할카드 느낌) */}
+                          <div className={`absolute left-0 top-0 h-full w-1 ${th.leftBar}`} />
+
+                          {/* header */}
+                          <div className="flex items-start justify-between gap-2 pl-2">
+                            <div className="min-w-0">
+                              <div className={`text-xs font-extrabold truncate ${th.accent}`}>
+                                {chemLabel(t)}
+                              </div>
+                              <div className="mt-0.5 text-[11px] text-slate-500">
+                                {chemTypeComment(t)}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* meta: count + percent (고급스럽게) */}
+                          <div className="mt-2 pl-2">
+                            <div className="flex items-center justify-between">
+                              <div className="text-[11px] font-bold text-slate-500">
+                                {chem.dist[t]}개 <span className="text-slate-300">·</span> {percent}%
+                              </div>
+                              {/* 옵션: 점 없애고 싶으면 이 줄 자체를 지워도 됨 */}
+                              <div className="text-[11px] font-bold text-slate-400">
+                                전체 조합 {pairs.length}개 중
+                              </div>
+                            </div>
+
+                            <div className="mt-2 h-2 w-full rounded-full bg-slate-200/80">
+                              <div
+                                className={`h-2 rounded-full ${th.leftBar}`}
+                                style={{ width: `${percent}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* body */}
+                          <div className="mt-3 pl-2">
+                            {picks.length > 0 ? (
+                              <ul className="divide-y divide-black/5 overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/5">
+                                {picks.map((p, idx) => (
+                                  <li
+                                    key={`${t}-${p.aId}-${p.bId}`}
+                                    className="flex items-center gap-2 px-3 py-2"
+                                    title={`${p.aMbti} × ${p.bMbti}`}
+                                  >
+                                    <span className="w-4 shrink-0 text-[11px] font-extrabold text-slate-400">
+                                      {idx + 1}
+                                    </span>
+
+                                    <span className="truncate text-xs font-extrabold text-slate-900">
+                                      {p.aName} × {p.bName}
+                                    </span>
+
+                                    <span className="ml-auto shrink-0 text-[11px] font-bold text-slate-500">
+                                      {p.aMbti}/{p.bMbti}
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <div className="rounded-xl bg-white/60 px-3 py-3 ring-1 ring-black/5">
+                                <div className="text-[11px] text-slate-500">
+                                  아직 이 타입으로 분류되는 조합이 없어요.
+                                </div>
+                              </div>
+                            )}
+
+                            {list.length > picks.length && (
+                              <div className="mt-2 text-[11px] font-bold text-slate-400">
+                                +{list.length - picks.length}조합 더 있음
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+
+              </>
+            )}
+          </div>
+        </section>
+
 
         {/* ✅ 1) MBTI 분포 */}
         <section className="mt-6">
           <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/5">
             <div className="flex items-center justify-between">
               <div className="text-sm font-extrabold">📌 모임 MBTI 분포</div>
-              <div className="text-[11px] text-slate-500">입력된 MBTI 기준</div>
             </div>
 
             {validMbtis.length === 0 ? (
@@ -717,7 +943,6 @@ export default async function GroupPage({
           <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/5">
             <div className="flex items-center justify-between">
               <div className="text-sm font-extrabold">🎭 모임 역할 추천</div>
-              <div className="text-[11px] text-slate-500">MBTI 기반</div>
             </div>
 
             {validMbtis.length === 0 ? (
@@ -827,6 +1052,18 @@ export default async function GroupPage({
                             )}
                           </div>
                         )}
+                        {sorted.length === 0 && (
+                          <div className="mt-3 pl-2">
+                            <div className="rounded-xl bg-white/60 px-3 py-3 ring-1 ring-black/5">
+                              <div className="text-[11px] font-extrabold text-slate-500">
+                                해당 성향 없음
+                              </div>
+                              <div className="mt-1 text-[11px] text-slate-400 leading-relaxed">
+                                {roleEmptyMessage(k)}
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
                       </div>
                     );
@@ -837,41 +1074,6 @@ export default async function GroupPage({
             )}
           </div>
         </section>
-
-
-        {/* ✅ 3) 케미 타입 분류 */}
-        <section className="mt-6">
-          <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/5">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-extrabold">⚡ 케미 타입 분류</div>
-              <div className="text-[11px] text-slate-500">모임 전체 기준</div>
-            </div>
-
-            <div className="mt-3 rounded-2xl bg-white/60 p-3 ring-1 ring-black/5">
-              <div className="text-xs font-extrabold text-slate-800">{chem.headline}</div>
-              <p className="mt-1 text-xs text-slate-600">{chem.tip}</p>
-            </div>
-
-            {pairs.length > 0 && (
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                {(["STABLE", "COMPLEMENT", "SPARK", "EXPLODE"] as ChemType[]).map((t) => (
-                  <div key={t} className="rounded-2xl bg-white/60 p-3 ring-1 ring-black/5">
-                    <div className="text-xs font-extrabold text-slate-800">{chemLabel(t)}</div>
-                    <div className="mt-1 text-[11px] text-slate-500">
-                      {chem.dist[t]}쌍 · {pct(chem.dist[t])}%
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {pairs.length === 0 && (
-              <p className="mt-2 text-sm text-slate-500">
-                케미 타입을 보려면 MBTI 입력 멤버가 2명 이상 필요해요.
-              </p>
-            )}
-          </div>
-        </section>      
 
         <section className="mt-6">
           <div className="rounded-3xl bg-white/70 p-5 ring-1 ring-black/5">
