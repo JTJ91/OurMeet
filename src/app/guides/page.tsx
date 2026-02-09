@@ -1,0 +1,48 @@
+import Link from "next/link";
+import { GUIDES } from "./_data/guides";
+
+export const metadata = {
+  title: "가이드 | 모임랭크",
+  description: "MBTI 인지기능 기반 모임 케미/팀워크 가이드 모음",
+};
+
+export default function GuidesIndexPage() {
+  return (
+    <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
+      <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-10">
+        <div className="mb-4 flex items-center justify-between">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 backdrop-blur hover:bg-white"
+          >
+            <span aria-hidden>←</span>
+            <span>메인으로</span>
+          </Link>
+        </div>
+
+        <header className="rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
+          <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">가이드</h1>
+          <p className="mt-4 text-sm leading-7 text-slate-700">
+            모임랭크의 케미/역할/갈등 포인트를 더 재밌고 실용적으로 이해할 수 있게 정리했어요.
+          </p>
+        </header>
+
+        <section className="mt-8 grid gap-3">
+          {GUIDES.map((g) => (
+            <Link
+              key={g.slug}
+              href={`/guides/${g.slug}`}
+              className="group rounded-3xl border border-black/5 bg-white/80 p-5 shadow-sm transition hover:bg-white"
+            >
+              <div className="text-sm font-extrabold text-slate-900 group-hover:text-[#1E88E5]">
+                {g.title}
+              </div>
+              <div className="mt-2 text-sm leading-7 text-slate-700">{g.description}</div>
+              <div className="mt-3 text-xs font-bold text-slate-400">자세히 보기 →</div>
+            </Link>
+          ))}
+        </section>
+      </div>
+    </main>
+  );
+}

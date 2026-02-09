@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     url: "https://www.moimrank.com/",
     images: [
       {
-        url: "https://www.moimrank.com/og.png",
+        url: "https://www.moimrank.com/og.png?v=20260210-1",
         width: 1200,
         height: 630,
       },
@@ -47,6 +47,10 @@ export default function RootLayout({
         {/* 공통 Footer */}
         <footer className="py-10 text-center text-xs text-slate-500 bg-[#F5F9FF] backdrop-blur pb-30">
           <div className="space-x-3">
+            <Link href="/guides" className="hover:text-slate-700 transition">
+              MBTI 가이드
+            </Link>
+            <span className="text-slate-300">·</span>
             <Link href="/faq" className="hover:text-slate-700 transition">
               자주 묻는 질문
             </Link>
