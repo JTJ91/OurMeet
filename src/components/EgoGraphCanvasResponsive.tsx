@@ -756,19 +756,6 @@ const onMouseLeave = () => {
 
   return (
     <div ref={wrapRef} style={{ width: "100%" }}>
-      {/* ✅ 헤더 한 줄: 모임이름 / 안내 / 인원 */}
-        <div className="mb-2 flex items-center justify-between">
-          {/* left: 모임이름 */}
-          <div className="min-w-0 truncate text-sm font-extrabold text-slate-900">
-            {groupName ?? "관계도"}
-          </div>
-
-          {/* right: 인원 */}
-          <div className="shrink-0 text-xs font-bold text-slate-500 tabular-nums">
-            {typeof memberCount === "number" ? `${memberCount}명` : ""}
-          </div>
-        </div>
-
       <canvas
           ref={canvasRef}
           onClick={onClick}
