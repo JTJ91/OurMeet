@@ -1,39 +1,64 @@
 "use client";
 
 import EgoGraphCanvasResponsive, { EgoNode } from "@/components/EgoGraphCanvasResponsive";
+import { calcCompatLevel, calcCompatScore } from "@/lib/mbtiCompat";
 import BottomCTA from "@/components/BottomCTA";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 
 export default function Home() {
-  const sample: EgoNode[] = [
-    { id: "1", name: "태주", mbti: "ESTP", level: 5 },
-    { id: "2", name: "서안", mbti: "ESTP", level: 5 },
-    { id: "3", name: "하린", mbti: "INFJ", level: 4 },
-    { id: "4", name: "도윤", mbti: "ENTJ", level: 4 },
-    { id: "5", name: "수아", mbti: "ISFP", level: 4 },
-    { id: "6", name: "현우", mbti: "INTP", level: 3 },
-    { id: "7", name: "유진", mbti: "ESFJ", level: 3 },
-    { id: "8", name: "나영", mbti: "ISTJ", level: 3 },
-    { id: "9", name: "다혜", mbti: "INFP", level: 3 },
-    { id: "10", name: "둘리", mbti: "ENTP", level: 3 },
-    { id: "11", name: "또치", mbti: "ISFJ", level: 2 },
-    { id: "12", name: "도우", mbti: "ESTJ", level: 2 },
-    { id: "13", name: "기현", mbti: "INTJ", level: 2 },
-    { id: "14", name: "세아", mbti: "ENFJ", level: 2 },
-    { id: "15", name: "수현", mbti: "ISTP", level: 2 },
-    { id: "16", name: "진아", mbti: "ESFP", level: 2 },
-    { id: "17", name: "덕칠", mbti: "ISTP", level: 1 },
-    { id: "18", name: "유미", mbti: "ENFP", level: 5 },
-    { id: "19", name: "원호", mbti: "INTJ", level: 1 },
-    { id: "20", name: "대겸", mbti: "ESTJ", level: 1 },
-  ];
-  const initialCenterId = sample[1].id; //
+  const members = [
+  { id: "1", name: "민준", mbti: "ESTP" },  // 👈 센터
 
+  // 🔵 5레벨 후보 (찰떡궁합 하나)
+  { id: "2", name: "유나", mbti: "ISFJ" },   // ESTP와 보완 시너지
+
+  // 🔴 1레벨 후보 (한계임박 하나)
+  { id: "3", name: "태윤", mbti: "ESTJ" },   // ESTP와 dom 충돌 가능성 높음
+
+  // 🟢 중상위권
+  { id: "4", name: "서연", mbti: "ENFP" },
+  { id: "5", name: "하준", mbti: "ENTP" },
+  { id: "6", name: "수아", mbti: "ENFJ" },
+
+  // 🟡 중간권
+  { id: "7", name: "지민", mbti: "INFJ" },
+  { id: "8", name: "도윤", mbti: "INTP" },
+  { id: "9", name: "예은", mbti: "ISFP" },
+  { id: "10", name: "현우", mbti: "ESFJ" },
+
+  // 🟠 조율필요권
+  { id: "11", name: "채원", mbti: "INTJ" },
+  { id: "12", name: "준호", mbti: "ISTJ" },
+
+  // 균형용
+  { id: "13", name: "아린", mbti: "INFP" },
+  { id: "14", name: "서준", mbti: "ISTP" },
+  { id: "15", name: "지우", mbti: "ESFP" },
+];
+
+
+
+  const initialCenterId = members[0].id;
   const [centerId, setCenterId] = useState<string>(initialCenterId);
 
-  const center = useMemo(() => sample.find((m) => m.id === centerId) ?? sample[0], [centerId]);
-  const otherNodes = useMemo(() => sample.filter((m) => m.id !== centerId), [centerId]);
+  const center = useMemo(
+    () => members.find((m) => m.id === centerId) ?? members[0],
+    [centerId]
+  );
+
+  const otherNodes: EgoNode[] = useMemo(() => {
+    return members
+      .filter((m) => m.id !== centerId)
+      .map((m) => ({
+        id: m.id,
+        name: m.name,
+        mbti: m.mbti,
+        score: calcCompatScore(center.mbti, m.mbti),
+        level: calcCompatLevel(center.mbti, m.mbti),
+      }));
+  }, [centerId, center.mbti]);
+
 
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-26">

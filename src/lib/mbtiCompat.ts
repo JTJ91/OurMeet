@@ -148,10 +148,10 @@ function scorePair(a: Stack, b: Stack): number {
 // -----------------------------
 function levelFromScore(score: number): Level {
   // 목표: 2/3 쏠림 ↓, 4 비중 ↑, 5/1은 여전히 드물게
-  if (score >= 90) return 5; // 찰떡궁합 (드물게)
+  if (score >= 84) return 5; // 찰떡궁합 (드물게)
   if (score >= 66) return 4; // 합좋은편 (← 여기 크게 늘어남)
   if (score >= 52) return 3; // 그럭저럭
-  if (score >= 38) return 2; // 조율필요
+  if (score >= 42) return 2; // 조율필요
   return 1;                  // 한계임박 (드물게)
 }
 
