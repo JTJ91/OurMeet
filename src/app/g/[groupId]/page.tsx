@@ -2,14 +2,19 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import InviteActions from "@/components/InviteActions";
 import RememberGroupClient from "@/components/RememberGroupClient";
-import Link from "next/link";
+import GraphServer from "./GraphServer";
 
+import Link from "next/link";
 export default async function GroupPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ groupId: string }>;
+  searchParams?: Promise<{ center?: string }>;
 }) {
   const { groupId } = await params;
+  const sp = (await searchParams) ?? {};
+  const centerId = sp.center;
 
   const group = await prisma.group.findUnique({
     where: { id: groupId },
@@ -82,46 +87,8 @@ export default async function GroupPage({
           </div>
         </section>
 
-        {/* 참여 멤버 (임시) */}
-        <section className="mt-4 rounded-3xl bg-white/80 p-5 ring-1 ring-black/5 shadow-sm backdrop-blur-md">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="text-sm font-extrabold text-slate-900">참여 멤버</div>
-            <div className="text-xs font-bold text-slate-500">
-              {group.members.length}명
-            </div>
-          </div>
-
-          {group.members.length === 0 ? (
-            <p className="text-sm text-slate-500">아직 참여한 멤버가 없어요.</p>
-          ) : (
-            <ul className="space-y-2">
-              {group.members
-                .slice()
-                .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-                .map((m) => (
-                  <li
-                    key={m.id}
-                    className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 ring-1 ring-black/5"
-                  >
-                    <div className="min-w-0">
-                      <div className="truncate text-sm font-extrabold text-slate-900">
-                        {m.nickname}
-                      </div>
-                      <div className="text-xs font-bold text-slate-500">
-                        {m.mbti.toUpperCase()}
-                      </div>
-                    </div>
-
-                    <span className="rounded-full bg-[#1E88E5]/10 px-2.5 py-1 text-xs font-extrabold text-[#1E88E5]">
-                      {m.mbti.toUpperCase()}
-                    </span>
-                  </li>
-                ))}
-            </ul>
-          )}
-        </section>
-
-        
+        <GraphServer groupId={groupId} centerId={centerId} />
+  
         <section className="mt-6">
           <div className="rounded-3xl bg-white/70 p-5 ring-1 ring-black/5">
             <p className="text-xs leading-relaxed text-slate-500">

@@ -9,6 +9,7 @@ export type EgoNode = {
   name: string;
   mbti: string;
   level: Level;
+  score?: number;
 };
 
 type Props = {
@@ -30,6 +31,7 @@ const LEVEL_META: Record<Level, { label: string; color: string }> = {
   2: { label: "조율필요", color: "#FB8C00" },
   1: { label: "한계임박", color: "#D50000" },
 };
+
 
 function hexToRgba(hex: string, a: number) {
   const h = hex.replace("#", "");
@@ -162,6 +164,130 @@ function useElementSize<T extends HTMLElement>() {
   return { ref, w };
 }
 
+function oneLineMessage(score?: number, color?: string) {
+  const s = Number.isFinite(Number(score)) ? Number(score) : 0;
+
+  const highlight = (text: string) => (
+    <span style={{ color: color, fontWeight: 700 }}>{text}</span>
+  );
+
+  if (s >= 90)
+    return (
+      <>
+        거의 <b>운명급</b>이에요. {highlight("찰떡 케미")}가 자연스럽게 터져요.
+      </>
+    );
+
+  if (s >= 80)
+    return (
+      <>
+        템포가 잘 맞는 편이에요. 같이 있으면 {highlight("흐름이 부드러워요")}.
+      </>
+    );
+
+  if (s >= 70)
+    return (
+      <>
+        기본 궁합은 좋아요. {highlight("포인트만 맞추면")} 더 탄탄해져요.
+      </>
+    );
+
+  if (s >= 60)
+    return (
+      <>
+        무난한 케미예요. 상황에 따라 {highlight("온도차")}가 살짝 생길 수 있어요.
+      </>
+    );
+
+  if (s >= 50)
+    return (
+      <>
+        차이가 느껴질 수 있어요. {highlight("룰만 정해두면")} 훨씬 편해져요.
+      </>
+    );
+
+  if (s >= 40)
+    return (
+      <>
+        조율이 필요한 조합이에요. 먼저 {highlight("기준을 맞추는 것")}이 중요해요.
+      </>
+    );
+
+  if (s >= 30)
+    return (
+      <>
+        생각보다 {highlight("부딪힘")}이 있을 수 있어요. 기대치를 낮추면 편해요.
+      </>
+    );
+
+  if (s >= 20)
+    return (
+      <>
+        에너지가 다를 수 있어요. {highlight("거리 조절")}이 핵심이에요.
+      </>
+    );
+
+  return (
+    <>
+      꽤 도전적인 조합이에요. {highlight("노력과 배려")}가 많이 필요해요.
+    </>
+  );
+}
+
+
+function ScoreBar({
+  value,
+  color,
+  level,
+}: {
+  value: number;
+  color: string;
+  level: 1 | 2 | 3 | 4 | 5;
+}) {
+  const v = Math.max(0, Math.min(100, value));
+
+  const rgba = (hex: string, a: number) => {
+    const h = hex.replace("#", "");
+    const num = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return `rgba(${r},${g},${b},${a})`;
+  };
+
+  const fill = `linear-gradient(90deg, ${rgba(color, 0.8)}, ${rgba(color, 1)})`;
+
+  return (
+    <div className="flex w-full items-center gap-4">
+      {/* 게이지 */}
+      <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-black/[0.06]">
+        <div
+          className="h-full rounded-full transition-all duration-300"
+          style={{
+            width: `${v}%`,
+            background: fill,
+            boxShadow: `0 0 8px ${rgba(color, 0.2)}`,
+          }}
+        />
+      </div>
+
+      {/* ✨ 있어보이는 점수 텍스트 */}
+      <div className="flex items-baseline gap-1 tabular-nums">
+        <span
+          className="text-base font-extrabold tracking-tight"
+          style={{ color: color }}
+        >
+          {Math.round(v)}
+        </span>
+        <span className="text-xs font-medium text-slate-400">
+          / 100
+        </span>
+      </div>
+    </div>
+  );
+}
+
+
 export default function EgoGraphCanvasResponsive({
   centerName,
   centerSub,
@@ -184,30 +310,49 @@ export default function EgoGraphCanvasResponsive({
   const safeNodes = useMemo(() => clampNodes(nodes, 20), [nodes]);
 
   const size = useMemo(() => {
-  const raw = Math.floor(wrapW);
+    const raw = Math.floor(wrapW);
 
-  if (raw > 768) {
-    return Math.min(900, raw);   // PC에서는 900까지 허용
-  }
+    if (raw > 768) {
+      return Math.min(900, raw);   // PC에서는 900까지 허용
+    }
 
-  return Math.max(280, Math.min(420, raw)); // 모바일은 기존 유지
-}, [wrapW]);
+    return Math.max(280, Math.min(420, raw)); // 모바일은 기존 유지
+  }, [wrapW]);
 
-  const height = Math.floor(size * aspect);
+    const height = Math.floor(size * aspect);
 
-  const placed: Placed[] = useMemo(() => {
+    const placed: Placed[] = useMemo(() => {
     const rings = mapToRings(safeNodes, ringCount);
-    const base = size * 0.19;
-    const step = size * 0.18;
-    const ringR = ringCount === 3 ? [base, base + step, base + step * 2] : [base, base + step * 1.4];
-    const starts = ringCount === 3 ? [-Math.PI / 2, -Math.PI / 2 + 0.4, -Math.PI / 2 + 0.15] : [-Math.PI / 2, -Math.PI / 2 + 0.25];
+
+    // ✅ 인원수에 따라 링 "퍼짐" 자동 조절 (적을수록 덜 퍼짐)
+    const n = safeNodes.length; // 주변 노드 수
+    // n=0~3이면 0.72, n=12 이상이면 1.00 근처
+    const t = Math.max(0, Math.min(1, (n - 3) / 9));
+    const spread = 0.72 + 0.28 * t; // 0.72 ~ 1.00
+
+    // 기존 값에 spread만 곱해 링을 안쪽/바깥쪽으로 조절
+    const base = size * 0.19 * spread;
+    const step = size * 0.18 * spread;
+
+    const ringR =
+      ringCount === 3
+        ? [base, base + step, base + step * 2]
+        : [base, base + step * 1.4];
+
+    const starts =
+      ringCount === 3
+        ? [-Math.PI / 2, -Math.PI / 2 + 0.4, -Math.PI / 2 + 0.15]
+        : [-Math.PI / 2, -Math.PI / 2 + 0.25];
+
     const all: Placed[] = [];
     rings.forEach((items, idx) => {
       const p = layoutOnRing(items, ringR[idx], starts[idx]);
-      p.forEach((n) => all.push({ ...n, ringIndex: idx, r: ringR[idx] }));
+      p.forEach((node) => all.push({ ...node, ringIndex: idx, r: ringR[idx] }));
     });
+
     return all;
   }, [safeNodes, ringCount, size]);
+
 
   // ✅ “바깥 노드까지 딱 들어오게” 자동 스케일 (전체 placed 기준 유지)
   const getFitScale = (canvasWpx: number, canvasHpx: number, dpr: number) => {
@@ -295,7 +440,7 @@ export default function EgoGraphCanvasResponsive({
       const toScreen = (wx: number, wy: number) => ({ x: cx + wx * fitScale * dpr, y: cy + wy * fitScale * dpr });
 
       const centerR = size * 0.07 * fitScale * dpr;
-      const nodeR = size * 0.048 * fitScale * dpr;
+      const nodeR = size * 0.058 * fitScale * dpr;
 
       // 링 가이드
       const ringsR = Array.from(new Set(placed.map((p) => p.r))).sort((a, b) => a - b);
@@ -320,7 +465,12 @@ export default function EgoGraphCanvasResponsive({
       const isFocused = (lv: Level) => (focusLevel ? lv === focusLevel : true);
       
       // 선(곡선 + 그라데이션)
-      placed.forEach((n) => {
+      const sortedNodes = [
+        ...placed.filter(n => n.id !== activeId),
+        ...placed.filter(n => n.id === activeId),
+      ];
+
+      sortedNodes.forEach((n) => {
         const p = toScreen(n.x, n.y);
         const isActive = activeId === n.id;
         const isHover = hoverId === n.id;
@@ -384,11 +534,29 @@ export default function EgoGraphCanvasResponsive({
         const isHover = hoverId === n.id;
         const meta = LEVEL_META[n.level];
       
-        const dim = focusLevel && !isFocused(n.level);
+        const dim =
+        (focusLevel && !isFocused(n.level)) ||
+        (activeId && !isActive);
       
-        const scale = isActive ? 1.10 : isHover ? 1.06 : 1.0;
+        const scale = isActive ? 1.35 : isHover ? 1.08 : 1.0;
         const r = nodeR * scale;
       
+        // ✅ 선택 시 부드러운 강조 링
+        if (isActive) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, r * 1.25, 0, Math.PI * 2);
+          ctx.fillStyle = hexToRgba(meta.color, 0.12);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        ctx.globalAlpha = activeId
+        ? isActive
+          ? 1
+          : 0.35
+        : 1;
+
         // 바디(그림자)
         drawSoftShadowCircle(
           ctx,
@@ -421,11 +589,28 @@ export default function EgoGraphCanvasResponsive({
       
         // 이름
         const label = n.name.length > 4 ? `${n.name.slice(0, 3)}…` : n.name;
-        ctx.fillStyle = dim ? "rgba(15,23,42,0.40)" : "#0F172A";
-        ctx.font = `${Math.round(size * 0.032 * fitScale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
+
+        const textScale = isActive ? 1.2 : isHover ? 1.05 : 1;
+
+        // 선택 시 더 진하게
+        const fontWeight = isActive ? 700 : 600;
+
+        ctx.fillStyle = activeId
+          ? isActive
+            ? "#0F172A"
+            : "rgba(15,23,42,0.35)"
+          : dim
+          ? "rgba(15,23,42,0.40)"
+          : "#0F172A";
+
+        ctx.font = `${fontWeight} ${Math.round(
+          size * 0.032 * fitScale * dpr * textScale
+        )}px ui-sans-serif, system-ui, -apple-system`;
+
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(label, p.x, p.y + 0.5 * dpr);
+
       });
 
       // 툴팁
@@ -478,8 +663,11 @@ export default function EgoGraphCanvasResponsive({
     };
 
     draw();
+    ctx.globalAlpha = 1;
+
   }, [activeId, hoverId, placed, centerName, centerSub, size, height, focusLevel]);
 
+  
   const hitTest = (clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
@@ -529,6 +717,10 @@ const onMouseLeave = () => {
 };
 
   const activeNode = useMemo(() => (activeId ? placed.find((p) => p.id === activeId) : null), [activeId, placed]);
+  const scoreNum =
+  activeNode && Number.isFinite(Number(activeNode.score))
+    ? Math.round(Number(activeNode.score))
+    : null;
 
   return (
     <div ref={wrapRef} style={{ width: "100%" }}>
@@ -542,30 +734,68 @@ const onMouseLeave = () => {
       
       {activeNode && (
         <div className="sticky bottom-2 z-10 mt-2 px-2">
-          <div className="mx-auto w-fit max-w-[320px] rounded-2xl border border-black/10 bg-white/95 p-2 pl-5 pr-5 shadow-sm backdrop-blur">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <span className="font-semibold text-slate-900">{activeNode.name}</span>
-              <span className="h-3 w-px bg-slate-300 mx-2 inline-block" />
-              <span className="font-semibold text-slate-600">{activeNode.mbti}</span>
-              <span className="h-3 w-px bg-slate-300 mx-2 inline-block" />
-              <span className="font-semibold" style={{ color: LEVEL_META[activeNode.level].color }}>
-                {LEVEL_META[activeNode.level].label}
-              </span>
+          <div className="mx-auto w-full max-w-[340px] overflow-hidden rounded-2xl border border-black/10 bg-white/90 shadow-[0_8px_20px_rgba(15,23,42,0.08)] backdrop-blur-md">
+            {/* ✅ 얇은 하이라이트 라인 */}
+            <div
+              className="h-[2px] w-full"
+              style={{
+                background: `linear-gradient(90deg, ${LEVEL_META[activeNode.level].color}55, rgba(255,255,255,0))`,
+              }}
+            />
 
-              {onCenterChange && (
-                <button
-                  type="button"
-                  className="ml-2 text-xs font-semibold text-slate-500 hover:text-slate-900 underline underline-offset-4"
-                  onClick={() => {
-                    onCenterChange(activeNode.id);
-                    setActiveId(null);
-                    setFocusLevel(null);
-                  }}
+            <div className="p-3">
+              {/* 1줄: 별명 MBTI   센터로가기 */}
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="font-semibold text-slate-900 truncate">
+                    {activeNode.name}
+                  </span>
+                  <span className="text-slate-300">•</span>
+                  <span className="font-semibold text-slate-600">
+                    {activeNode.mbti}
+                  </span>
+                </div>
+
+                {onCenterChange && (
+                  <button
+                    type="button"
+                    className="shrink-0 text-xs font-semibold text-slate-500 hover:text-slate-900 underline underline-offset-4"
+                    onClick={() => {
+                      onCenterChange(activeNode.id);
+                      setActiveId(null);
+                      setFocusLevel(null);
+                    }}
+                  >
+                    센터로 가기
+                  </button>
+                )}
+              </div>
+
+              {/* 2줄: 관계(조율필요) + 가로 게이지 */}
+              <div className="mt-2 flex w-full items-center gap-3">
+                <span
+                  className="shrink-0 text-sm font-extrabold"
+                  style={{ color: LEVEL_META[activeNode.level].color }}
                 >
-                  센터로 보기
-                </button>
-              )}
+                  {LEVEL_META[activeNode.level].label}
+                </span>
+
+                {scoreNum != null && (
+                  <ScoreBar
+                    value={scoreNum}
+                    color={LEVEL_META[activeNode.level].color}
+                    level={activeNode.level}
+                  />
+                )}
+              </div>
+
+
+              {/* 3줄: 메시지 */}
+              <div className="mt-2 text-xs font-medium text-slate-600">
+                {oneLineMessage(activeNode.score, LEVEL_META[activeNode.level].color)}
+              </div>
             </div>
+
           </div>
         </div>
       )}
