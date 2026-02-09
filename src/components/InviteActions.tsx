@@ -8,7 +8,11 @@ export default function InviteActions({ groupId }: { groupId: string }) {
 
   const fullUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return `${window.location.origin}/g/${groupId}`;
+    const ver = process.env.NEXT_PUBLIC_SHARE_VER ?? "1";
+
+    const u = new URL(`/g/${groupId}`, window.location.origin);
+    u.searchParams.set("v", ver);
+    return u.toString();
   }, [groupId]);
 
   const share = async () => {
