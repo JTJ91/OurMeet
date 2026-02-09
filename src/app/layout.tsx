@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,16 +33,39 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="ko">
+      <body className="min-h-screen flex flex-col bg-[#F5F9FF]">
+        {/* 페이지 내용 */}
+        <div className="flex-1">
+          {children}
+        </div>
+
+        {/* 공통 Footer */}
+        <footer className="py-10 text-center text-xs text-slate-500 bg-[#F5F9FF] backdrop-blur pb-30">
+          <div className="space-x-3">
+            <Link href="/faq" className="hover:text-slate-700 transition">
+              자주 묻는 질문
+            </Link>
+            <span className="text-slate-300">·</span>
+            <Link href="/terms" className="hover:text-slate-700 transition">
+              이용 약관
+            </Link>
+            <span className="text-slate-300">·</span>
+            <Link href="/privacy" className="hover:text-slate-700 transition">
+              개인정보처리방침
+            </Link>
+          </div>
+
+          <div className="mt-4 text-[11px] text-slate-400">
+            © 2026 모임랭크. All rights reserved.
+          </div>
+        </footer>
       </body>
     </html>
   );
 }
+

@@ -585,7 +585,7 @@ export default async function GroupPage({
   };
 
   return (
-    <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-24">
+    <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-10">
       <div className="mx-auto max-w-[760px] px-5 pt-6">
         {/* Top left back */}
         <div className="flex items-center justify-between">
@@ -1084,25 +1084,7 @@ export default async function GroupPage({
         </section>
       </div>
 
-      <footer className="border-black/5 py-10 text-center text-xs text-slate-500">
-        <div className="space-x-3">
-          <a href="/faq" className="hover:text-slate-700 transition">
-            자주 묻는 질문
-          </a>
-          <span className="text-slate-300">·</span>
-          <a href="/terms" className="hover:text-slate-700 transition">
-            이용약관
-          </a>
-          <span className="text-slate-300">·</span>
-          <a href="/privacy" className="hover:text-slate-700 transition">
-            개인정보처리방침
-          </a>
-        </div>
-
-        <div className="mt-4 text-[11px] text-slate-400">
-          © 2026 모임랭크. All rights reserved.
-        </div>
-      </footer>
+    
     </main>
   );
 }
