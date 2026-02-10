@@ -37,7 +37,8 @@ export default function JoinFormClient({
         myMbti: String(fd.get("mbti") || "").toUpperCase(),
         });
 
-        router.push(`/g/${result.groupId}?center=${result.memberId}`);
+        router.replace(`/g/${result.groupId}?center=${result.memberId}`);
+        router.refresh();
     }}
 
       className={["mt-5 space-y-4", isSubmitting ? "pointer-events-none" : ""].join(" ")}

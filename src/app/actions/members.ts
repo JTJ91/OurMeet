@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache"; // ✅ 추가
 
 function normalizeMbti(s: string) {
   return s.replace(/\s/g, "").toUpperCase();
@@ -33,7 +34,9 @@ export async function joinGroupAction(formData: FormData) {
     select: { id: true },
   });
 
-  // ✅ redirect 대신 return
+  // ✅ 여기서 캐시 무효화
+  revalidatePath(`/g/${groupId}`);
+
   return {
     groupId: group.id,
     groupName: group.name,

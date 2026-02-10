@@ -21,11 +21,27 @@ export default function GuidesIndexPage() {
         </div>
 
         <header className="rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
-          <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">가이드</h1>
+          <div className="text-xs font-bold uppercase tracking-wider text-[#1E88E5]">
+            MOIM RANK GUIDE
+          </div>
+
+          <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">
+            모임을 더 잘 굴리는 방법
+          </h1>
+
           <p className="mt-4 text-sm leading-7 text-slate-700">
-            모임랭크의 케미/역할/갈등 포인트를 더 재밌고 실용적으로 이해할 수 있게 정리했어요.
+            MBTI 인지기능 기반으로
+            <b className="text-slate-900"> 케미, 역할 분담, 갈등 구조</b>를
+            실전 운영 관점에서 정리했어요.
           </p>
+
+          <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-slate-500">
+            <span className="rounded-full bg-slate-100 px-3 py-1">#케미분석</span>
+            <span className="rounded-full bg-slate-100 px-3 py-1">#팀워크운영</span>
+            <span className="rounded-full bg-slate-100 px-3 py-1">#인지기능</span>
+          </div>
         </header>
+
 
         <section className="mt-8 grid gap-3">
           {GUIDES.map((g) => (
