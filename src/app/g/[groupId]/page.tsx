@@ -8,6 +8,8 @@ import GraphServer from "./GraphServer";
 import { calcCompatScore } from "@/lib/mbtiCompat";
 import { unstable_cache } from "next/cache";
 import ChemReportSection from "@/app/g/[groupId]/components/ChemReportSection";
+import TouchSavedGroupClient from "@/components/TouchSavedGroupClient";
+import SaveGroupClient from "@/components/SaveGroupClient";
 
 
 import Link from "next/link";
@@ -666,6 +668,8 @@ export default async function GroupPage({
           </Link>
         </div>
 
+        <TouchSavedGroupClient groupId={groupId} groupName={group.name} />
+
         {/* Unified top card */}
         <section className="mt-4">
           <div className="rounded-3xl bg-white/70 p-5 shadow-sm ring-1 ring-black/5">
@@ -694,17 +698,11 @@ export default async function GroupPage({
                 />
               </div>
             </div>
-
-            {/* actions */}
+            
             <div className="mt-5">
-              <Link
-                href={`/g/${group.id}/join`}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#1E88E5] text-sm font-extrabold text-white transition-all duration-200 hover:bg-[#1E88E5]/90 active:scale-[0.98]"
-              >
-                <span aria-hidden>🫶</span>
-                <span className="whitespace-nowrap">모임 참여하기</span>
-              </Link>
+              <div id="group-actions-slot" />
             </div>
+
           </div>
         </section>
 

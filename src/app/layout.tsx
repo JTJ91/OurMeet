@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        {/* ✅ Google Analytics (GA4) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-PPW94SF44D"
+          strategy="afterInteractive"
+        />
+        <Script id="ga-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){window.dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-PP9W49F44D');
+          `}
+        </Script>
+      </head>
+
+      
+      
       <body className="min-h-screen flex flex-col bg-[#F5F9FF]">
         {/* 페이지 내용 */}
         <div className="flex-1">

@@ -6,6 +6,8 @@ export type SavedGroup = {
   myMemberId?: string;  // 그룹별 내 memberId
   myNickname?: string;  // 그룹별 내 별명
   myMbti?: string;      // 그룹별 내 MBTI
+
+  centerMemberId?: string;
 };
 
 const KEY = "moimrank:groups";
@@ -35,7 +37,6 @@ export function upsertSavedGroup(input: {
   const prev = readSavedGroups();
   const prevItem = prev.find((g) => g.id === input.id);
 
-  // ✅ 기존 값 유지 + 새 값 있으면 덮어쓰기
   const nextItem: SavedGroup = {
     id: input.id,
     name: input.name,
@@ -44,15 +45,13 @@ export function upsertSavedGroup(input: {
     myMemberId: input.myMemberId ?? prevItem?.myMemberId,
     myNickname: input.myNickname ?? prevItem?.myNickname,
     myMbti: input.myMbti ?? prevItem?.myMbti,
+
   };
 
-  const next: SavedGroup[] = [
-    nextItem,
-    ...prev.filter((g) => g.id !== input.id),
-  ].slice(0, 20);
-
+  const next: SavedGroup[] = [nextItem, ...prev.filter((g) => g.id !== input.id)].slice(0, 20);
   localStorage.setItem(KEY, JSON.stringify(next));
 }
+
 
 export function removeSavedGroup(groupId: string) {
   if (typeof window === "undefined") return;

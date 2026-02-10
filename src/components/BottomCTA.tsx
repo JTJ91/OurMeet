@@ -157,6 +157,7 @@ export default function BottomCTA() {
                 ) : (
                   <ul className="space-y-2">
                     {groups.map((g) => {
+                      console.log(g);
                       const href = g.myMemberId ? `/g/${g.id}?center=${g.myMemberId}` : `/g/${g.id}`;
 
                       return (
