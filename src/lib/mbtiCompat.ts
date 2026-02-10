@@ -41,7 +41,7 @@ function stableHash(s: string) {
   return h;
 }
 
-function axisDiffCount(a: string, b: string) {
+export function axisDiffCount(a: string, b: string) {
   const A = norm(a);
   const B = norm(b);
   return (

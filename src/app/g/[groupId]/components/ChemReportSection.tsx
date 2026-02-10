@@ -1,6 +1,6 @@
 import React from "react";
 
-import { getCompatScore } from "@/lib/mbtiCompat";
+import { getCompatScore, axisDiffCount } from "@/lib/mbtiCompat";
 import { levelFromScore } from "@/lib/mbtiCompat";
 
 type JudgeStyle = "LOGIC" | "PEOPLE";
