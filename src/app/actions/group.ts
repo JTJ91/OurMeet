@@ -45,8 +45,8 @@ export async function createGroupAction(formData: FormData) {
   const nickname = normalizeNickname(formData.get("nickname"));
   const mbti = normalizeMbti(formData.get("mbti"));
 
-  const judgeStyle = normalizeJudgeStyle(formData.get("judgeStyle"));
-  const infoStyle = normalizeInfoStyle(formData.get("infoStyle"));
+  const judgeStyle = normalizeJudgeStyle(formData.get("judge"));
+  const infoStyle  = normalizeInfoStyle(formData.get("info"));
 
   if (!groupName || !nickname || !mbti) {
     throw new Error("모임 이름/별명/MBTI는 필수예요.");
