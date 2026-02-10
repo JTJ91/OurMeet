@@ -1,7 +1,7 @@
 // app/g/[groupId]/GraphServer.tsx
 import { prisma } from "@/lib/prisma";
 import GraphClient from "./GraphClient";
-import { calcCompatLevel, calcCompatScore } from "@/lib/mbtiCompat";
+import { getCompatScore } from "@/lib/mbtiCompat";
 
 type Level = 1 | 2 | 3 | 4 | 5;
 
@@ -37,16 +37,24 @@ export default async function GraphServer({
   const center =
     (centerId ? members.find((m) => m.id === centerId) : null) ?? members[0];
 
-  // ✅ 서버에서 nodes(레벨)까지 완성해서 내려보내기
   const nodes = members
   .filter((m) => m.id !== center.id)
-  .map((m) => ({
-    id: m.id,
-    name: m.nickname,
-    mbti: m.mbti.toUpperCase(),
-    score: calcCompatScore(center.mbti, m.mbti),          // ✅ 추가
-    level: calcCompatLevel(center.mbti, m.mbti),          // ✅ 그대로
-  }));
+  .map((m) => {
+    const { score, level } = getCompatScore(
+      center.id,
+      center.mbti,
+      m.id,
+      m.mbti
+    );
+
+    return {
+      id: m.id,
+      name: m.nickname,
+      mbti: m.mbti.toUpperCase(),
+      score, // ✅ 리포트와 동일한 소수점 점수
+      level, // ✅ 같은 기준의 레벨
+    };
+  });
 
 
   return (

@@ -1,7 +1,5 @@
-"use client";
-
 import React, { useEffect, useMemo, useRef, useState } from "react";
-
+import { getCompatScore } from "@/lib/mbtiCompat";
 
 type Level = 1 | 2 | 3 | 4 | 5;
 
@@ -555,7 +553,7 @@ function ScoreBar({
       {/* ✨ 있어보이는 점수 텍스트 */}
       <div className="flex items-baseline gap-2 tabular-nums">
         <span className="text-base font-extrabold tracking-tight" style={{ color }}>
-          {Math.round(v)}
+          {v.toFixed(2)}
         </span>
         <span className="text-xs font-semibold text-slate-400">점</span>
       </div>
@@ -920,9 +918,9 @@ export default function EgoGraphCanvasResponsive({
   );
 
   const scoreNum =
-    activeNode && Number.isFinite(Number(activeNode.score))
-      ? Math.round(Number(activeNode.score))
-      : null;
+  activeNode && Number.isFinite(Number(activeNode.score))
+    ? Number(activeNode.score) // ✅ 소수점 유지
+    : null;
 
   return (
     <div ref={wrapRef} style={{ width: "100%" }}>

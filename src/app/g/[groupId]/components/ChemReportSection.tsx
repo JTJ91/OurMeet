@@ -1,5 +1,8 @@
 import React from "react";
 
+import { getCompatScore } from "@/lib/mbtiCompat";
+import { levelFromScore } from "@/lib/mbtiCompat";
+
 type JudgeStyle = "LOGIC" | "PEOPLE";
 type InfoStyle = "IDEA" | "FACT";
 
@@ -115,16 +118,8 @@ function chemRankPillCls(t: ChemType, rankIdx: number) {
   return `${strong} ${rankIdx === 0 ? "bg-rose-500/15 text-rose-800" : "bg-rose-500/10 text-rose-700"}`;
 }
 
-function scoreToLevel(score: number): Level {
-  if (score >= 75) return 5;
-  if (score >= 65) return 4;
-  if (score >= 55) return 3;
-  if (score >= 45) return 2;
-  return 1;
-}
-
 function scoreColor(score: number) {
-  return LEVEL_META[scoreToLevel(score)].color;
+  return LEVEL_META[levelFromScore(score)].color;
 }
 
 function chemLabel(t: ChemType) {
@@ -214,17 +209,6 @@ function summarizeChemTypesDetailed(pairs: PairRow[]) {
   return { dist, byType, headline, tip };
 }
 
-function axisDiffCount(a: string, b: string) {
-  const A = a.trim().toUpperCase();
-  const B = b.trim().toUpperCase();
-  return (
-    (A[0] !== B[0] ? 1 : 0) +
-    (A[1] !== B[1] ? 1 : 0) +
-    (A[2] !== B[2] ? 1 : 0) +
-    (A[3] !== B[3] ? 1 : 0)
-  );
-}
-
 
 function chemComboTitle(t: ChemType, a: string, b: string, score: number) {
   const diff = axisDiffCount(a, b);
@@ -248,84 +232,53 @@ function chemComboTitle(t: ChemType, a: string, b: string, score: number) {
 }
 
 function top5RankSlots(list: PairRow[], t: ChemType) {
-  // 1) micro 계산해서 붙이기
-  const withMicro = list.map((p) => ({ ...p, micro: calcMicroScore(p, t) }));
-
-  // 2) 정렬: EXPLODE는 score 낮은게 우선, 나머지는 높은게 우선
-  const sorted = [...withMicro].sort((a, b) => {
-    if (t === "EXPLODE") {
-      // 낮은 score 우선, 동점이면 micro 낮은 쪽(더 낮게 보정된 것) 우선
-      if (a.score !== b.score) return a.score - b.score;
-      return (a.micro ?? a.score) - (b.micro ?? b.score);
-    }
-    // 높은 score 우선, 동점이면 micro 높은 쪽 우선
-    if (a.score !== b.score) return b.score - a.score;
-    return (b.micro ?? b.score) - (a.micro ?? a.score);
+  // ✅ micro는 무조건 lib(getCompatScore) 기준으로 통일
+  const withScore = list.map((p) => {
+    const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti);
+    return {
+      ...p,
+      scoreInt: r.scoreInt, // ✅ 정수(분류/레벨/1차정렬 기준)
+      micro: r.score,       // ✅ 소수점(표시/동점깨기)
+    };
   });
 
-  // 3) "공동순위" 묶는 기준을 세분화
-  // - 기존: score가 완전히 같으면 묶음
-  // - 개선: micro 차이가 아주 작을 때만 묶음
-  //   (예: 0.03 이내면 체감상 동률 → 공동)
+  // ✅ 정렬 규칙: EXPLODE는 낮은 scoreInt 우선, 나머지는 높은 scoreInt 우선
+  const sorted = [...withScore].sort((a, b) => {
+    const aInt = (a as any).scoreInt ?? a.score;
+    const bInt = (b as any).scoreInt ?? b.score;
+
+    const aMicro = a.micro ?? aInt;
+    const bMicro = b.micro ?? bInt;
+
+    if (t === "EXPLODE") {
+      if (aInt !== bInt) return aInt - bInt;      // 낮은 정수점수 우선
+      return aMicro - bMicro;                     // 동점이면 micro 낮은쪽 우선
+    }
+
+    if (aInt !== bInt) return bInt - aInt;        // 높은 정수점수 우선
+    return bMicro - aMicro;                       // 동점이면 micro 높은쪽 우선
+  });
+
+  // ✅ 공동순위 묶기: scoreInt가 같고 micro가 거의 같을 때만
   const EPS = 0.01;
 
-  const slots: Array<{ score: number; microKey: number; items: PairRow[] }> = [];
+  const slots: Array<{ scoreInt: number; microKey: number; items: PairRow[] }> = [];
   for (const p of sorted) {
-    const mk = p.micro ?? p.score;
-    const last = slots[slots.length - 1];
+    const pInt = (p as any).scoreInt ?? p.score;
+    const mk = p.micro ?? pInt;
 
-    if (
-      last &&
-      last.score === p.score &&
-      Math.abs(last.microKey - mk) <= EPS
-    ) {
+    const last = slots[slots.length - 1];
+    if (last && last.scoreInt === pInt && Math.abs(last.microKey - mk) <= EPS) {
       last.items.push(p);
-      // microKey는 묶음 대표값 유지
     } else {
-      slots.push({ score: p.score, microKey: mk, items: [p] });
+      slots.push({ scoreInt: pInt, microKey: mk, items: [p] });
     }
   }
 
-  // 4) 순위 슬롯 기준 TOP 5
-  return slots.slice(0, 5).map(({ score, microKey, items }) => ({ score, microKey, items }));
+  // TOP 5 슬롯
+  return slots.slice(0, 5);
 }
 
-
-function stableHash(s: string) {
-  // 아주 단순한 안정 해시(SSR/CSR 동일하게)
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-  return h;
-}
-
-/**
- * ✅ 같은 score 안에서 갈라주는 미세점수
- * - 축 차이(diff) 많을수록 가중치
- * - 같은 MBTI면 고정값(항상 동일)
- * - 이름/ID 해시로 아주 작은 흔들림(동점 깨기)
- */
-function calcMicroScore(p: PairRow, t: ChemType) {
-  const diff = axisDiffCount(p.aMbti, p.bMbti); // 0~4
-  const key = `${p.aId}|${p.bId}|${p.aMbti}|${p.bMbti}`;
-  const h = stableHash(key) % 1000; // 0~999
-
-  // diff 가중치: 타입마다 약간 다르게
-  // STABLE은 diff 낮을수록 더 “안정” → 미세점수는 diff 낮은 쪽이 위
-  // COMPLEMENT/SPARK는 diff 높은 쪽이 위
-  // EXPLODE는 위험(낮은 점수) 우선이지만, 같은 점수면 diff 큰쪽이 더 위험 → 위
-  let diffBias = 0;
-  if (t === "STABLE") diffBias = (4 - diff) * 0.18;      // 0.00 ~ 0.48
-  else if (t === "COMPLEMENT") diffBias = diff * 0.10;   // 0.00 ~ 0.40
-  else if (t === "SPARK") diffBias = diff * 0.08;        // 0.00 ~ 0.32
-  else diffBias = diff * 0.06;                           // 0.00 ~ 0.24
-
-  // 아주 작은 해시 흔들림(완전 동률 방지)
-  const jitter = h / 1000 * 0.09; // 0.000 ~ 0.089
-
-  // 기본 정수 점수에 미세치 추가
-  // EXPLODE는 “낮을수록 위” 정렬이라 micro는 같은 방향으로 더해도 OK(정렬 로직에서 처리)
-  return Number((p.score + diffBias + jitter).toFixed(3));
-}
 
 
 
@@ -362,23 +315,29 @@ export default function ChemReportSection({ pairs, best3, worst3 }: Props) {
                 </div>
 
                 <ul className="space-y-2">
-                  {best3.map((p, idx) => (
-                    <li
-                      key={`best-${p.aId}-${p.bId}`}
-                      className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
-                    >
-                      <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
-                        <span className="text-slate-400">{idx + 1}.</span>
-                        <span className="truncate">{p.aName} × {p.bName}</span>
-                      </div>
-                      <span
-                        className="shrink-0 text-[12px] font-extrabold"
-                        style={{ color: scoreColor(p.score) }}
+                  {best3.map((p, idx) => {
+                    const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti); // ✅ micro 포함
+
+                    return (
+                      <li
+                        key={`best-${p.aId}-${p.bId}`}
+                        className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
+                      >
+                        <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
+                            <span className="text-slate-400">{idx + 1}.</span>
+                          <span className="truncate">{p.aName} × {p.bName}</span>
+                        </div>
+
+                        <span
+                          className="shrink-0 text-[12px] font-extrabold"
+                          style={{ color: scoreColor(r.score) }} // ✅ micro 기준 색
                         >
-                        {calcMicroScore(p, classifyChemType(p.aMbti, p.bMbti, p.score)).toFixed(2)}
+                          {r.score.toFixed(2)} {/* ✅ micro 표시 */}
                         </span>
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })} 
+
                 </ul>
               </div>
 
@@ -390,23 +349,29 @@ export default function ChemReportSection({ pairs, best3, worst3 }: Props) {
                 </div>
 
                 <ul className="space-y-2">
-                  {worst3.map((p, idx) => (
-                    <li
-                      key={`worst-${p.aId}-${p.bId}`}
-                      className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
-                    >
-                      <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
-                        <span className="text-slate-400">{idx + 1}.</span>
-                        <span className="truncate">{p.aName} × {p.bName}</span>
-                      </div>
-                      <span
-                        className="shrink-0 text-[12px] font-extrabold"
-                        style={{ color: scoreColor(p.score) }}
+                  {worst3.map((p, idx) => {
+                    const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti);
+
+                    return (
+                      <li
+                        key={`worst-${p.aId}-${p.bId}`}
+                        className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
+                      >
+                        <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
+                          <span className="text-slate-400">{idx + 1}.</span>
+                          <span className="truncate">{p.aName} × {p.bName}</span>
+                        </div>
+
+                        <span
+                          className="shrink-0 text-[12px] font-extrabold"
+                          style={{ color: scoreColor(r.score) }} // ✅ micro 기준 색
                         >
-                        {calcMicroScore(p, classifyChemType(p.aMbti, p.bMbti, p.score)).toFixed(2)}
+                          {r.score.toFixed(2)}
                         </span>
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })}
+
                 </ul>
               </div>
             </div>
@@ -468,7 +433,7 @@ export default function ChemReportSection({ pairs, best3, worst3 }: Props) {
 
                             return (
                             <li
-                                key={`${t}-rank-${rankIdx}-${slot.score}`}
+                                key={`${t}-rank-${rankIdx}-${slot.scoreInt}`}
                                 className="px-3 py-2"
                             >
                                 {/* 헤더: 순위 + 칭호 + 점수 */}
@@ -486,8 +451,11 @@ export default function ChemReportSection({ pairs, best3, worst3 }: Props) {
                                     )}
 
                                 </div>
-                                <span className="shrink-0 text-[11px] font-extrabold text-slate-700">
-                                    {slot.microKey.toFixed(2)}점
+                                <span
+                                  className="shrink-0 text-[11px] font-extrabold"
+                                  style={{ color: scoreColor(slot.microKey) }} // ✅ microKey 기준 색
+                                >
+                                  {slot.microKey.toFixed(2)}점
                                 </span>
                                 </div>
 
