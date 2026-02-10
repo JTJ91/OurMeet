@@ -29,15 +29,15 @@ export default function SaveGroupClient(props: {
         setTimeout(() => setSaved(false), 1200);
       }}
       className="
-        flex h-12 w-full items-center justify-center
-        rounded-2xl
-        bg-white
+        flex h-10 w-full items-center justify-center gap-1.5
+        rounded-2xl bg-white
         text-sm font-extrabold text-slate-800
-        ring-1 ring-black/10
+        border border-black/10
         transition-all duration-200
         hover:bg-slate-50
         active:scale-[0.98]
-      "
+        leading-none
+        "
     >
       {saved ? "저장됨 ✓" : "저장하기"}
     </button>
