@@ -2,20 +2,30 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import InviteActions from "@/components/InviteActions";
 import RememberGroupClient from "@/components/RememberGroupClient";
+import ChemMoreList from "@/app/g/[groupId]/components/ChemMoreList";
+import RoleMoreList from "@/app/g/[groupId]/components/RoleMoreList";
 import GraphServer from "./GraphServer";
 import { calcCompatScore } from "@/lib/mbtiCompat";
 import { unstable_cache } from "next/cache";
+import ChemReportSection from "@/app/g/[groupId]/components/ChemReportSection";
+
 
 import Link from "next/link";
 import { Suspense } from "react";
 
 const isValidMbti = (s?: string | null) => /^[EI][NS][TF][JP]$/i.test((s ?? "").trim());
 
+type JudgeStyle = "LOGIC" | "PEOPLE";
+type InfoStyle = "IDEA" | "FACT";
 type PairRow = {
-      aId: string; aName: string; aMbti: string;
-      bId: string; bName: string; bMbti: string;
-      score: number;
-    };
+  aId: string; aName: string; aMbti: string;
+  bId: string; bName: string; bMbti: string;
+  score: number;
+
+  // ✅ 추가 (인지기능 보정용)
+  aJudge?: JudgeStyle; aInfo?: InfoStyle;
+  bJudge?: JudgeStyle; bInfo?: InfoStyle;
+};
 
 
 /** ✅ 1) MBTI 분포 분석 */
@@ -71,6 +81,27 @@ function summarizeMbtiDistribution(mbtis: string[]) {
 /** ✅ 2) 역할 추천 (방 전체) */
 type RoleKey = "STRATEGY" | "VIBE" | "EXEC" | "ORGANIZE" | "MEDIATOR";
 
+function calcFitRanks(list: { fit: number }[]) {
+  const sorted = [...list].sort((a, b) => b.fit - a.fit);
+
+  const fitToRank = new Map<number, number>();
+  let rank = 0;
+  let lastFit: number | null = null;
+
+  for (const m of sorted) {
+    if (lastFit === null || m.fit < lastFit) {
+      rank += 1;
+      lastFit = m.fit;
+    }
+    if (!fitToRank.has(m.fit)) {
+      fitToRank.set(m.fit, rank);
+    }
+  }
+
+  return fitToRank; // fit -> rank (1부터 시작)
+}
+
+
 function roleLabel(r: RoleKey) {
   switch (r) {
     case "STRATEGY": return "🧠 전략 담당";
@@ -95,21 +126,6 @@ function roleTheme(k: RoleKey) {
       return { card: "bg-white/70 ring-black/5", accent: "text-rose-700", leftBar: "bg-rose-400" };
   }
 }
-
-function chemTheme(t: ChemType) {
-  switch (t) {
-    case "STABLE":
-      return { leftBar: "bg-sky-400", accent: "text-sky-700", chip: "bg-sky-500/10 text-sky-700" };
-    case "COMPLEMENT":
-      return { leftBar: "bg-emerald-400", accent: "text-emerald-700", chip: "bg-emerald-500/10 text-emerald-700" };
-    case "SPARK":
-      return { leftBar: "bg-amber-400", accent: "text-amber-700", chip: "bg-amber-500/10 text-amber-700" };
-    case "EXPLODE":
-      return { leftBar: "bg-rose-400", accent: "text-rose-700", chip: "bg-rose-500/10 text-rose-700" };
-  }
-}
-
-
 
 function roleRankBadge(role: RoleKey, rank: number) {
   // rank: 0=1등, 1=2등, 2=3등, 3=4등, 4=5등...
@@ -218,13 +234,15 @@ function roleEmptyMessage(role: RoleKey) {
 
 
 function pickRolesForGroup(
-  members: { nickname: string; mbti: string }[]
+  members: { nickname: string; mbti: string; judgeStyle?: JudgeStyle; infoStyle?: InfoStyle }[]
 ) {
   // 아주 가벼운 휴리스틱(인지기능까지 안가도 충분히 납득감)
   const valid = members
   .map((m) => ({
     name: m.nickname,
     mbti: m.mbti.trim().toUpperCase(),
+    judgeStyle: (m.judgeStyle ?? "LOGIC") as JudgeStyle,
+    infoStyle: (m.infoStyle ?? "IDEA") as InfoStyle,
   }))
   .filter((m) => isValidMbti(m.mbti));
 
@@ -248,7 +266,12 @@ function pickRolesForGroup(
     return out;
   };
 
-  const roleFitScore = (mbti: string, role: RoleKey) => {
+  const roleFitScore = (
+    mbti: string,
+    role: RoleKey,
+    judgeStyle?: JudgeStyle,
+    infoStyle?: InfoStyle
+  ) => {
     const t = mbti.trim().toUpperCase();
     const E = t[0] === "E";
     const N = t[1] === "N";
@@ -256,14 +279,18 @@ function pickRolesForGroup(
     const J = t[3] === "J";
     const S = t[1] === "S";
     const F = t[2] === "F";
+    const P = t[3] === "P";
 
-    // 0~100 정도 감각의 가벼운 점수(휴리스틱)
     let s = 50;
+
+    /* =========================
+      1️⃣ 역할별 기본 점수 (기존)
+      ========================= */
 
     if (role === "STRATEGY") {
       if (N) s += 18;
       if (T) s += 18;
-      if (!E) s += 6;     // 집중형 전략 가산
+      if (!E) s += 6;
       if (J) s += 6;
     }
 
@@ -278,7 +305,7 @@ function pickRolesForGroup(
       if (E) s += 12;
       if (S) s += 18;
       if (!N) s += 6;
-      if (!J) s += 6;     // 즉흥 실행
+      if (!J) s += 6;
     }
 
     if (role === "ORGANIZE") {
@@ -290,12 +317,102 @@ function pickRolesForGroup(
 
     if (role === "MEDIATOR") {
       if (F) s += 18;
-      if (J) s += 12;     // 중재/조율은 기준 세우는 힘도 필요
+      if (J) s += 12;
       if (E) s += 6;
     }
 
-    return Math.max(0, Math.min(100, s));
+    /* =========================
+      2️⃣ 인지 스타일 미세 가중치
+      ========================= */
+
+    const judge = judgeStyle ?? "LOGIC";
+    const info = infoStyle ?? "IDEA";
+
+    // 🧠 STRATEGY — 사고 결 + 추상 결 차이
+    if (role === "STRATEGY") {
+      if (T) s += 2;              // 논리적 설계
+      if (F) s -= 1;              // 공감 설계(살짝 약함)
+      if (info === "IDEA") s += 2;
+      if (info === "FACT") s -= 1;
+    }
+
+    // 💬 VIBE — 감정 표현 방식 차이
+    if (role === "VIBE") {
+      if (F) s += 2;              // 공감형 분위기
+      if (T) s -= 1;              // 논리형 분위기
+      if (judge === "PEOPLE") s += 2;
+      if (judge === "LOGIC") s -= 1;
+    }
+
+    // 🚀 EXEC — 실행 스타일 차이
+    if (role === "EXEC") {
+      if (S) s += 1;              // 현장형 실행
+      if (N) s -= 1;              // 아이디어 과잉
+      if (P) s += 2;              // 즉흥 추진
+      if (J) s -= 1;              // 계획 과잉
+      if (info === "FACT") s += 2;
+    }
+
+    // 🗂 ORGANIZE — 정리 방식 차이
+    if (role === "ORGANIZE") {
+      if (J) s += 2;              // 마감/결정 강함
+      if (P) s -= 1;              // 유연하지만 늘어짐
+      if (T) s += 1;              // 기준 명확
+      if (F) s -= 1;
+      if (info === "FACT") s += 2;
+    }
+
+    // 🧯 MEDIATOR — 중재 스타일 차이
+    if (role === "MEDIATOR") {
+      if (F) s += 2;              // 감정 중재
+      if (T) s -= 1;              // 논리 중재(차갑게 보일 수 있음)
+      if (judge === "PEOPLE") s += 2;
+      if (info === "IDEA") s += 1;
+    }
+
+    /* =========================
+      3️⃣ 🔍 초미세 타이브레이커
+    ========================= */
+
+    if (role === "STRATEGY") {
+      if (N) s += 1;
+      if (T) s += 1;
+      if (!E) s += 1;
+      if (S) s -= 1;
+    }
+
+    if (role === "VIBE") {
+      if (E) s += 1;
+      if (F) s += 1;
+      if (!J) s += 1;
+      if (T) s -= 1;
+    }
+
+    if (role === "EXEC") {
+      if (S) s += 1;
+      if (P) s += 1;
+      if (T) s += 1;
+      if (N) s -= 1;
+    }
+
+    if (role === "ORGANIZE") {
+      if (J) s += 1;
+      if (T) s += 1;
+      if (!E) s += 1;
+      if (P) s -= 1;
+    }
+
+    if (role === "MEDIATOR") {
+      if (F) s += 1;
+      if (J) s += 1;
+      if (E) s += 1;
+      if (T) s -= 1;
+    }
+
+
+    return Math.max(0, Math.min(100, Math.round(s)));
   };
+
 
 
   const bucket: Record<RoleKey, { name: string; mbti: string; fit: number }[]> = {
@@ -311,7 +428,7 @@ function pickRolesForGroup(
       bucket[r].push({
         name: m.name,
         mbti: m.mbti,
-        fit: roleFitScore(m.mbti, r),
+        fit: roleFitScore(m.mbti, r, m.judgeStyle, m.infoStyle),
       });
     }
   }
@@ -354,120 +471,7 @@ function pickRolesForGroup(
 }
 
 /** ✅ 3) 케미 타입 분류 (점수 기반 + 약간의 위트) */
-type ChemType = "STABLE" | "COMPLEMENT" | "SPARK" | "EXPLODE";
 
-function chemLabel(t: ChemType) {
-  switch (t) {
-    case "STABLE": return "🌊 안정형";
-    case "COMPLEMENT": return "🧩 보완형";
-    case "SPARK": return "⚡ 스파크형";
-    case "EXPLODE": return "🧨 폭발형";
-  }
-}
-
-// 점수 + MBTI 축 차이로 가볍게 타입 분류
-function classifyChemType(a: string, b: string, score: number): ChemType {
-  const A = a.trim().toUpperCase();
-  const B = b.trim().toUpperCase();
-  const diff =
-    (A[0] !== B[0] ? 1 : 0) +
-    (A[1] !== B[1] ? 1 : 0) +
-    (A[2] !== B[2] ? 1 : 0) +
-    (A[3] !== B[3] ? 1 : 0);
-
-  if (score >= 72) return diff >= 2 ? "COMPLEMENT" : "STABLE";
-  if (score >= 62) return diff >= 3 ? "SPARK" : "STABLE";
-  if (score >= 54) return diff >= 3 ? "SPARK" : "COMPLEMENT";
-  return diff >= 2 ? "EXPLODE" : "SPARK";
-}
-
-function summarizeChemTypes(pairs: Array<{ aMbti: string; bMbti: string; score: number }>) {
-  const dist: Record<ChemType, number> = { STABLE: 0, COMPLEMENT: 0, SPARK: 0, EXPLODE: 0 };
-  if (pairs.length === 0) {
-    return {
-      avg: null as number | null,
-      dist,
-      headline: "케미 타입을 보려면 MBTI 입력 멤버가 2명 이상 필요해요.",
-      tip: "MBTI를 입력하면 자동으로 ‘안정/보완/스파크/폭발’ 분포가 보여요.",
-    };
-  }
-
-  let sum = 0;
-  for (const p of pairs) {
-    sum += p.score;
-    dist[classifyChemType(p.aMbti, p.bMbti, p.score)]++;
-  }
-  const avg = Math.round(sum / pairs.length);
-
-  const best = (Object.keys(dist) as ChemType[]).sort((x, y) => dist[y] - dist[x])[0];
-
-  const headline = (() => {
-    if (avg >= 72) return `전체 평균이 ${avg}점이에요. 분위기 자체가 꽤 ${chemLabel("STABLE")}에 가까워요.`;
-    if (avg >= 62) return `전체 평균이 ${avg}점이에요. 무난하지만 상황 따라 ${chemLabel("SPARK")}가 튈 수 있어요.`;
-    if (avg >= 54) return `전체 평균이 ${avg}점이에요. 조율이 없으면 ${chemLabel("SPARK")}가 자주 나올 수 있어요.`;
-    return `전체 평균이 ${avg}점이에요. 방치하면 ${chemLabel("EXPLODE")} 구간이 슬쩍 보입니다.`;
-  })();
-
-  const tip = (() => {
-    if (best === "STABLE") return "이 방은 ‘기본 예의 + 템포만 맞추기’면 오래 편해요.";
-    if (best === "COMPLEMENT") return "역할만 잘 나누면 팀플처럼 굴러가요. (정리 담당만 세우면 끝)";
-    if (best === "SPARK") return "센 말 나오기 전에 ‘내가 말한 전제’부터 맞추면 싸움이 줄어요.";
-    return "농담으로 넘기기 어려운 날이 있어요. 짧고 명확하게 말하는 게 안전해요.";
-  })();
-
-  return { avg, dist, headline, tip };
-}
-
-function chemTypeComment(t: ChemType) {
-  switch (t) {
-    case "STABLE": return "기본 예의 + 템포만 맞추면 오래 편해요.";
-    case "COMPLEMENT": return "역할만 나누면 팀플처럼 굴러가요.";
-    case "SPARK": return "친해지기 빠르지만, 말꼬리에서 불이 붙을 수 있어요.";
-    case "EXPLODE": return "피곤한 날엔 ‘말투’ 하나로 분위기 갈릴 수 있어요.";
-  }
-}
-
-function summarizeChemTypesDetailed(pairs: PairRow[]) {
-  const dist: Record<ChemType, number> = { STABLE: 0, COMPLEMENT: 0, SPARK: 0, EXPLODE: 0 };
-  const byType: Record<ChemType, PairRow[]> = { STABLE: [], COMPLEMENT: [], SPARK: [], EXPLODE: [] };
-
-  if (pairs.length === 0) {
-    return {
-      avg: null as number | null,
-      dist,
-      byType,
-      headline: "케미 타입을 보려면 MBTI 입력 멤버가 2명 이상 필요해요.",
-      tip: "MBTI를 입력하면 자동으로 ‘안정/보완/스파크/폭발’ 분포와 예시 커플이 보여요.",
-    };
-  }
-
-  let sum = 0;
-  for (const p of pairs) {
-    sum += p.score;
-    const t = classifyChemType(p.aMbti, p.bMbti, p.score);
-    dist[t]++;
-    byType[t].push(p);
-  }
-
-  const avg = Math.round(sum / pairs.length);
-  const best = (Object.keys(dist) as ChemType[]).sort((x, y) => dist[y] - dist[x])[0];
-
-  const headline = (() => {
-    if (avg >= 72) return `전체 평균이 ${avg}점이에요. 전체적으로 안정적으로 굴러가는 편이에요.`;
-    if (avg >= 62) return `전체 평균이 ${avg}점이에요. 무난하지만 스파크가 가끔 튈 수 있어요.`;
-    if (avg >= 54) return `전체 평균이 ${avg}점이에요. 조율 없으면 갈등이 자주 생길 수 있어요.`;
-    return `전체 평균이 ${avg}점이에요. 방치하면 폭발형이 자주 보일 수 있어요.`;
-  })();
-
-  const tip = (() => {
-    if (best === "STABLE") return "편한 조합이 많아요. 속도만 맞추면 됩니다.";
-    if (best === "COMPLEMENT") return "역할 분배하면 효율이 확 올라가요.";
-    if (best === "SPARK") return "전제부터 맞추면 급싸를 많이 줄일 수 있어요.";
-    return "짧고 명확하게 말하는 게 안전해요.";
-  })();
-
-  return { avg, dist, byType, headline, tip };
-}
 
 
 /** ✅ cached rankings (원본 유지 + pairs도 같이 반환해 3번에 재사용) */
@@ -485,6 +489,8 @@ const getRankings = unstable_cache(
         id: m.id,
         nickname: m.nickname,
         mbti: (m.mbti ?? "").trim().toUpperCase(),
+        judgeStyle: (m.judgeStyle ?? "LOGIC") as JudgeStyle, // ✅
+        infoStyle: (m.infoStyle ?? "IDEA") as InfoStyle,     // ✅
       }));
 
     const pairs: PairRow[] = [];
@@ -492,6 +498,14 @@ const getRankings = unstable_cache(
       for (let j = i + 1; j < membersForRank.length; j++) {
         const a = membersForRank[i];
         const b = membersForRank[j];
+
+        const base = calcCompatScore(a.mbti, b.mbti);
+        const score = adjustChemScoreByStyles(
+          base,
+          { judge: a.judgeStyle, info: a.infoStyle },
+          { judge: b.judgeStyle, info: b.infoStyle }
+        );
+
         pairs.push({
           aId: a.id,
           aName: a.nickname,
@@ -499,7 +513,7 @@ const getRankings = unstable_cache(
           bId: b.id,
           bName: b.nickname,
           bMbti: b.mbti,
-          score: calcCompatScore(a.mbti, b.mbti),
+          score: score,
         });
       }
     }
@@ -523,17 +537,61 @@ const LEVEL_META: Record<Level, { label: string; color: string }> = {
   1: { label: "위험", color: "#E53935" },
 };
 
-function scoreToLevel(score: number): Level {
-  if (score >= 75) return 5;
-  if (score >= 65) return 4;
-  if (score >= 55) return 3;
-  if (score >= 45) return 2;
-  return 1;
+function clampScore(n: number) {
+  return Math.max(0, Math.min(100, Math.round(n)));
 }
 
-function scoreColor(score: number) {
-  return LEVEL_META[scoreToLevel(score)].color;
+function adjustChemScoreByStyles(
+  base: number,
+  a: { judge?: JudgeStyle; info?: InfoStyle },
+  b: { judge?: JudgeStyle; info?: InfoStyle }
+) {
+  let s = base;
+
+  const aj = a.judge ?? "LOGIC";
+  const bj = b.judge ?? "LOGIC";
+  const ai = a.info ?? "IDEA";
+  const bi = b.info ?? "IDEA";
+
+  // -----------------------------
+  // 1️⃣ 판단 기준 (논리 vs 사람)
+  // -----------------------------
+  if (aj === bj) {
+    s += 4; // ✅ 같은 기준 → 말이 빨리 맞음
+  } else {
+    s -= 5; // ❗ 핵심 충돌: 결론 내는 방식 자체가 다름
+  }
+
+  // -----------------------------
+  // 2️⃣ 정보 처리 (아이디어 vs 사실)
+  // -----------------------------
+  if (ai === bi) {
+    s += 3; // 같은 레벨에서 이야기
+  } else {
+    s -= 3; // 전제부터 어긋남
+  }
+
+  // -----------------------------
+  // 3️⃣ 궁합이 낮은데 스타일까지 다르면 증폭
+  // -----------------------------
+  if (base < 55 && aj !== bj) {
+    s -= 3; // ❗ 싸움으로 번질 확률
+  }
+
+  if (base < 55 && ai !== bi) {
+    s -= 2; // 은근한 피로 누적
+  }
+
+  // -----------------------------
+  // 4️⃣ 궁합이 높은데 스타일이 맞으면 보너스
+  // -----------------------------
+  if (base >= 70 && aj === bj && ai === bi) {
+    s += 2; // 말 안 해도 통하는 느낌
+  }
+
+  return clampScore(s);
 }
+
 
 
 export default async function GroupPage({
@@ -549,7 +607,6 @@ export default async function GroupPage({
 
   const pctNum = (n: number, total: number) => (total ? Math.round((n / total) * 100) : 0);
   const fracText = (n: number, total: number) => `${n}/${total}명 (${pctNum(n, total)}%)`;
-
 
   const cached = await getRankings(groupId);
   if (!cached) return notFound();
@@ -571,22 +628,18 @@ export default async function GroupPage({
   const pctPeople = (n: number) => Math.round((n / distTotal) * 100);
   const fracText2 = (n: number) => `${n}/${distTotal}명 (${pctPeople(n)}%)`;
 
-
   const dist = summarizeMbtiDistribution(validMbtis);
+
   const roles = pickRolesForGroup(
     group.members
       .filter((m) => isValidMbti(m.mbti))
       .map((m) => ({
         nickname: m.nickname,
         mbti: m.mbti ?? "",
+        judgeStyle: (m.judgeStyle ?? "LOGIC") as JudgeStyle,
+        infoStyle: (m.infoStyle ?? "IDEA") as InfoStyle,
       }))
   );
-
-  const chem = summarizeChemTypesDetailed(pairs as PairRow[]);
-
-
-  const totalPairs = pairs.length || 1;
-  const pct = (x: number) => Math.round((x / totalPairs) * 100);
 
   const MBTI_COLOR: Record<string, string> = {
     E: "#F59E0B",
@@ -676,200 +729,7 @@ export default async function GroupPage({
         </Suspense>
 
         {/* ✅ 케미 리포트 (랭킹 + 타입요약) */}
-        <section className="mt-6">
-          <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/5">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-extrabold">🏆 케미 리포트</div>
-            </div>
-
-            {/* ✅ 상단 요약 (기존 chem.headline/tip 재사용) */}
-            <div className="mt-3 rounded-2xl bg-white/60 p-3 ring-1 ring-black/5">
-              <div className="text-xs font-extrabold text-slate-800">{chem.headline}</div>
-              <p className="mt-1 text-xs text-slate-600">{chem.tip}</p>
-            </div>
-
-            {pairs.length === 0 ? (
-              <p className="mt-3 text-sm text-slate-500">
-                랭킹을 보려면 MBTI를 입력한 멤버가 2명 이상 필요해요.
-              </p>
-            ) : (
-              <>
-                {/* ✅ 랭킹 (기존 유지) */}
-                <div className="mt-3 grid grid-cols-2 gap-3">
-                  {/* LEFT: BEST */}
-                  <div className="min-w-0">
-                    <div className="mb-2 flex items-center gap-2">
-                      <span className="text-[11px] font-extrabold text-[#1E88E5]">🔥 최고</span>
-                      <span className="text-[11px] text-slate-400">TOP 3</span>
-                    </div>
-
-                    <ul className="space-y-2">
-                      {best3.map((p, idx) => (
-                        <li
-                          key={`best-${p.aId}-${p.bId}`}
-                          className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
-                        >
-                          <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
-                            <span className="text-slate-400">{idx + 1}.</span>
-                            <span className="truncate">{p.aName} × {p.bName}</span>
-                          </div>
-                          {(() => {
-                            return (
-                              <span
-                                className="shrink-0 text-[12px] font-extrabold"
-                                style={{ color: scoreColor(p.score) }}
-                              >
-                                {p.score}
-                              </span>
-                            );
-                          })()}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* RIGHT: WORST */}
-                  <div className="min-w-0">
-                    <div className="mb-2 flex items-center gap-2">
-                      <span className="text-[11px] font-extrabold text-rose-600">🥶 최악</span>
-                      <span className="text-[11px] text-slate-400">WORST 3</span>
-                    </div>
-
-                    <ul className="space-y-2">
-                      {worst3.map((p, idx) => (
-                        <li
-                          key={`worst-${p.aId}-${p.bId}`}
-                          className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
-                        >
-                          <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
-                            <span className="text-slate-400">{idx + 1}.</span>
-                            <span className="truncate">{p.aName} × {p.bName}</span>
-                          </div>
-                          {(() => {
-                            return (
-                              <span
-                                className="shrink-0 text-[12px] font-extrabold"
-                                style={{ color: scoreColor(p.score) }}
-                              >
-                                {p.score}
-                              </span>
-                            );
-                          })()}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                {/* ✅ 타입 요약: 숫자/비율만 깔끔하게 */}
-                {pairs.length > 0 && (
-                  <div className="mt-3 space-y-3">
-                    {(["STABLE", "COMPLEMENT", "SPARK", "EXPLODE"] as ChemType[]).map((t) => {
-                      const th = chemTheme(t);
-                      const list = (chem.byType?.[t] ?? []).slice();
-
-                      // ✅ 안정/보완/스파크는 높은 점수 쪽, 폭발은 낮은 점수 쪽
-                      const picks =
-                        t === "EXPLODE"
-                          ? list.sort((a, b) => a.score - b.score).slice(0, 4)
-                          : list.sort((a, b) => b.score - a.score).slice(0, 4);
-
-                      const totalPairs = pairs.length || 1;
-                      const percent = Math.round(((chem.dist[t] ?? 0) / totalPairs) * 100);
-
-                      return (
-                        <div
-                          key={t}
-                          className={[
-                            "relative overflow-hidden rounded-2xl bg-white/70 p-3",
-                            "ring-1 ring-black/5",
-                          ].join(" ")}
-                        >
-                          {/* left accent bar (역할카드 느낌) */}
-                          <div className={`absolute left-0 top-0 h-full w-1 ${th.leftBar}`} />
-
-                          {/* header */}
-                          <div className="flex items-start justify-between gap-2 pl-2">
-                            <div className="min-w-0">
-                              <div className={`text-xs font-extrabold truncate ${th.accent}`}>
-                                {chemLabel(t)}
-                              </div>
-                              <div className="mt-0.5 text-[11px] text-slate-500">
-                                {chemTypeComment(t)}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* meta: count + percent (고급스럽게) */}
-                          <div className="mt-2 pl-2">
-                            <div className="flex items-center justify-between">
-                              <div className="text-[11px] font-bold text-slate-500">
-                                {chem.dist[t]}개 <span className="text-slate-300">·</span> {percent}%
-                              </div>
-                              {/* 옵션: 점 없애고 싶으면 이 줄 자체를 지워도 됨 */}
-                              <div className="text-[11px] font-bold text-slate-400">
-                                전체 조합 {pairs.length}개 중
-                              </div>
-                            </div>
-
-                            <div className="mt-2 h-2 w-full rounded-full bg-slate-200/80">
-                              <div
-                                className={`h-2 rounded-full ${th.leftBar}`}
-                                style={{ width: `${percent}%` }}
-                              />
-                            </div>
-                          </div>
-
-                          {/* body */}
-                          <div className="mt-3 pl-2">
-                            {picks.length > 0 ? (
-                              <ul className="divide-y divide-black/5 overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/5">
-                                {picks.map((p, idx) => (
-                                  <li
-                                    key={`${t}-${p.aId}-${p.bId}`}
-                                    className="flex items-center gap-2 px-3 py-2"
-                                    title={`${p.aMbti} × ${p.bMbti}`}
-                                  >
-                                    <span className="w-4 shrink-0 text-[11px] font-extrabold text-slate-400">
-                                      {idx + 1}
-                                    </span>
-
-                                    <span className="truncate text-xs font-extrabold text-slate-900">
-                                      {p.aName} × {p.bName}
-                                    </span>
-
-                                    <span className="ml-auto shrink-0 text-[11px] font-bold text-slate-500">
-                                      {p.aMbti}/{p.bMbti}
-                                    </span>
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <div className="rounded-xl bg-white/60 px-3 py-3 ring-1 ring-black/5">
-                                <div className="text-[11px] text-slate-500">
-                                  아직 이 타입으로 분류되는 조합이 없어요.
-                                </div>
-                              </div>
-                            )}
-
-                            {list.length > picks.length && (
-                              <div className="mt-2 text-[11px] font-bold text-slate-400">
-                                +{list.length - picks.length}조합 더 있음
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-
-              </>
-            )}
-          </div>
-        </section>
-
+        <ChemReportSection pairs={pairs} best3={best3} worst3={worst3} />
 
         {/* ✅ 1) MBTI 분포 */}
         <section className="mt-6">
@@ -983,6 +843,8 @@ export default async function GroupPage({
                       .slice()
                       .sort((a, b) => b.fit - a.fit);
 
+                    const fitRankMap = calcFitRanks(sorted);
+
                     return (
                       <div
                         key={k}
@@ -1016,15 +878,16 @@ export default async function GroupPage({
                           <div className="mt-3 pl-2">
                             <ul className="divide-y divide-black/5 overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/5">
                               {sorted.slice(0, 5).map((m, idx) => {
-                                const isTopRank = idx === 0; // ✅ 역할 내 1등만
-                                const badge = roleRankBadge(k, idx);
+                                const rank = fitRankMap.get(m.fit) ?? 999; // 1,2,3...
+                                const badge = roleRankBadge(k, rank - 1); // roleRankBadge는 0=1등 규칙
+                                const isCoFirst = rank === 1;
 
                                 return (
                                   <li
                                     key={`${k}-${m.name}-${m.mbti}`}
                                     className={[
                                       "relative flex items-center justify-between px-3 py-2",
-                                      isTopRank ? "bg-white/85" : "",
+                                      isCoFirst ? "bg-white/85" : ""
                                     ].join(" ")}
                                     title={`적합도 ${m.fit}`}
                                   >
@@ -1046,25 +909,23 @@ export default async function GroupPage({
                                     </div>
 
                                     {/* ✅ 우측: 1등만 왕관 + 순위 칭호(색은 순위에 따라 점점 화려) */}
-                                    <span className="shrink-0 text-[11px]">
-                                    {isTopRank && "👑 "}
-                                    {badge && (
-                                      <span className={badge.cls}>
-                                        {badge.title}
-                                      </span>
-                                    )}
-                                  </span>
+                                    <span className="shrink-0 text-right text-[11px] leading-tight">
+                                      <div>
+                                        {isCoFirst && "👑 "}
+                                        {badge && <span className={badge.cls}>{badge.title}</span>}
+                                      </div>
+                                      <div className="font-extrabold text-slate-700">
+                                        {m.fit}점
+                                      </div>
+                                    </span>
+
                                   </li>
                                 );
                               })}
 
                             </ul>
 
-                            {sorted.length > 5 && (
-                              <div className="mt-2 text-[11px] font-bold text-slate-400">
-                                +{sorted.length - 5}명 더 있음
-                              </div>
-                            )}
+                            <RoleMoreList roleKey={k} members={sorted} shown={5} />
                           </div>
                         )}
                         {sorted.length === 0 && (

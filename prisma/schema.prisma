@@ -19,6 +19,10 @@ model Member {
   id        String   @id @default(cuid())
   nickname  String
   mbti      String
+
+  judgeStyle String @default("LOGIC") // LOGIC | PEOPLE
+  infoStyle  String @default("IDEA")  // IDEA | FACT
+
   groupId   String
   group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())

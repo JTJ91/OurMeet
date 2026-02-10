@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Member" ADD COLUMN     "infoStyle" TEXT NOT NULL DEFAULT 'IDEA',
+ADD COLUMN     "judgeStyle" TEXT NOT NULL DEFAULT 'LOGIC';

@@ -27,19 +27,30 @@ export default function JoinFormClient({
   return (
     <form
         action={async (fd: FormData) => {
-        const result = await joinGroupAction(fd);
+          try {
+            const result = await joinGroupAction(fd);
 
-        upsertSavedGroup({
-        id: result.groupId,
-        name: result.groupName,
-        myMemberId: result.memberId,
-        myNickname: String(fd.get("nickname") || ""),
-        myMbti: String(fd.get("mbti") || "").toUpperCase(),
-        });
+            upsertSavedGroup({
+              id: result.groupId,
+              name: result.groupName,
+              myMemberId: result.memberId,
+              myNickname: String(fd.get("nickname") || ""),
+              myMbti: String(fd.get("mbti") || "").toUpperCase(),
+            });
 
-        router.replace(`/g/${result.groupId}?center=${result.memberId}`);
-        router.refresh();
-    }}
+            // ✅ 성공 시 이동
+            router.replace(`/g/${result.groupId}?center=${result.memberId}`);
+            router.refresh();
+          } catch (err: any) {
+            // ✅ 에러 처리
+            alert(err?.message ?? "참가 중 문제가 발생했어요.");
+
+            // 🔓 잠금 해제
+            lockedRef.current = false;
+            setIsSubmitting(false);
+          }
+        }}
+
 
       className={["mt-5 space-y-4", isSubmitting ? "pointer-events-none" : ""].join(" ")}
       onSubmit={(e) => {
@@ -151,6 +162,119 @@ export default function JoinFormClient({
           <p className="mt-1 text-[11px] text-slate-500">ENFP 형식, 공백 없이 4글자</p>
         )}
       </label>
+
+      {/* ✅ 추가 입력 1: 판단 기준 (T/F 보정) */}
+        <fieldset className="block">
+          <legend className="text-sm font-bold text-slate-800">판단 기준</legend>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <label className="cursor-pointer">
+              <input
+                type="radio"
+                name="judge"
+                value="LOGIC"
+                defaultChecked
+                disabled={isFull || isSubmitting}
+                className="peer sr-only"
+              />
+              <div
+                className="
+                  h-12 rounded-2xl bg-white px-4
+                  ring-1 ring-black/10
+                  flex items-center justify-center
+                  text-[13px] font-extrabold text-slate-700
+                  peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50
+                  peer-checked:bg-white
+                  hover:bg-white
+                  disabled:opacity-60
+                "
+              >
+                🔢 논리·효율·근거
+              </div>
+            </label>
+
+            <label className="cursor-pointer">
+              <input
+                type="radio"
+                name="judge"
+                value="PEOPLE"
+                disabled={isFull || isSubmitting}
+                className="peer sr-only"
+              />
+              <div
+                className="
+                  h-12 rounded-2xl bg-white px-4
+                  ring-1 ring-black/10
+                  flex items-center justify-center
+                  text-[13px] font-extrabold text-slate-700
+                  peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50
+                  peer-checked:bg-white
+                  hover:bg-white
+                  disabled:opacity-60
+                "
+              >
+                💬 사람·분위기·감정
+              </div>
+            </label>
+          </div>
+          <p className="mt-1 text-[11px] text-slate-500">같은 MBTI여도 판단 습관이 달라질 수 있어요.</p>
+        </fieldset>
+
+        {/* ✅ 추가 입력 2: 정보 방식 (N/S 보정) */}
+        <fieldset className="block">
+          <legend className="text-sm font-bold text-slate-800">정보 방식</legend>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <label className="cursor-pointer">
+              <input
+                type="radio"
+                name="info"
+                value="IDEA"
+                defaultChecked
+                disabled={isFull || isSubmitting}
+                className="peer sr-only"
+              />
+              <div
+                className="
+                  h-12 rounded-2xl bg-white px-4
+                  ring-1 ring-black/10
+                  flex items-center justify-center
+                  text-[13px] font-extrabold text-slate-700
+                  peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50
+                  peer-checked:bg-white
+                  hover:bg-white
+                  disabled:opacity-60
+                "
+              >
+                💡 가능성·의미·큰 그림
+              </div>
+            </label>
+
+            <label className="cursor-pointer">
+              <input
+                type="radio"
+                name="info"
+                value="FACT"
+                disabled={isFull || isSubmitting}
+                className="peer sr-only"
+              />
+              <div
+                className="
+                  h-12 rounded-2xl bg-white px-4
+                  ring-1 ring-black/10
+                  flex items-center justify-center
+                  text-[13px] font-extrabold text-slate-700
+                  peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50
+                  peer-checked:bg-white
+                  hover:bg-white
+                  disabled:opacity-60
+                "
+              >
+                📋 사실·경험·현실
+              </div>
+            </label>
+          </div>
+          <p className="mt-1 text-[11px] text-slate-500">아이디어형 vs 현실형 편차를 반영해요.</p>
+        </fieldset>
+
 
       <button
         type="submit"
