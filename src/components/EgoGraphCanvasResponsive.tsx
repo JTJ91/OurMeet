@@ -972,7 +972,7 @@ export default function EgoGraphCanvasResponsive({
 
       {activeNode && (
         <div className="sticky bottom-2 z-10 mt-2 px-2">
-          <div className="mx-auto w-full max-w-[340px] overflow-hidden rounded-2xl border border-black/10 bg-white/90 shadow-[0_8px_20px_rgba(15,23,42,0.08)] backdrop-blur-md">
+          <div className="mx-auto w-full max-w-[340px] overflow-visible rounded-2xl border border-black/10 bg-white/90 shadow-[0_8px_20px_rgba(15,23,42,0.08)] backdrop-blur-md">
             <div
               className="h-[2px] w-full"
               style={{
@@ -992,7 +992,7 @@ export default function EgoGraphCanvasResponsive({
                   <div className="relative shrink-0">
                     {/* 코치마크(처음 1회) - 우측 칩에 붙임 */}
                     {showCenterCoach && (
-                      <div className="pointer-events-none absolute -top-9 right-0">
+                      <div className="pointer-events-none absolute -top-9 right-0 z-50">
                         <div className="rounded-full bg-slate-900/90 px-3 py-1 text-[11px] font-semibold text-white shadow">
                           센터 바꾸기 👇
                         </div>
