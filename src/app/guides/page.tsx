@@ -58,6 +58,22 @@ export default function GuidesIndexPage() {
             </Link>
           ))}
         </section>
+
+        {/* CTA */}
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <a
+              href="/"
+              className="flex-1 rounded-full border border-slate-300 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              메인으로
+            </a>
+            <a
+              href="/create"
+              className="flex-1 rounded-full bg-[#1E88E5] px-6 py-3 text-center text-sm font-semibold text-white shadow-md transition hover:bg-[#1E88E5]/90"
+            >
+              우리 모임 케미 보러가기 →
+            </a>
+          </div>
       </div>
     </main>
   );

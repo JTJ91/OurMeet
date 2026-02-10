@@ -123,7 +123,7 @@ export default function Home() {
                   1
                 </span>
                 <span className="leading-6">
-                  <b className="text-slate-800">모임 생성</b> 후 초대 링크를 공유해요
+                  <b className="text-slate-800">모임 만들기</b> 후 초대 링크를 공유해요
                 </span>
               </li>
 
@@ -132,7 +132,7 @@ export default function Home() {
                   2
                 </span>
                 <span className="leading-6">
-                  멤버들이 <b className="text-slate-800">MBTI</b>를 입력해요
+                  멤버들이 <b className="text-slate-800">별명, MBTI</b>를 입력해요
                 </span>
               </li>
 

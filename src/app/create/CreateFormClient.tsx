@@ -121,49 +121,96 @@ export default function CreateFormClient() {
         )}
       </label>
 
-      {/* 판단 기준 */}
+      {/* 결정 스타일 */}
       <fieldset className="block">
-        <legend className="text-sm font-bold text-slate-800">판단 기준</legend>
+        <legend className="text-sm font-bold text-slate-800">결정 스타일</legend>
+        <p className="mt-1 text-[11px] text-slate-500">
+          모임에서 “결론 내릴 때” 무엇을 더 우선하나요?
+        </p>
+
         <div className="mt-2 grid grid-cols-2 gap-2">
           <label className="cursor-pointer">
             <input type="radio" name="judge" value="LOGIC" defaultChecked className="peer sr-only" />
-            <div className="h-12 rounded-2xl bg-white px-4 ring-1 ring-black/10 flex items-center justify-center text-[13px] font-extrabold text-slate-700 peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50">
-              🔢 논리·효율·근거
+            <div
+              className="
+                h-14 rounded-2xl bg-white px-4 ring-1 ring-black/10
+                flex flex-col items-center justify-center gap-0.5
+                text-center
+                peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50
+                peer-checked:bg-[#1E88E5]/[0.06]
+              "
+            >
+              <div className="text-[13px] font-extrabold text-slate-800">🔍 근거·효율</div>
+              <div className="text-[11px] text-slate-500">팩트/논리로 정리</div>
             </div>
           </label>
+
           <label className="cursor-pointer">
             <input type="radio" name="judge" value="PEOPLE" className="peer sr-only" />
-            <div className="h-12 rounded-2xl bg-white px-4 ring-1 ring-black/10 flex items-center justify-center text-[13px] font-extrabold text-slate-700 peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50">
-              💬 사람·분위기·감정
+            <div
+              className="
+                h-14 rounded-2xl bg-white px-4 ring-1 ring-black/10
+                flex flex-col items-center justify-center gap-0.5
+                text-center
+                peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50
+                peer-checked:bg-[#1E88E5]/[0.06]
+              "
+            >
+              <div className="text-[13px] font-extrabold text-slate-800">🤝 공감·분위기</div>
+              <div className="text-[11px] text-slate-500">사람/감정도 고려</div>
             </div>
           </label>
         </div>
       </fieldset>
 
-      {/* 정보 방식 */}
+      {/* 정보 선호 */}
       <fieldset className="block">
-        <legend className="text-sm font-bold text-slate-800">정보 방식</legend>
+        <legend className="text-sm font-bold text-slate-800">정보 선호</legend>
+        <p className="mt-1 text-[11px] text-slate-500">
+          얘기할 때 어떤 정보가 더 편한가요?
+        </p>
+
         <div className="mt-2 grid grid-cols-2 gap-2">
           <label className="cursor-pointer">
             <input type="radio" name="info" value="IDEA" defaultChecked className="peer sr-only" />
-            <div className="h-12 rounded-2xl bg-white px-4 ring-1 ring-black/10 flex items-center justify-center text-[13px] font-extrabold text-slate-700 peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50">
-              💡 가능성·의미·큰 그림
+            <div
+              className="
+                h-14 rounded-2xl bg-white px-4 ring-1 ring-black/10
+                flex flex-col items-center justify-center gap-0.5
+                text-center
+                peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50
+                peer-checked:bg-[#1E88E5]/[0.06]
+              "
+            >
+              <div className="text-[13px] font-extrabold text-slate-800">💡 아이디어</div>
+              <div className="text-[11px] text-slate-500">의미/가능성 위주</div>
             </div>
           </label>
+
           <label className="cursor-pointer">
             <input type="radio" name="info" value="FACT" className="peer sr-only" />
-            <div className="h-12 rounded-2xl bg-white px-4 ring-1 ring-black/10 flex items-center justify-center text-[13px] font-extrabold text-slate-700 peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50">
-              📋 사실·경험·현실
+            <div
+              className="
+                h-14 rounded-2xl bg-white px-4 ring-1 ring-black/10
+                flex flex-col items-center justify-center gap-0.5
+                text-center
+                peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50
+                peer-checked:bg-[#1E88E5]/[0.06]
+              "
+            >
+              <div className="text-[13px] font-extrabold text-slate-800">📌 현실·사실</div>
+              <div className="text-[11px] text-slate-500">경험/데이터 선호</div>
             </div>
           </label>
         </div>
       </fieldset>
+
 
       <button
         type="submit"
         disabled={isSubmitting}
         className={[
-          "w-full rounded-2xl px-4 py-4 text-sm font-extrabold text-white transition-all duration-200 active:scale-[0.98]",
+          "w-full rounded-2xl mt-4 px-4 py-4 text-sm font-extrabold text-white transition-all duration-200 active:scale-[0.98]",
           isSubmitting ? "bg-slate-300" : "bg-[#1E88E5] hover:bg-[#1E88E5]/90",
         ].join(" ")}
       >
