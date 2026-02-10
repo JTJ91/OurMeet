@@ -584,10 +584,6 @@ export default function EgoGraphCanvasResponsive({
   // ✅ 범례 강조(필터): null이면 전체 동일 강도
   const [focusLevel, setFocusLevel] = useState<Level | null>(null);
 
-  const COACH_KEY = "om_center_coach_v1";
-  const [showCenterCoach, setShowCenterCoach] = useState(false);
-
-
   const safeNodes = useMemo(() => clampNodes(nodes, 20), [nodes]);
 
   const TOP_UI = 44; // px (원하면 40~52 사이로 조절)
@@ -923,28 +919,6 @@ export default function EgoGraphCanvasResponsive({
     [activeId, placed]
   );
 
-  useEffect(() => {
-  if (!activeNode) return;
-  if (!onCenterChange) return;
-
-  try {
-    const seen = localStorage.getItem(COACH_KEY);
-    if (seen) return;
-
-    setShowCenterCoach(true);
-
-    const t = window.setTimeout(() => {
-      setShowCenterCoach(false);
-      localStorage.setItem(COACH_KEY, "1");
-    }, 2200);
-
-    return () => window.clearTimeout(t);
-  } catch {
-    // storage 막힌 환경이면 무시
-  }
-}, [activeNode, onCenterChange]);
-
-
   const scoreNum =
     activeNode && Number.isFinite(Number(activeNode.score))
       ? Math.round(Number(activeNode.score))
@@ -972,7 +946,7 @@ export default function EgoGraphCanvasResponsive({
 
       {activeNode && (
         <div className="sticky bottom-2 z-10 mt-2 px-2">
-          <div className="mx-auto w-full max-w-[340px] overflow-visible rounded-2xl border border-black/10 bg-white/90 shadow-[0_8px_20px_rgba(15,23,42,0.08)] backdrop-blur-md">
+          <div className="mx-auto w-full max-w-[340px] overflow-hidden rounded-2xl border border-black/10 bg-white/90 shadow-[0_8px_20px_rgba(15,23,42,0.08)] backdrop-blur-md">
             <div
               className="h-[2px] w-full"
               style={{
@@ -990,29 +964,16 @@ export default function EgoGraphCanvasResponsive({
 
                 {onCenterChange && (
                   <div className="relative shrink-0">
-                    {/* 코치마크(처음 1회) - 우측 칩에 붙임 */}
-                    {showCenterCoach && (
-                      <div className="pointer-events-none absolute -top-9 right-0 z-50">
-                        <div className="rounded-full bg-slate-900/90 px-3 py-1 text-[11px] font-semibold text-white shadow">
-                          센터 바꾸기 👇
-                        </div>
-                      </div>
-                    )}
-
                     <button
                       type="button"
                       onClick={() => {
                         setActiveId(null);
                         setFocusLevel(null);
-                        setShowCenterCoach(false);
 
                         React.startTransition(() => {
                           onCenterChange(activeNode.id);
                         });
 
-                        try {
-                          localStorage.setItem(COACH_KEY, "1");
-                        } catch {}
                       }}
                       className={[
                         "inline-flex items-center gap-1.5",

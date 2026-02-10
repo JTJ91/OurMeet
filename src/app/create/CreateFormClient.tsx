@@ -81,7 +81,7 @@ export default function CreateFormClient() {
           required
           maxLength={30}
           disabled={isSubmitting}
-          className="mt-2 w-full rounded-2xl border border-black/10 bg-white/90 px-4 py-3 text-sm outline-none ring-0 placeholder:text-slate-400 focus:border-[#1E88E5]/40 focus:shadow-[0_0_0_3px_rgba(30,136,229,0.12)] disabled:opacity-60"
+          className="mt-2 w-full rounded-2xl border border-black/10 bg-white/90 px-4 py-3 text-[16px] outline-none ring-0 placeholder:text-slate-400 focus:border-[#1E88E5]/40 focus:shadow-[0_0_0_3px_rgba(30,136,229,0.12)] disabled:opacity-60"
           onChange={(e) => {
             e.currentTarget.value = e.currentTarget.value.trimStart();
           }}
@@ -98,7 +98,7 @@ export default function CreateFormClient() {
             required
             maxLength={3}
             disabled={isSubmitting}
-            className="mt-2 w-full rounded-2xl border border-black/10 bg-white/90 px-4 py-3 text-sm outline-none placeholder:text-slate-400 focus:border-[#1E88E5]/40 focus:shadow-[0_0_0_3px_rgba(30,136,229,0.12)] disabled:opacity-60"
+            className="mt-2 w-full rounded-2xl border border-black/10 bg-white/90 px-4 py-3 text-[16px] outline-none placeholder:text-slate-400 focus:border-[#1E88E5]/40 focus:shadow-[0_0_0_3px_rgba(30,136,229,0.12)] disabled:opacity-60"
             onKeyDown={(e) => {
               if (e.key === " ") e.preventDefault();
             }}
@@ -124,7 +124,7 @@ export default function CreateFormClient() {
             disabled={isSubmitting}
             aria-invalid={!!mbtiError}
             className={[
-              "mt-2 w-full rounded-2xl border bg-white/90 px-4 py-3 text-sm uppercase outline-none placeholder:text-slate-400 disabled:opacity-60",
+              "mt-2 w-full rounded-2xl border bg-white/90 px-4 py-3 text-[16px] uppercase outline-none placeholder:text-slate-400 disabled:opacity-60",
               mbtiError
                 ? "border-red-400 focus:border-red-400 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.18)]"
                 : "border-black/10 focus:border-[#1E88E5]/40 focus:shadow-[0_0_0_3px_rgba(30,136,229,0.12)]",

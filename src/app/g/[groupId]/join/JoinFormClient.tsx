@@ -93,7 +93,7 @@ export default function JoinFormClient({
           maxLength={3}
           placeholder="예) 태주"
           disabled={isFull || isSubmitting}
-          className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-white px-4 text-sm outline-none focus:border-[#1E88E5]/50 disabled:opacity-60"
+          className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-white px-4 text-[16px] outline-none focus:border-[#1E88E5]/50 disabled:opacity-60"
           onKeyDown={(e) => {
             if (e.key === " ") e.preventDefault();
           }}
@@ -115,7 +115,7 @@ export default function JoinFormClient({
           disabled={isFull || isSubmitting}
           aria-invalid={!!mbtiError}
           className={[
-            "mt-2 h-12 w-full rounded-2xl border bg-white px-4 text-sm uppercase outline-none disabled:opacity-60",
+            "mt-2 h-12 w-full rounded-2xl border bg-white px-4 text-[16px] uppercase outline-none disabled:opacity-60",
             mbtiError ? "border-red-400 focus:border-red-400" : "border-black/10 focus:border-[#1E88E5]/50",
           ].join(" ")}
           onKeyDown={(e) => {

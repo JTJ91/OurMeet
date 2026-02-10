@@ -185,6 +185,21 @@ function roleRankBadge(role: RoleKey, rank: number) {
   );
 }
 
+function roleDescMessage(role: RoleKey) {
+  switch (role) {
+    case "STRATEGY":
+      return "큰그림·패턴을 먼저 보는 편이에요. 방향 잡고 설계하는 역할에 강해요.";
+    case "VIBE":
+      return "분위기 읽고 말 잘 이어주는 편이에요. 어색함을 풀어주는 역할이에요.";
+    case "EXEC":
+      return "생각보다 ‘일단 해보자’가 빠른 편이에요. 움직이게 만드는 추진력이에요.";
+    case "ORGANIZE":
+      return "정리·우선순위·결론을 잘 내는 편이에요. 회의 마무리 담당이에요.";
+    case "MEDIATOR":
+      return "서로 입장 차이를 부드럽게 맞추는 편이에요. 갈등을 줄여주는 역할이에요.";
+  }
+}
+
 
 function roleEmptyMessage(role: RoleKey) {
   switch (role) {
@@ -986,7 +1001,7 @@ export default async function GroupPage({
                               {roleLabel(k)}
                             </div>
                             <div className="mt-0.5 text-[11px] text-slate-500">
-                              역할 성향이 비슷한 멤버를 모아봤어요
+                              {roleDescMessage(k)}
                             </div>
                           </div>
 

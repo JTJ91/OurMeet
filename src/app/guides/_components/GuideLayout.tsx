@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+
 export default function GuideLayout({
   title,
   description,
@@ -15,11 +16,11 @@ export default function GuideLayout({
         {/* Back */}
         <div className="mb-4 flex items-center justify-between">
           <Link
-            href="/"
+            href="/guides"
             className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 backdrop-blur hover:bg-white"
           >
             <span aria-hidden>←</span>
-            <span>메인으로</span>
+            <span>가이드 목록</span>
           </Link>
         </div>
 
