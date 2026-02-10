@@ -20,8 +20,6 @@ type ChemType = "STABLE" | "COMPLEMENT" | "SPARK" | "EXPLODE";
 
 type Props = {
   pairs: PairRow[];
-  best3: PairRow[];
-  worst3: PairRow[];
 };
 
 type Level = 1 | 2 | 3 | 4 | 5;
@@ -168,7 +166,17 @@ function classifyChemType(a: string, b: string, score: number): ChemType {
   return diff >= 2 ? "EXPLODE" : "SPARK";
 }
 
-function summarizeChemTypesDetailed(pairs: PairRow[]) {
+type ChemSummary = {
+  dist: Record<ChemType, number>;
+  byType: Record<ChemType, PairRow[]>;
+  headline: string;      // 상단 한 줄(짧게)
+  tag: string;           // 모임 타입 뱃지용
+  profile: string;       // “우리 모임은 …” 한 문장
+  friction: string[];    // 자주 부딪히는 포인트 3개
+  scenes: string[];      // 실제 장면 6개
+};
+
+function summarizeChemTypesDetailed(pairs: PairRow[]): ChemSummary {
   const dist: Record<ChemType, number> = { STABLE: 0, COMPLEMENT: 0, SPARK: 0, EXPLODE: 0 };
   const byType: Record<ChemType, PairRow[]> = { STABLE: [], COMPLEMENT: [], SPARK: [], EXPLODE: [] };
 
@@ -176,39 +184,133 @@ function summarizeChemTypesDetailed(pairs: PairRow[]) {
     return {
       dist,
       byType,
-      headline: "케미 리포트를 보려면 MBTI 입력 멤버가 2명 이상 필요해요.",
-      tip: "MBTI를 입력하면 자동으로 ‘안정/보완/스파크/폭발’ 분포와 예시 조합이 보여요.",
+      headline: "케미 리포트를 보려면 멤버가 2명 이상 필요해요.",
+      tag: "📝 입력 필요",
+      profile: "멤버를 추가하면 우리 모임의 분위기와 실제 상황 예시가 자동으로 생성돼요.",
+      friction: [],
+      scenes: [],
     };
   }
 
-  let sum = 0;
   for (const p of pairs) {
-    sum += p.score;
-    const t = classifyChemType(p.aMbti, p.bMbti, p.score);
+    const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti);
+    const t = classifyChemType(p.aMbti, p.bMbti, r.scoreInt);
     dist[t]++;
     byType[t].push(p);
   }
 
-  const avg = Math.round(sum / pairs.length);
-  const best = (Object.keys(dist) as ChemType[]).sort((x, y) => dist[y] - dist[x])[0];
+  const total = pairs.length;
+  const pct = (t: ChemType) => Math.round((dist[t] / total) * 100);
+  const stablePct = pct("STABLE");
+  const complementPct = pct("COMPLEMENT");
+  const sparkPct = pct("SPARK");
+  const explodePct = pct("EXPLODE");
 
-  const headline = (() => {
-    if (avg >= 72) return `전체 평균이 ${avg}점이에요. 전체적으로 안정적으로 굴러가는 편이에요.`;
-    if (avg >= 62) return `전체 평균이 ${avg}점이에요. 무난하지만 스파크가 가끔 튈 수 있어요.`;
-    if (avg >= 54) return `전체 평균이 ${avg}점이에요. 조율 없으면 갈등이 자주 생길 수 있어요.`;
-    return `전체 평균이 ${avg}점이에요. 방치하면 폭발형이 자주 보일 수 있어요.`;
+  const sorted = (Object.keys(dist) as ChemType[]).sort((a, b) => dist[b] - dist[a]);
+  const top = sorted[0];
+  const second = sorted[1] ?? top;
+
+  // 위험도 텍스트(짧게)
+  const riskLabel =
+    explodePct >= 45 ? "☢️ 위험 높음" :
+    explodePct >= 30 ? "🧨 주의 필요" :
+    explodePct >= 18 ? "⚠️ 가끔 삐걱" :
+    "🌿 안정적";
+
+  const tag = `${chemLabel(top)} 중심 · ${riskLabel}`;
+
+  // 모임 프로필(한 문장)
+  const profile = (() => {
+    if (explodePct >= 40) {
+      return "우리 모임은 말투나 해석이 엇갈리면 서운함이 빠르게 쌓일 수 있는 타입의 모임이에요.";
+    }
+    if (sparkPct >= 45 && explodePct < 25) {
+      return "우리 모임은 텐션이 잘 붙고 재밌지만, 취향과 기준이 자주 갈리는 타입의 모임이에요.";
+    }
+    if (stablePct >= 50 && explodePct < 20) {
+      return "우리 모임은 같이 있어도 편하고, 큰 이벤트 없이도 꾸준히 이어지는 타입의 모임이에요.";
+    }
+    if (complementPct >= 45 && explodePct < 25) {
+      return "우리 모임은 서로 빈칸을 잘 채워주고, 역할이 맞물리면 결과가 좋아지는 타입의 모임이에요.";
+    }
+
+    const key = `${top}-${second}`;
+    if (key === "STABLE-SPARK") return "우리 모임은 기본은 편한데, 한 번 시동 걸리면 대화가 엄청 재밌어지는 타입의 모임이에요.";
+    if (key === "STABLE-COMPLEMENT") return "우리 모임은 편안함이 기본이고, 자연스럽게 누가 뭘 맡을지가 정리되는 타입의 모임이에요.";
+    if (key === "COMPLEMENT-SPARK") return "우리 모임은 역할도 갈리고 텐션도 좋아서, 잘 굴러가면 정말 강해지는 타입의 모임이에요.";
+    if (key === "SPARK-EXPLODE") return "우리 모임은 재밌지만 컨디션이 나쁜 날에는 오해가 쉽게 생길 수 있는 타입의 모임이에요.";
+    if (key === "COMPLEMENT-EXPLODE") return "우리 모임은 역할 분담이 되면 좋은데, 기여도 체감이 흔들리면 불만이 쌓일 수 있는 타입의 모임이에요.";
+
+    return "우리 모임은 상황에 따라 분위기 색이 바뀌는 혼합형 타입의 모임이에요.";
   })();
 
-  const tip = (() => {
-    if (best === "STABLE") return "편한 조합이 많아요. 속도만 맞추면 됩니다.";
-    if (best === "COMPLEMENT") return "역할 분배하면 효율이 확 올라가요.";
-    if (best === "SPARK") return "전제부터 맞추면 급싸를 많이 줄일 수 있어요.";
-    return "짧고 명확하게 말하는 게 안전해요.";
+  // 분포 기반 마찰 포인트(3개만)
+  const friction: string[] = (() => {
+    if (explodePct >= 30) {
+      return [
+        "단톡 말투/답장 속도 때문에 감정 해석이 갈릴 수 있어요.",
+        "정산·지각·불참 같은 현실 이슈가 서운함으로 번지기 쉬워요.",
+        "서운함을 쌓아두면 다음 만남에서 갑자기 어색해질 수 있어요.",
+      ];
+    }
+    if (sparkPct >= 35) {
+      return [
+        "장소·메뉴·여행처럼 선택지가 많을 때 의견이 확 갈릴 수 있어요.",
+        "즉흥 vs 계획, 속도 차이로 답답함이 생길 수 있어요.",
+        "드립/농담 수위가 사람마다 달라서 피곤한 날엔 민감해질 수 있어요.",
+      ];
+    }
+    if (stablePct >= 40) {
+      return [
+        "대부분은 편하지만, 연락 템포 차이로 오해가 가끔 생길 수 있어요.",
+        "‘다 괜찮아’가 많아지면 결국 한 사람이 정리 담당이 될 수 있어요.",
+        "조용한 사람이 생기면 ‘기분이 안 좋나?’로 해석될 수 있어요.",
+      ];
+    }
+    if (complementPct >= 40) {
+      return [
+        "역할이 자연스럽게 고정되면 한쪽만 바빠질 수 있어요.",
+        "기여도 체감이 달라서 ‘왜 나만 하는 느낌이지?’가 생길 수 있어요.",
+        "디테일 vs 큰 그림으로 얘기할 때 서로 답답해질 수 있어요.",
+      ];
+    }
+    return [
+      "약속·정산·장소 선택 같은 현실 이슈에서 스타일 차이가 드러날 수 있어요.",
+      "직설/완곡 말투 차이로 의도 확인이 없으면 오해가 생길 수 있어요.",
+      "컨디션에 따라 텐션이 출렁이는 날이 있을 수 있어요.",
+    ];
   })();
 
-  return { dist, byType, headline, tip };
+  // 실제 장면(최대 6개)
+  const scenes: string[] = (() => {
+    const base = [
+      "단톡에서 ‘ㅇㅇ/ㅇㅋ’ 같은 짧은 답장을 두고, 담백함 vs 차가움으로 반응이 갈릴 수 있어요.",
+      "장소 정할 때 ‘아무 데나’가 진짜 아무 데나인 사람과 추천을 기대하는 사람이 섞여서 결정이 늦어질 수 있어요.",
+      "정산이 며칠 밀리면 ‘바쁜가 보다’와 ‘신경 안 쓰나?’로 해석이 갈릴 수 있어요.",
+      "여행에서 ‘일단 가서 정하자’와 ‘예약부터 하자’가 부딪혀 초반 분위기가 흔들릴 수 있어요.",
+      "지각을 가볍게 넘기는 사람과 기다림에 예민한 사람이 섞이면 불편함이 쌓일 수 있어요.",
+      "농담이 잘 통하는 날도 있지만, 피곤한 날엔 같은 농담이 부담으로 들릴 수 있어요.",
+    ];
+
+    // 폭발형 높으면 더 현실적으로 교체
+    if (explodePct >= 30) {
+      return [
+        "단톡에서 읽고 답이 늦어지면, 어떤 사람은 ‘바쁜가 보다’지만 어떤 사람은 ‘일부러 무시하나?’로 받아들일 수 있어요.",
+        "농담으로 던진 말이 특정 사람에게는 ‘비꼼’으로 남아서 다음 만남에서 어색해질 수 있어요.",
+        "정산 이야기가 나왔을 때, 어떤 사람은 원칙을 말하고 어떤 사람은 ‘왜 그걸로 분위기 깨냐’로 받아들일 수 있어요.",
+        "지각한 사람은 대수롭지 않게 넘기는데, 기다린 사람은 그날 내내 기분이 가라앉아 있을 수 있어요.",
+        "불참이 잦은 사람이 생기면 ‘사정’과 ‘성의’ 사이에서 해석이 갈려 분위기가 딱딱해질 수 있어요.",
+        "한 번 서운해지면, 같은 말도 다르게 들리는 구간이 생길 수 있어요.",
+      ];
+    }
+
+    return base;
+  })();
+
+  const headline = tag; // 상단은 짧게 뱃지 느낌으로
+
+  return { dist, byType, headline, tag, profile, friction, scenes };
 }
-
 
 function chemComboTitle(t: ChemType, a: string, b: string, score: number) {
   const diff = axisDiffCount(a, b);
@@ -282,22 +384,12 @@ function top5RankSlots(list: PairRow[], t: ChemType) {
 
 
 
-export default function ChemReportSection({ pairs, best3, worst3 }: Props) {
+export default function ChemReportSection({ pairs }: Props) {
   const chem = summarizeChemTypesDetailed(pairs);
   const totalPairs = pairs.length || 1;
 
   return (
-    <section className="mt-6">
-      <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/5">
-        <div className="flex items-center justify-between">
-          <div className="text-sm font-extrabold">🏆 케미 리포트</div>
-        </div>
-
-        {/* ✅ 상단 요약 */}
-        <div className="mt-3 rounded-2xl bg-white/60 p-3 ring-1 ring-black/5">
-          <div className="text-xs font-extrabold text-slate-800">{chem.headline}</div>
-          <p className="mt-1 text-xs text-slate-600">{chem.tip}</p>
-        </div>
+    <>
 
         {pairs.length === 0 ? (
           <p className="mt-3 text-sm text-slate-500">
@@ -305,76 +397,58 @@ export default function ChemReportSection({ pairs, best3, worst3 }: Props) {
           </p>
         ) : (
           <>
-            {/* ✅ 랭킹(best/worst) */}
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              {/* LEFT: BEST */}
-              <div className="min-w-0">
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="text-[11px] font-extrabold text-[#1E88E5]">🔥 최고</span>
-                  <span className="text-[11px] text-slate-400">TOP 3</span>
-                </div>
-
-                <ul className="space-y-2">
-                  {best3.map((p, idx) => {
-                    const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti); // ✅ micro 포함
-
-                    return (
-                      <li
-                        key={`best-${p.aId}-${p.bId}`}
-                        className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
-                      >
-                        <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
-                            <span className="text-slate-400">{idx + 1}.</span>
-                          <span className="truncate">{p.aName} × {p.bName}</span>
-                        </div>
-
-                        <span
-                          className="shrink-0 text-[12px] font-extrabold"
-                          style={{ color: scoreColor(r.score) }} // ✅ micro 기준 색
-                        >
-                          {r.score.toFixed(2)} {/* ✅ micro 표시 */}
-                        </span>
-                      </li>
-                    );
-                  })} 
-
-                </ul>
+            {/* ✅ 상단 요약(가독성 개선) */}
+            <div className="mt-3 space-y-2">
+              {/* 뱃지 */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-extrabold text-slate-700 ring-1 ring-black/5">
+                  {chem.tag}
+                </span>
               </div>
 
-              {/* RIGHT: WORST */}
-              <div className="min-w-0">
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="text-[11px] font-extrabold text-rose-600">🥶 최악</span>
-                  <span className="text-[11px] text-slate-400">WORST 3</span>
+              {/* 모임 프로필 */}
+              <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
+                <div className="text-[11px] font-extrabold text-slate-500">모임 성격</div>
+                <div className="mt-1 text-xs font-extrabold text-slate-800 leading-5">
+                  {chem.profile}
                 </div>
-
-                <ul className="space-y-2">
-                  {worst3.map((p, idx) => {
-                    const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti);
-
-                    return (
-                      <li
-                        key={`worst-${p.aId}-${p.bId}`}
-                        className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
-                      >
-                        <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
-                          <span className="text-slate-400">{idx + 1}.</span>
-                          <span className="truncate">{p.aName} × {p.bName}</span>
-                        </div>
-
-                        <span
-                          className="shrink-0 text-[12px] font-extrabold"
-                          style={{ color: scoreColor(r.score) }} // ✅ micro 기준 색
-                        >
-                          {r.score.toFixed(2)}
-                        </span>
-                      </li>
-                    );
-                  })}
-
-                </ul>
               </div>
+
+              {/* 부딪히는 포인트(칩 형태) */}
+              {chem.friction?.length ? (
+                <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
+                  <div className="text-[11px] font-extrabold text-slate-500">자주 흔들리는 포인트</div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {chem.friction.slice(0, 3).map((t: string, i: number) => (
+                      <span
+                        key={i}
+                        className="rounded-2xl bg-slate-50 px-2.5 py-1.5 text-[11px] font-bold text-slate-700 ring-1 ring-black/5"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {/* 실제 장면(번호 카드) */}
+              {chem.scenes?.length ? (
+                <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
+                  <div className="text-[11px] font-extrabold text-slate-500">실제로 자주 나오는 장면</div>
+                  <ul className="mt-2 space-y-2">
+                    {chem.scenes.slice(0, 6).map((s: string, i: number) => (
+                      <li key={i} className="flex gap-2 rounded-xl bg-white/70 px-3 py-2 ring-1 ring-black/5">
+                        <div className="mt-[1px] h-5 w-5 shrink-0 rounded-full bg-slate-100 text-[11px] font-extrabold text-slate-600 flex items-center justify-center ring-1 ring-black/5">
+                          {i + 1}
+                        </div>
+                        <div className="text-[12px] leading-5 text-slate-700">{s}</div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
+
 
             {/* ✅ 타입(안정/보완/스파크/폭발) 리스트 */}
             <div className="mt-3 space-y-3">
@@ -501,7 +575,7 @@ export default function ChemReportSection({ pairs, best3, worst3 }: Props) {
             </div>
           </>
         )}
-      </div>
-    </section>
+
+      </>
   );
 }

@@ -10,6 +10,7 @@ import { unstable_cache } from "next/cache";
 import ChemReportSection from "@/app/g/[groupId]/components/ChemReportSection";
 import TouchSavedGroupClient from "@/components/TouchSavedGroupClient";
 import SaveGroupClient from "@/components/SaveGroupClient";
+import ChemTopWorst from "./components/ChemTopWorst";
 
 
 import Link from "next/link";
@@ -594,6 +595,73 @@ function adjustChemScoreByStyles(
   return clampScore(s);
 }
 
+function SectionCard2({
+  icon,
+  title,
+  subtitle,
+  tone = "blue",
+  children,
+}: {
+  icon: string;
+  title: string;
+  subtitle?: string;
+  tone?: "blue" | "indigo" | "violet" | "emerald";
+  children: React.ReactNode;
+}) {
+  const toneMap = {
+    blue: {
+      top: "bg-[#1E88E5]",
+      chip: "bg-[#1E88E5]/10 text-[#1E88E5]",
+      headerBg: "bg-[#1E88E5]/[0.06]",
+    },
+    indigo: {
+      top: "bg-indigo-500",
+      chip: "bg-indigo-500/10 text-indigo-700",
+      headerBg: "bg-indigo-500/[0.06]",
+    },
+    violet: {
+      top: "bg-violet-500",
+      chip: "bg-violet-500/10 text-violet-700",
+      headerBg: "bg-violet-500/[0.06]",
+    },
+    emerald: {
+      top: "bg-emerald-500",
+      chip: "bg-emerald-500/10 text-emerald-700",
+      headerBg: "bg-emerald-500/[0.06]",
+    },
+  }[tone];
+
+  return (
+    <section className="mt-6">
+      <div className="overflow-hidden rounded-3xl bg-white/75 shadow-sm ring-1 ring-black/5">
+        {/* ✅ 상단 얇은 라인(구분감 핵심) */}
+
+
+        {/* ✅ 헤더 스트립(아주 약한 배경톤) */}
+        <div className={`px-4 py-3 ${toneMap.headerBg}`}>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`rounded-full px-2.5 py-1 text-[11px] font-extrabold ${toneMap.chip}`}>
+                  {icon} {title}
+                </span>
+                {subtitle ? (
+                  <span className="text-[11px] font-bold text-slate-500">
+                    {subtitle}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ✅ 본문 */}
+        <div className="px-4 pb-4">{children}</div>
+      </div>
+    </section>
+  );
+}
+
 
 
 export default async function GroupPage({
@@ -698,7 +766,7 @@ export default async function GroupPage({
                 />
               </div>
             </div>
-            
+
             <div className="mt-5">
               <div id="group-actions-slot" />
             </div>
@@ -726,22 +794,40 @@ export default async function GroupPage({
           <GraphServer groupId={groupId} centerId={centerId} />
         </Suspense>
 
+        {/* ✅ 최고 / 최악 */}
+        <SectionCard2
+          icon="🏆"
+          title="케미 순위"
+          subtitle="상·하위 조합"
+          tone="blue"
+        >
+          <ChemTopWorst best3={best3} worst3={worst3} />
+        </SectionCard2>
+
         {/* ✅ 케미 리포트 (랭킹 + 타입요약) */}
-        <ChemReportSection pairs={pairs} best3={best3} worst3={worst3} />
+        <SectionCard2
+          icon="🔍"
+          title="케미 리포트"
+          subtitle="분위기 요약 & 타입별 랭킹"
+          tone="violet"
+        >
+          <ChemReportSection pairs={pairs} />
+        </SectionCard2>
+
 
         {/* ✅ 1) MBTI 분포 */}
-        <section className="mt-6">
-          <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/5">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-extrabold">📌 모임 MBTI 분포</div>
-            </div>
-
-            {validMbtis.length === 0 ? (
-              <p className="mt-2 text-sm text-slate-500">
-                아직 입력된 MBTI가 없어요. 한 명만 입력해도 분포가 잡히기 시작해요.
-              </p>
-            ) : (
-              <>
+        <SectionCard2
+          icon="📌"
+          title="MBTI 분포"
+          subtitle="우리 모임 성향 비율"
+          tone="indigo"
+        >
+          {validMbtis.length === 0 ? (
+            <p className="mt-1 text-sm text-slate-500">
+              아직 입력된 MBTI가 없어요. 한 명만 입력해도 분포가 잡히기 시작해요.
+            </p>
+          ) : (
+            <>
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   {[
                     { title: "에너지", a: dist.ei.a, b: dist.ei.b },
@@ -806,24 +892,23 @@ export default async function GroupPage({
                   <div className="text-xs font-extrabold text-slate-800">한 줄 총평</div>
                   <p className="mt-1 text-xs text-slate-600">{dist.vibe}</p>
                 </div>
-              </>
-            )}
-          </div>
-        </section>
+            </>
+          )}
+        </SectionCard2>
 
         {/* ✅ 2) 역할 추천 */}
-        <section className="mt-6">
-          <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/5">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-extrabold">🎭 모임 역할 추천</div>
-            </div>
-
-            {validMbtis.length === 0 ? (
-              <p className="mt-2 text-sm text-slate-500">
-                MBTI가 들어오면 “이 방은 어떤 역할이 강한지”가 자동으로 잡혀요.
-              </p>
-            ) : (
-              <>
+        <SectionCard2
+          icon="🎭"
+          title="모임 역할 추천"
+          subtitle="누가 어떤 역할에 강한지"
+          tone="emerald"
+        >
+          {validMbtis.length === 0 ? (
+            <p className="mt-1 text-sm text-slate-500">
+              MBTI가 들어오면 “이 방은 어떤 역할이 강한지”가 자동으로 잡혀요.
+            </p>
+          ) : (
+            <>
                 {/* ✅ Summary card */}
                 <div className="mt-3 rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
                   <div className="text-xs font-extrabold text-slate-900">{roles.headline}</div>
@@ -945,9 +1030,8 @@ export default async function GroupPage({
                 </div>
 
               </>
-            )}
-          </div>
-        </section>
+          )}
+        </SectionCard2>
 
         <section className="mt-6">
           <div className="rounded-3xl bg-white/70 p-5 ring-1 ring-black/5">
