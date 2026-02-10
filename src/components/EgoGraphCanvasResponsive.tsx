@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState, startTransition } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+
 
 type Level = 1 | 2 | 3 | 4 | 5;
 
@@ -583,6 +584,10 @@ export default function EgoGraphCanvasResponsive({
   // ✅ 범례 강조(필터): null이면 전체 동일 강도
   const [focusLevel, setFocusLevel] = useState<Level | null>(null);
 
+  const COACH_KEY = "om_center_coach_v1";
+  const [showCenterCoach, setShowCenterCoach] = useState(false);
+
+
   const safeNodes = useMemo(() => clampNodes(nodes, 20), [nodes]);
 
   const TOP_UI = 44; // px (원하면 40~52 사이로 조절)
@@ -917,6 +922,29 @@ export default function EgoGraphCanvasResponsive({
     () => (activeId ? placed.find((p) => p.id === activeId) : null),
     [activeId, placed]
   );
+
+  useEffect(() => {
+  if (!activeNode) return;
+  if (!onCenterChange) return;
+
+  try {
+    const seen = localStorage.getItem(COACH_KEY);
+    if (seen) return;
+
+    setShowCenterCoach(true);
+
+    const t = window.setTimeout(() => {
+      setShowCenterCoach(false);
+      localStorage.setItem(COACH_KEY, "1");
+    }, 2200);
+
+    return () => window.clearTimeout(t);
+  } catch {
+    // storage 막힌 환경이면 무시
+  }
+}, [activeNode, onCenterChange]);
+
+
   const scoreNum =
     activeNode && Number.isFinite(Number(activeNode.score))
       ? Math.round(Number(activeNode.score))
@@ -933,10 +961,14 @@ export default function EgoGraphCanvasResponsive({
       />
 
       {!activeId && (
-        <div className="mt-4 mb-1 text-center text-[12px] font-semibold text-slate-400">
+        <div className="mt-4 mb-1 text-center text-[12px] font-semibold text-slate-600">
           이름을 눌러 관계를 확인해보세요
+          <div className="mt-1 text-[11px] font-semibold text-slate-500">
+            카드에서 ‘센터로 보기’를 누르면 기준이 바뀌어요
+          </div>
         </div>
       )}
+
 
       {activeNode && (
         <div className="sticky bottom-2 z-10 mt-2 px-2">
@@ -957,23 +989,46 @@ export default function EgoGraphCanvasResponsive({
                 </div>
 
                 {onCenterChange && (
-                  <button
-                    type="button"
-                    className="shrink-0 text-xs font-semibold text-slate-500 hover:text-slate-900 underline underline-offset-4"
-                    onClick={() => {
-                      // 먼저 로컬 UI를 즉시 정리(체감 속도 ↑)
-                      setActiveId(null);
-                      setFocusLevel(null);
+                  <div className="relative shrink-0">
+                    {/* 코치마크(처음 1회) - 우측 칩에 붙임 */}
+                    {showCenterCoach && (
+                      <div className="pointer-events-none absolute -top-9 right-0">
+                        <div className="rounded-full bg-slate-900/90 px-3 py-1 text-[11px] font-semibold text-white shadow">
+                          센터 바꾸기 👇
+                        </div>
+                      </div>
+                    )}
 
-                      // 부모 상태 변경은 transition으로(버벅임 ↓)
-                      startTransition(() => {
-                        onCenterChange(activeNode.id);
-                      });
-                    }}
-                  >
-                    센터로 설정
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveId(null);
+                        setFocusLevel(null);
+                        setShowCenterCoach(false);
+
+                        React.startTransition(() => {
+                          onCenterChange(activeNode.id);
+                        });
+
+                        try {
+                          localStorage.setItem(COACH_KEY, "1");
+                        } catch {}
+                      }}
+                      className={[
+                        "inline-flex items-center gap-1.5",
+                        "rounded-full border border-slate-200 bg-slate-50",
+                        "px-2.5 py-1 text-[11px] font-bold text-slate-700",
+                        "shadow-sm transition hover:bg-slate-100 hover:text-slate-900",
+                        "active:scale-[0.98]",
+                      ].join(" ")}
+                      aria-label="이 사람을 센터로 보기"
+                    >
+                      <span className="text-[12px]">🎯</span>
+                      센터로 보기
+                    </button>
+                  </div>
                 )}
+
               </div>
 
               <div className="mt-2 flex w-full items-center gap-3">
@@ -999,6 +1054,7 @@ export default function EgoGraphCanvasResponsive({
                 if (!msg) return null;
                 return <div className="mt-1 text-xs font-medium text-slate-500">{msg}</div>;
               })()}
+
             </div>
           </div>
         </div>
