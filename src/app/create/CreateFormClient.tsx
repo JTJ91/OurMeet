@@ -31,7 +31,6 @@ export default function CreateFormClient() {
           });
 
           router.replace(`/g/${result.groupId}?center=${result.memberId}`);
-          router.refresh();
         } catch (err: any) {
           alert(err?.message ?? "모임 생성 중 문제가 발생했어요.");
           lockedRef.current = false;
