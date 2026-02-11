@@ -166,6 +166,12 @@ export default function CognitiveFunctionsGuidePage() {
           {/* CTA */}
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <a
+              href="/guides"
+              className="flex-1 rounded-full border border-slate-300 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              MBTI 가이드
+            </a>
+            <a
               href="/"
               className="flex-1 rounded-full border border-slate-300 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >
