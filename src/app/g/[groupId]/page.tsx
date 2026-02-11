@@ -30,6 +30,21 @@ type PairRow = {
   bJudge?: JudgeStyle; bInfo?: InfoStyle;
 };
 
+type AxisKey = "EI" | "NS" | "TF" | "JP" | "BAL";
+
+type TextToken =
+  | { t: string }            // 일반 텍스트
+  | { t: string; k: AxisKey }; // ✅ 강조 토큰(색/굵게)
+
+const T = (t: string): TextToken => ({ t });
+const H = (t: string, k: AxisKey): TextToken => ({ t, k });
+
+type VibeBlock = {
+  core: { label: string; k: AxisKey }[];      // 요약 칩
+  scene: TextToken[][];                        // 문장(토큰 배열) 여러 줄
+  caution: { k: AxisKey; tokens: TextToken[] };// 주의 포인트
+};
+
 
 /** ✅ 1) MBTI 분포 분석 */
 function summarizeMbtiDistribution(mbtis: string[]) {
@@ -49,34 +64,115 @@ function summarizeMbtiDistribution(mbtis: string[]) {
     const dom = A === B ? null : (A > B ? a : b);
     const pct = (x: number) => Math.round((x / total) * 100);
 
+    const aPct = pct(A);
+    const bPct = pct(B);
+    const diffPct = Math.abs(aPct - bPct); // ✅ 격차 (0~100)
+
     return {
-      a: { key: a, label: labelA, v: A, pct: pct(A) },
-      b: { key: b, label: labelB, v: B, pct: pct(B) },
+      a: { key: a, label: labelA, v: A, pct: aPct },
+      b: { key: b, label: labelB, v: B, pct: bPct },
       dom,
+      diffPct, // ✅ 추가
     };
   };
+
 
   const ei = axisLine("E", "I", "E(외향)", "I(내향)");
   const ns = axisLine("N", "S", "N(직관)", "S(감각)");
   const tf = axisLine("T", "F", "T(사고)", "F(감정)");
   const jp = axisLine("J", "P", "J(판단)", "P(인식)");
 
-  // 한줄 총평(가벼운 위트, 밈X)
-  const vibe = (() => {
-    const tags: string[] = [];
-    if (ei.dom === "E") tags.push("대화가 잘 붙는 편");
-    if (ei.dom === "I") tags.push("각자 페이스를 존중하는 편");
-    if (ns.dom === "N") tags.push("아이디어가 자주 튀는 방");
-    if (ns.dom === "S") tags.push("현실적인 얘기에서 강한 방");
-    if (tf.dom === "T") tags.push("팩트/결론이 빠른 편");
-    if (tf.dom === "F") tags.push("분위기/공감이 우선인 편");
-    if (jp.dom === "J") tags.push("정리 담당이 자연히 생김");
-    if (jp.dom === "P") tags.push("즉흥에도 잘 굴러감");
 
-    if (tags.length === 0) return "균형 잡힌 구성이라 어떤 주제든 무난하게 굴러가요.";
-    const pick = tags.slice(0, 2).join(" · ");
-    return `${pick}. (장점은 크고, 단점은 가끔 ‘정리’에서만 나와요.)`;
+  type VibeBlock = {
+    core: { label: string; k: Exclude<AxisKey, "TF"> | "BAL" }[]; // EI/NS/JP/BAL만
+    scene: TextToken[][];
+    caution: { k: AxisKey; tokens: TextToken[] };
+  };
+
+  
+  // 한줄 총평(가벼운 위트, 밈X)
+  const vibe: VibeBlock = (() => {
+    const domEI = ei.dom; // "E" | "I" | null
+    const domNS = ns.dom; // "N" | "S" | null
+    const domTF = tf.dom; // "T" | "F" | null
+    const domJP = jp.dom; // "J" | "P" | null
+
+    const isTie = (x: { dom: any; diffPct: number }) => x.dom === null || x.diffPct <= 10;
+
+    // ✅ 1) 핵심 3칩
+    const core = [
+      isTie(ei)
+        ? { label: "상황형", k: "BAL" as const }
+        : { label: domEI === "E" ? "토크형" : "조용한 핵심형", k: "EI" as const },
+
+      isTie(ns)
+        ? { label: "균형 감각", k: "BAL" as const }
+        : { label: domNS === "N" ? "아이디어 폭주" : "현실 결론", k: "NS" as const },
+
+      isTie(jp)
+        ? { label: "유연 운영", k: "BAL" as const }
+        : { label: domJP === "J" ? "정리 담당 존재" : "즉흥 운영", k: "JP" as const },
+    ];
+
+    // ✅ 2) 장면 문장 (핵심 단어만 강조 토큰)
+    const scene: TextToken[][] = [
+      // EI
+      isTie(ei)
+        ? [T("말할 땐 말하고, 쉴 땐 쉬어요.")]
+        : domEI === "E"
+          ? [H("대화", "EI"), T("가 먼저 "), H("시동", "EI"), T("이고, "), H("침묵", "EI"), T("은 잠깐뿐이에요.")]
+          : [H("조용", "EI"), T("하다가 한 번 말하면 "), H("핵심", "EI"), T("만 정확해요.")],
+
+      // NS
+      isTie(ns)
+        ? [H("큰그림", "NS"), T("과 "), H("디테일", "NS"), T("이 번갈아 나와요.")]
+        : domNS === "N"
+          ? [H("주제", "NS"), T("가 옆길로 "), H("확장", "NS"), T("되는 게 정상입니다.")]
+          : [T("얘기가 새도 결국 "), H("실행", "NS"), T(" 얘기로 돌아와요.")],
+
+      // JP
+      isTie(jp)
+        ? [H("결론", "JP"), T("도 열어두고, 필요하면 닫아요.")]
+        : domJP === "J"
+          ? [H("정리", "JP"), T(" 담당이 자연스럽게 등장해서 회의를 닫아줍니다.")]
+          : [H("결론", "JP"), T("은 나중, 일단 "), H("굴리면서", "JP"), T(" 맞춰요.")],
+    ];
+
+    // ✅ 3) 주의 포인트 (역시 핵심 단어만 강조)
+    const caution = (() => {
+      if (!isTie(tf)) {
+        if (domTF === "T") {
+          return {
+            k: "TF" as const,
+            tokens: [H("직설", "TF"), T("로 들릴 수 있어요. "), H("요약 멘트", "TF"), T("에 쿠션을 한 번만.")],
+          };
+        }
+        if (domTF === "F") {
+          return {
+            k: "TF" as const,
+            tokens: [H("결론", "TF"), T("이 늦어질 수 있어요. "), H("결정할 항목", "TF"), T("만 미리 박아두면 좋아요.")],
+          };
+        }
+      }
+
+      if (!isTie(jp) && domJP === "P") {
+        return {
+          k: "JP" as const,
+          tokens: [H("일정", "JP"), T("이 자주 바뀔 수 있어요. "), H("마감", "JP"), T("만 하나 잡아두면 편해요.")],
+        };
+      }
+
+      return {
+        k: "BAL" as const,
+        tokens: [T("큰 단점은 없고, "), H("주제", "BAL"), T("만 명확하면 더 잘 굴러가요.")],
+      };
+    })();
+
+    return { core, scene, caution };
   })();
+
+
+
 
   return { cnt, ei, ns, tf, jp, vibe };
 }
@@ -711,6 +807,30 @@ export default async function GroupPage({
       }))
   );
 
+  type AxisKey2 = "EI" | "NS" | "TF" | "JP";
+  const AXIS_ONE: Record<AxisKey2, Record<string, string>> = {
+    EI: {
+      E: "말이 자연스럽게 이어지고, 대화가 금방 살아나요.",
+      I: "조용한 편이지만, 나올 때는 핵심만 딱 집어요.",
+    },
+    NS: {
+      N: "이야기가 한 주제에서 또 다른 아이디어로 잘 이어져요.",
+      S: "얘기가 좀 새도, 결국 실행 얘기로 돌아오는 편이에요.",
+    },
+    TF: {
+      T: "먼저 정리하고 생각한 뒤에, 감정을 살펴보는 흐름이에요.",
+      F: "결론보다 먼저, 서로 어떤 느낌인지부터 나눠요.",
+    },
+    JP: {
+      J: "누군가 자연스럽게 정리하면서 흐름을 마무리해줘요.",
+      P: "결론은 열어두고, 해보면서 맞춰가는 분위기에요.",
+    },
+  };
+
+
+  const BALANCE_ONE = "어느 한쪽도 안 밀려서, 상황에 따라 톤이 자연스럽게 바뀝니다.";
+
+
   const MBTI_COLOR: Record<string, string> = {
     E: "#F59E0B",
     I: "#6366F1",
@@ -721,6 +841,48 @@ export default async function GroupPage({
     J: "#2563EB",
     P: "#F97316",
   };
+  
+
+  const AXIS_COLOR: Record<AxisKey | "BAL", string> = {
+    EI: MBTI_COLOR[dist.ei.dom ?? "E"], // tie면 E색 대충
+    NS: MBTI_COLOR[dist.ns.dom ?? "N"],
+    TF: MBTI_COLOR[dist.tf.dom ?? "T"],
+    JP: MBTI_COLOR[dist.jp.dom ?? "J"],
+    BAL: "#64748B", // slate-500 느낌
+  };
+  function H({ k, children }: { k: AxisKey | "BAL"; children: React.ReactNode }) {
+    return (
+      <span className="font-extrabold" style={{ color: AXIS_COLOR[k] }}>
+        {children}
+      </span>
+    );
+  }
+
+
+const axisToChar: Record<Exclude<AxisKey, "BAL">, "E"|"I"|"N"|"S"|"T"|"F"|"J"|"P"> = {
+  EI: (dist.ei.dom ?? "E") as any,
+  NS: (dist.ns.dom ?? "N") as any,
+  TF: (dist.tf.dom ?? "T") as any,
+  JP: (dist.jp.dom ?? "J") as any,
+};
+
+const axisColor = (k: AxisKey) => {
+  if (k === "BAL") return "#64748B"; // slate-500
+  return MBTI_COLOR[axisToChar[k]];
+};
+
+function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
+  return tokens.map((x, i) =>
+    x.k ? (
+      <span key={i} className="font-extrabold" style={{ color: axisColor(x.k) }}>
+        {x.t}
+      </span>
+    ) : (
+      <span key={i}>{x.t}</span>
+    )
+  );
+}
+
 
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-10">
@@ -804,17 +966,6 @@ export default async function GroupPage({
           <ChemTopWorst best3={best3} worst3={worst3} />
         </SectionCard2>
 
-        {/* ✅ 케미 리포트 (랭킹 + 타입요약) */}
-        <SectionCard2
-          icon="🔍"
-          title="케미 리포트"
-          subtitle="분위기 요약 & 타입별 랭킹"
-          tone="violet"
-        >
-          <ChemReportSection pairs={pairs} />
-        </SectionCard2>
-
-
         {/* ✅ 1) MBTI 분포 */}
         <SectionCard2
           icon="📌"
@@ -834,66 +985,136 @@ export default async function GroupPage({
                     { title: "정보", a: dist.ns.a, b: dist.ns.b },
                     { title: "판단", a: dist.tf.a, b: dist.tf.b },
                     { title: "스타일", a: dist.jp.a, b: dist.jp.b },
-                  ].map((row) => (
-                    <div key={row.title} className="rounded-2xl bg-white/60 p-3 ring-1 ring-black/5">
-                      <div className="text-[11px] font-extrabold text-slate-500">{row.title}</div>
-                      <div className="mt-2 flex items-center justify-between text-xs font-extrabold">
-                        <span
-                          className="font-extrabold"
-                          style={{ color: MBTI_COLOR[row.a.key] }}
-                        >
-                          {row.a.label}
-                        </span>
-                        <span
-                          className="font-semibold"
-                          style={{ color: MBTI_COLOR[row.a.key] }}
-                        >
-                          {fracText2(row.a.v)}
-                        </span>
-                      </div>
-                      <div className="mt-2 h-2 w-full rounded-full bg-slate-200">
-                        <div
-                          className="h-2 rounded-full transition-all duration-300"
-                          style={{
-                            width: `${row.a.pct}%`,
-                            backgroundColor: MBTI_COLOR[row.a.key],
-                          }}
-                        />
-                      </div>
-                      <div className="mt-1 flex items-center justify-between text-xs font-extrabold">
-                        <span
-                          className="font-extrabold"
-                          style={{ color: MBTI_COLOR[row.b.key] }}
-                        >
-                          {row.b.label}
-                        </span>
-                        <span
-                          className="font-semibold"
-                          style={{ color: MBTI_COLOR[row.b.key] }}
-                        >
-                          {fracText2(row.b.v)}
-                        </span>
-                      </div>
-                      <div className="mt-2 h-2 w-full rounded-full bg-slate-200">
-                      <div
-                        className="h-2 rounded-full transition-all duration-300"
-                        style={{
-                          width: `${row.b.pct}%`,
-                          backgroundColor: MBTI_COLOR[row.b.key],
-                        }}
-                      />
-                    </div>
+                  ].map((row) => {
+                    const total = row.a.v + row.b.v || 1;
 
-                    </div>
-                  ))}
+                    // ✅ 더 많은 쪽을 위(first)로
+                    const first = row.a.v >= row.b.v ? row.a : row.b;
+                    const second = row.a.v >= row.b.v ? row.b : row.a;
+
+                    const firstPct = Math.round((first.v / total) * 100);
+                    const secondPct = 100 - firstPct;
+
+                    // ✅ gap을 먼저 선언!
+                    const gap = Math.abs(firstPct - secondPct);
+
+                    const axisKey =
+                      row.title === "에너지" ? ("EI" as const) :
+                      row.title === "정보" ? ("NS" as const) :
+                      row.title === "판단" ? ("TF" as const) :
+                      ("JP" as const);
+
+                    const isTie = first.v === second.v;
+
+                    // ✅ 이제 gap 사용
+                    const tone =
+                      isTie ? "tie" :
+                      gap >= 40 ? "hard" :
+                      gap >= 20 ? "mid" : "soft";
+
+                    const oneLine =
+                      isTie ? BALANCE_ONE : (AXIS_ONE[axisKey][first.key] ?? "");
+
+                    const finalLine = tone === "soft" ? `대체로 ${oneLine}` : oneLine;
+
+
+                    return (
+                      <div key={row.title} className="rounded-2xl bg-white/60 p-3 ring-1 ring-black/5">
+                        <div className="text-[11px] font-extrabold text-slate-500">{row.title}</div>
+
+                        {/* ✅ first (다수파) */}
+                        <div className="mt-2 flex items-center justify-between text-xs font-extrabold">
+                          <span className="font-extrabold" style={{ color: MBTI_COLOR[first.key] }}>
+                            {first.label}
+                          </span>
+                          <span className="font-semibold" style={{ color: MBTI_COLOR[first.key] }}>
+                            {first.v}/{distTotal}명 ({firstPct}%)
+                          </span>
+                        </div>
+                        <div className="mt-2 h-2 w-full rounded-full bg-slate-200">
+                          <div
+                            className="h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${firstPct}%`, backgroundColor: MBTI_COLOR[first.key] }}
+                          />
+                        </div>
+
+                        {/* ✅ second (소수파) */}
+                        <div className="mt-2 flex items-center justify-between text-xs font-extrabold">
+                          <span className="font-extrabold" style={{ color: MBTI_COLOR[second.key] }}>
+                            {second.label}
+                          </span>
+                          <span className="font-semibold" style={{ color: MBTI_COLOR[second.key] }}>
+                            {second.v}/{distTotal}명 ({secondPct}%)
+                          </span>
+                        </div>
+                        <div className="mt-2 h-2 w-full rounded-full bg-slate-200">
+                          <div
+                            className="h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${secondPct}%`, backgroundColor: MBTI_COLOR[second.key] }}
+                          />
+                        </div>
+                                           
+                        
+                        <div className="mt-3 text-[11px] leading-relaxed text-slate-500">
+                          {finalLine}
+                        </div>
+
+                      </div>
+                    );
+                  })}
                 </div>
 
+                
                 <div className="mt-3 rounded-2xl bg-white/60 p-3 ring-1 ring-black/5">
-                  <div className="text-xs font-extrabold text-slate-800">한 줄 총평</div>
-                  <p className="mt-1 text-xs text-slate-600">{dist.vibe}</p>
+                  <div className="text-xs font-extrabold text-slate-800">모임 분위기 요약</div>
+
+                  {/* ✅ 핵심 3칩 */}
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {dist.vibe.core.map((c, i) => (
+                      <span
+                        key={i}
+                        className="rounded-full bg-white/70 px-2 py-1 text-[11px] font-extrabold ring-1 ring-black/5"
+                        style={{ color: axisColor(c.k) }}
+                      >
+                        {c.label}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* ✅ 장면 문장들: 핵심 단어만 색/굵게 */}
+                  <div className="mt-2 space-y-1.5 text-xs leading-relaxed text-slate-600">
+                    {dist.vibe.scene.map((line, i) => (
+                      <div key={i}>• {renderTokens(line as any)}</div>
+                    ))}
+                  </div>
+
+                  {/* ✅ 주의 포인트 */}
+                  <div className="mt-2 rounded-xl bg-white/70 p-2 ring-1 ring-black/5">
+                    <div className="text-[11px] font-extrabold text-slate-700">
+                      <span className="font-extrabold" style={{ color: axisColor(dist.vibe.caution.k) }}>
+                        주의 포인트
+                      </span>
+                    </div>
+                    <div className="mt-0.5 text-xs leading-relaxed text-slate-600">
+                      {renderTokens(dist.vibe.caution.tokens as any)}
+                    </div>
+                  </div>
                 </div>
+
+
+
             </>
           )}
+        </SectionCard2>
+
+        {/* ✅ 케미 리포트 (랭킹 + 타입요약) */}
+        <SectionCard2
+          icon="🔍"
+          title="케미 리포트"
+          subtitle="우리모임 조합 랭킹"
+          tone="violet"
+        >
+          <ChemReportSection pairs={pairs} />
         </SectionCard2>
 
         {/* ✅ 2) 역할 추천 */}

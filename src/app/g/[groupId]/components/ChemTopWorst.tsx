@@ -43,20 +43,25 @@ export default function ChemTopWorst({ best3, worst3 }: Props) {
             return (
               <li
                 key={`best-${p.aId}-${p.bId}`}
-                className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
+                className="rounded-xl bg-white/60 px-3 py-2 ring-1 ring-black/5"
               >
-                <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
-                  <span className="text-slate-400">{idx + 1}.</span>
-                  <span className="truncate">{p.aName} × {p.bName}</span>
+                {/* 이름 */}
+                <div className="flex items-start gap-2 text-xs font-extrabold text-slate-800">
+                  <span className="shrink-0 text-slate-400">{idx + 1}.</span>
+                  <span className="leading-snug break-words">
+                    {p.aName} × {p.bName}
+                  </span>
                 </div>
 
-                <span
-                  className="shrink-0 text-[12px] font-extrabold"
-                  style={{ color: scoreColor(r.score) }}
-                >
-                  {r.score.toFixed(2)}
-                </span>
+                {/* 점수 (보조 정보 느낌) */}
+                <div className="mt-0.5 pl-5 text-[12px] font-extrabold">
+                  <span style={{ color: scoreColor(r.score) }}>
+                    {r.score.toFixed(2)}점
+                  </span>
+                </div>
               </li>
+
+
             );
           })}
         </ul>
@@ -76,20 +81,25 @@ export default function ChemTopWorst({ best3, worst3 }: Props) {
             return (
               <li
                 key={`worst-${p.aId}-${p.bId}`}
-                className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-1.5 ring-1 ring-black/5"
+                className="rounded-xl bg-white/60 px-3 py-2 ring-1 ring-black/5"
               >
-                <div className="flex items-center gap-2 min-w-0 text-xs font-extrabold text-slate-800">
-                  <span className="text-slate-400">{idx + 1}.</span>
-                  <span className="truncate">{p.aName} × {p.bName}</span>
+                {/* 이름 */}
+                <div className="flex items-start gap-2 text-xs font-extrabold text-slate-800">
+                  <span className="shrink-0 text-slate-400">{idx + 1}.</span>
+                  <span className="leading-snug break-words">
+                    {p.aName} × {p.bName}
+                  </span>
                 </div>
 
-                <span
-                  className="shrink-0 text-[12px] font-extrabold"
-                  style={{ color: scoreColor(r.score) }}
-                >
-                  {r.score.toFixed(2)}
-                </span>
+                {/* 점수 (보조 정보 느낌) */}
+                <div className="mt-0.5 pl-5 text-[12px] font-extrabold">
+                  <span style={{ color: scoreColor(r.score) }}>
+                    {r.score.toFixed(2)}점
+                  </span>
+                </div>
               </li>
+
+
             );
           })}
         </ul>

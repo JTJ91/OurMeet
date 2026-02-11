@@ -282,30 +282,25 @@ function summarizeChemTypesDetailed(pairs: PairRow[]): ChemSummary {
   })();
 
   // 실제 장면(최대 6개)
+    // 실제 장면(최대 3개로 확 줄임)
   const scenes: string[] = (() => {
-    const base = [
-      "단톡에서 ‘ㅇㅇ/ㅇㅋ’ 같은 짧은 답장을 두고, 담백함 vs 차가움으로 반응이 갈릴 수 있어요.",
-      "장소 정할 때 ‘아무 데나’가 진짜 아무 데나인 사람과 추천을 기대하는 사람이 섞여서 결정이 늦어질 수 있어요.",
-      "정산이 며칠 밀리면 ‘바쁜가 보다’와 ‘신경 안 쓰나?’로 해석이 갈릴 수 있어요.",
-      "여행에서 ‘일단 가서 정하자’와 ‘예약부터 하자’가 부딪혀 초반 분위기가 흔들릴 수 있어요.",
-      "지각을 가볍게 넘기는 사람과 기다림에 예민한 사람이 섞이면 불편함이 쌓일 수 있어요.",
-      "농담이 잘 통하는 날도 있지만, 피곤한 날엔 같은 농담이 부담으로 들릴 수 있어요.",
+    const base3 = [
+      "단톡 답장 템포(읽씹/칼답) 차이 때문에 ‘무시’ vs ‘담백’으로 해석이 갈릴 수 있어요.",
+      "장소/메뉴/일정 정할 때 ‘아무 데나’가 진짜인 사람과 추천을 기대하는 사람이 섞여 결정이 늘어질 수 있어요.",
+      "정산·지각·불참 같은 현실 이슈가 ‘사정’ vs ‘성의’로 갈려서 감정이 남을 수 있어요.",
     ];
 
-    // 폭발형 높으면 더 현실적으로 교체
     if (explodePct >= 30) {
       return [
-        "단톡에서 읽고 답이 늦어지면, 어떤 사람은 ‘바쁜가 보다’지만 어떤 사람은 ‘일부러 무시하나?’로 받아들일 수 있어요.",
-        "농담으로 던진 말이 특정 사람에게는 ‘비꼼’으로 남아서 다음 만남에서 어색해질 수 있어요.",
-        "정산 이야기가 나왔을 때, 어떤 사람은 원칙을 말하고 어떤 사람은 ‘왜 그걸로 분위기 깨냐’로 받아들일 수 있어요.",
-        "지각한 사람은 대수롭지 않게 넘기는데, 기다린 사람은 그날 내내 기분이 가라앉아 있을 수 있어요.",
-        "불참이 잦은 사람이 생기면 ‘사정’과 ‘성의’ 사이에서 해석이 갈려 분위기가 딱딱해질 수 있어요.",
-        "한 번 서운해지면, 같은 말도 다르게 들리는 구간이 생길 수 있어요.",
+        "읽고 답이 늦어졌을 때, 한쪽은 ‘바쁘겠지’인데 다른 쪽은 ‘기분 상한 거지?’로 받아들일 수 있어요.",
+        "정산/지각 얘기에서 원칙을 말한 쪽은 ‘정리’인데, 다른 쪽은 ‘분위기 깨는 공격’으로 느낄 수 있어요.",
+        "농담 한 마디가 ‘장난’으로 끝나지 않고, 다음 만남까지 미세하게 어색함으로 남을 수 있어요.",
       ];
     }
 
-    return base;
+    return base3;
   })();
+
 
   const headline = tag; // 상단은 짧게 뱃지 느낌으로
 
@@ -397,59 +392,6 @@ export default function ChemReportSection({ pairs }: Props) {
           </p>
         ) : (
           <>
-            {/* ✅ 상단 요약(가독성 개선) */}
-            <div className="mt-3 space-y-2">
-              {/* 뱃지 */}
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-extrabold text-slate-700 ring-1 ring-black/5">
-                  {chem.tag}
-                </span>
-              </div>
-
-              {/* 모임 프로필 */}
-              <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
-                <div className="text-[11px] font-extrabold text-slate-500">모임 성격</div>
-                <div className="mt-1 text-xs font-extrabold text-slate-800 leading-5">
-                  {chem.profile}
-                </div>
-              </div>
-
-              {/* 부딪히는 포인트(칩 형태) */}
-              {chem.friction?.length ? (
-                <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
-                  <div className="text-[11px] font-extrabold text-slate-500">자주 흔들리는 포인트</div>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {chem.friction.slice(0, 3).map((t: string, i: number) => (
-                      <span
-                        key={i}
-                        className="rounded-2xl bg-slate-50 px-2.5 py-1.5 text-[11px] font-bold text-slate-700 ring-1 ring-black/5"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              {/* 실제 장면(번호 카드) */}
-              {chem.scenes?.length ? (
-                <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
-                  <div className="text-[11px] font-extrabold text-slate-500">실제로 자주 나오는 장면</div>
-                  <ul className="mt-2 space-y-2">
-                    {chem.scenes.slice(0, 6).map((s: string, i: number) => (
-                      <li key={i} className="flex gap-2 rounded-xl bg-white/70 px-3 py-2 ring-1 ring-black/5">
-                        <div className="mt-[1px] h-5 w-5 shrink-0 rounded-full bg-slate-100 text-[11px] font-extrabold text-slate-600 flex items-center justify-center ring-1 ring-black/5">
-                          {i + 1}
-                        </div>
-                        <div className="text-[12px] leading-5 text-slate-700">{s}</div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </div>
-
-
             {/* ✅ 타입(안정/보완/스파크/폭발) 리스트 */}
             <div className="mt-3 space-y-3">
               {(["STABLE", "COMPLEMENT", "SPARK", "EXPLODE"] as ChemType[]).map((t) => {
@@ -572,6 +514,50 @@ export default function ChemReportSection({ pairs }: Props) {
 
 
               })}
+            </div>
+            {/* ✅ 상단 요약(가독성 개선) */}
+            <div className="mt-3 space-y-2">
+              {/* 모임 프로필 */}
+              <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
+                <div className="text-[11px] font-extrabold text-slate-500">모임 성격</div>
+                <div className="mt-1 text-xs font-extrabold text-slate-800 leading-5">
+                  {chem.profile}
+                </div>
+              </div>
+
+              {/* 부딪히는 포인트(칩 형태) */}
+              {chem.friction?.length ? (
+                <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
+                  <div className="text-[11px] font-extrabold text-slate-500">자주 흔들리는 포인트</div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {chem.friction.slice(0, 3).map((t: string, i: number) => (
+                      <span
+                        key={i}
+                        className="rounded-2xl bg-slate-50 px-2.5 py-1.5 text-[11px] font-bold text-slate-700 ring-1 ring-black/5"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {/* 실제 장면(번호 카드) */}
+              {chem.scenes?.length ? (
+                <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
+                  <div className="text-[11px] font-extrabold text-slate-500">실제로 자주 나오는 장면</div>
+                  <ul className="mt-2 space-y-2">
+                    {chem.scenes.slice(0, 6).map((s: string, i: number) => (
+                      <li key={i} className="flex gap-2 rounded-xl bg-white/70 px-3 py-2 ring-1 ring-black/5">
+                        <div className="mt-[1px] h-5 w-5 shrink-0 rounded-full bg-slate-100 text-[11px] font-extrabold text-slate-600 flex items-center justify-center ring-1 ring-black/5">
+                          {i + 1}
+                        </div>
+                        <div className="text-[12px] leading-5 text-slate-700">{s}</div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
           </>
         )}

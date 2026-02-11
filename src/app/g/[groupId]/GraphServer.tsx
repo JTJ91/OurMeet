@@ -1,9 +1,51 @@
 // app/g/[groupId]/GraphServer.tsx
 import { prisma } from "@/lib/prisma";
 import GraphClient from "./GraphClient";
-import { calcCompatLevel, calcCompatScore } from "@/lib/mbtiCompat";
+import { getCompatScore } from "@/lib/mbtiCompat";
+
 
 type Level = 1 | 2 | 3 | 4 | 5;
+
+function GraphSectionCard({
+  title,
+  subtitle,
+  right,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  right?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mt-6">
+      <div className="overflow-hidden rounded-3xl bg-white/75 shadow-sm ring-1 ring-black/5">
+        {/* 헤더 스트립 */}
+        <div className="px-4 py-3 bg-[#1E88E5]/[0.06]">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-[#1E88E5]/10 px-2.5 py-1 text-[11px] font-extrabold text-[#1E88E5]">
+                  🧭 {title}
+                </span>
+                {subtitle ? (
+                  <span className="text-[11px] font-bold text-slate-500">
+                    {subtitle}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+
+            {right ? <div className="shrink-0">{right}</div> : null}
+          </div>
+        </div>
+
+        {/* 본문 */}
+        <div className="">{children}</div>
+      </div>
+    </section>
+  );
+}
 
 export default async function GraphServer({
   groupId,
@@ -40,22 +82,33 @@ export default async function GraphServer({
   // ✅ 서버에서 nodes(레벨)까지 완성해서 내려보내기
   const nodes = members
   .filter((m) => m.id !== center.id)
-  .map((m) => ({
-    id: m.id,
-    name: m.nickname,
-    mbti: m.mbti.toUpperCase(),
-    score: calcCompatScore(center.mbti, m.mbti),          // ✅ 추가
-    level: calcCompatLevel(center.mbti, m.mbti),          // ✅ 그대로
-  }));
+  .map((m) => {
+    const compat = getCompatScore(center.id, center.mbti, m.id, m.mbti);
 
+    return {
+      id: m.id,
+      name: m.nickname,
+      mbti: m.mbti.toUpperCase(),
+      score: compat.score, // ✅ 마이크로(소수점) = 리포트/캔버스 동일
+      level: compat.level, // ✅ 마이크로 기준 레벨(색/범례도 동일)
+      // type: compat.type, // 필요하면 추가 가능
+    };
+  });
 
   return (
-    <GraphClient
-      groupId={group.id}
-      groupName={group.name}
-      center={center}
-      nodes={nodes}
-      memberCount={members.length}
-    />
+    <GraphSectionCard
+      title="관계도"
+      subtitle="센터 기준 케미 연결"
+    >
+      <GraphClient
+        groupId={group.id}
+        groupName={group.name}
+        center={center}
+        nodes={nodes}
+        memberCount={members.length}
+      />
+    </GraphSectionCard>
   );
+
+
 }

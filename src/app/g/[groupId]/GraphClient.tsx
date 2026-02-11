@@ -97,7 +97,7 @@ export default function GraphClient({
 
 
   return (
-    <section className="mt-4 rounded-3xl bg-white/80 p-5 ring-1 ring-black/5 shadow-sm backdrop-blur-md">
+    <>
       {/* ✅ 버튼을 page.tsx 슬롯으로 순간이동 */}
       {slotEl ? createPortal(actions, slotEl) : null}
 
@@ -115,6 +115,6 @@ export default function GraphClient({
           router.replace(`/g/${groupId}?${next.toString()}`);
         }}
       />
-    </section>
+    </>
   );
 }
