@@ -163,61 +163,7 @@ export default function JoinFormClient({
         )}
       </label>
 
-      {/* ✅ 추가 입력 1: 판단 기준 (T/F 보정) */}
-        <fieldset className="block">
-          <legend className="text-sm font-bold text-slate-800">판단 기준</legend>
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            <label className="cursor-pointer">
-              <input
-                type="radio"
-                name="judge"
-                value="LOGIC"
-                defaultChecked
-                disabled={isFull || isSubmitting}
-                className="peer sr-only"
-              />
-              <div
-                className="
-                  h-12 rounded-2xl bg-white px-4
-                  ring-1 ring-black/10
-                  flex items-center justify-center
-                  text-[13px] font-extrabold text-slate-700
-                  peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50
-                  peer-checked:bg-white
-                  hover:bg-white
-                  disabled:opacity-60
-                "
-              >
-                🔢 논리·효율·근거
-              </div>
-            </label>
-
-            <label className="cursor-pointer">
-              <input
-                type="radio"
-                name="judge"
-                value="PEOPLE"
-                disabled={isFull || isSubmitting}
-                className="peer sr-only"
-              />
-              <div
-                className="
-                  h-12 rounded-2xl bg-white px-4
-                  ring-1 ring-black/10
-                  flex items-center justify-center
-                  text-[13px] font-extrabold text-slate-700
-                  peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50
-                  peer-checked:bg-white
-                  hover:bg-white
-                  disabled:opacity-60
-                "
-              >
-                💬 사람·분위기·감정
-              </div>
-            </label>
-          </div>
-          <p className="mt-1 text-[11px] text-slate-500">같은 MBTI여도 판단 습관이 달라질 수 있어요.</p>
-        </fieldset>
+      
 
         {/* 결정 스타일 */}
       <fieldset className="block">

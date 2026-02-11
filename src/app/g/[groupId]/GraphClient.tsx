@@ -39,7 +39,7 @@ export default function GraphClient({
         <div className="flex items-center justify-between rounded-2xl bg-white/70 px-3 py-2 ring-1 ring-black/5">
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-[11px] font-extrabold text-slate-500 shrink-0">
-              현재 센터
+              내 정보
             </span>
 
             <span className="h-1 w-1 rounded-full bg-slate-300 shrink-0" />
@@ -53,9 +53,6 @@ export default function GraphClient({
             </span>
           </div>
 
-          <span className="text-[11px] font-bold text-slate-400 shrink-0">
-            (저장 기준)
-          </span>
         </div>
 
         {/* ✅ 안내 문구: 저장 기준 명확히 */}
