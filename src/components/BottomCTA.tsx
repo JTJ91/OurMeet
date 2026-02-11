@@ -10,6 +10,8 @@ export default function BottomCTA() {
   const [groups, setGroups] = useState<SavedGroup[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
 
+  const [menuOpen, setMenuOpen] = useState(false);  //네비게이션 메뉴 
+
   function formatRelativeTime(ts: number) {
     const diff = Date.now() - ts;
     const sec = Math.floor(diff / 1000);
@@ -34,6 +36,20 @@ export default function BottomCTA() {
     const year = Math.floor(day / 365);
     return `${year}년 전`;
   }
+
+  useEffect(() => {
+    const onMenu = (e: Event) => {
+      const ce = e as CustomEvent<{ open: boolean }>;
+      setMenuOpen(!!ce.detail?.open);
+
+      // ✅ 메뉴 열리면 CTA의 바텀시트도 같이 닫아버리기(겹침 방지)
+      if (ce.detail?.open) setSheetOpen(false);
+    };
+
+    window.addEventListener("app:menu", onMenu as EventListener);
+    return () => window.removeEventListener("app:menu", onMenu as EventListener);
+  }, []);
+
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -65,8 +81,14 @@ export default function BottomCTA() {
   }, [hasAny, groups.length]);
 
     return (
-    <div className="fixed inset-x-0 bottom-0 z-50 sm:static sm:z-auto sm:mt-10">
-      <div className="mx-auto max-w-[420px] px-5 pb-5 sm:pb-0">
+    <div
+      data-bottom-cta
+      className={[
+        "fixed inset-x-0 bottom-0 z-50 sm:static sm:z-auto sm:mt-10",
+        menuOpen ? "hidden" : "",
+      ].join(" ")}
+    >
+      <div className="mx-auto max-w-[760px] px-5 pb-5 sm:pb-0">
         <div
           className={`
             rounded-3xl bg-white/80 p-3 ring-1 ring-black/5

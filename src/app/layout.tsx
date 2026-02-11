@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import Script from "next/script";
+import FloatingToTop from "@/components/FloatingToTop";
+import ClientOverlays from "@/components/ClientOverlays";
+import AppHeader from "@/components/AppHeader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,9 +58,9 @@ export default function RootLayout({
         </Script>
       </head>
 
-      
-      
       <body className="min-h-screen flex flex-col bg-[#F5F9FF]">
+        <AppHeader />
+        
         {/* 페이지 내용 */}
         <div className="flex-1">
           {children}
@@ -65,15 +68,24 @@ export default function RootLayout({
 
         {/* 공통 Footer */}
         <footer className="py-10 text-center text-xs text-slate-500 bg-[#F5F9FF] backdrop-blur pb-30">
-          <div className="space-x-3">
+          
+          {/* 1줄: 콘텐츠 */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link href="/cognitive-functions" className="hover:text-slate-700 transition">
+              MBTI 인지기능
+            </Link>
+            <span className="text-slate-300">·</span>
             <Link href="/guides" className="hover:text-slate-700 transition">
-              MBTI 가이드
+              모임 속 MBTI
             </Link>
             <span className="text-slate-300">·</span>
             <Link href="/faq" className="hover:text-slate-700 transition">
               자주 묻는 질문
             </Link>
-            <span className="text-slate-300">·</span>
+          </div>
+
+          {/* 2줄: 정책 */}
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
             <Link href="/terms" className="hover:text-slate-700 transition">
               이용 약관
             </Link>
@@ -87,6 +99,9 @@ export default function RootLayout({
             © 2026 모임랭크. All rights reserved.
           </div>
         </footer>
+
+
+        <ClientOverlays />
       </body>
     </html>
   );

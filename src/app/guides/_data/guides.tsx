@@ -1,1820 +1,2066 @@
-import React from "react";
-import { Card } from "../_components/GuideLayout";
-
-export type Guide = {
-  slug: string;
-  title: string;
-  description: string;
-  keywords?: string[];
-  component: React.ReactNode;
-};
-
-
-const AdPlaceholder = () => (
-  <div className="rounded-3xl border border-dashed border-slate-300 bg-white/60 p-5 text-center text-xs text-slate-500">
-    (광고 영역) — 추후 Google AdSense / 쿠팡 파트너스 배치 위치
-  </div>
-);
-
+// app/guides/_data/guides.ts
+import type { Guide, GroupType } from "./types";
 
 export const GUIDES: Guide[] = [
+  // =========================
+  // FRIENDS (5)
+  // =========================
   {
-    slug: "what-is-chem",
-    title: "모임 케미란 무엇인가?",
+    slug: "friends-awkward-moment",
+    groupType: "FRIENDS",
+    title: "친구 모임이 ‘말 많은데 어색해지는’ 순간들",
     description:
-      "‘잘 맞는다’는 감이 아니라, 대화 흐름·결정 속도·역할 분담이 자연스럽게 굴러가는 상태를 뜻해요.",
-    keywords: ["MBTI", "케미", "모임", "팀워크", "인지기능"],
-    component: (
-        <>
-            <Card title="모임 케미란 무엇인가?">
-            <p className="text-sm leading-7 text-slate-700">
-                모임 케미는 단순히 “성격이 잘 맞는다”가 아니라,
-                <b className="text-slate-900"> 대화가 자연스럽게 이어지고, 결론이 나고, 역할이 돌아가는 상태</b>를 말해요.
-                같은 목표를 가진 모임이라도 생각 방식(인지기능)이 엇갈리면,
-                회의가 길어지고 피로도가 쌓이기 쉽습니다.
-            </p>
-
-            <div className="mt-4 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">한 문장 정의</div>
-                <p className="mt-1 text-sm leading-7 text-slate-700">
-                케미 = <b className="text-slate-900">“정보를 보는 방식 + 결정을 내리는 방식”</b>이 서로 잘 이어져서,
-                <b className="text-slate-900"> 덜 싸우고 더 빨리 굴러가는 정도</b>
-                </p>
-            </div>
-            </Card>
-
-            <Card title="모임에서 케미가 무너지면 보이는 신호 7가지">
-            <ul className="space-y-2 text-sm leading-7 text-slate-700">
-                <li>✔ 회의는 했는데, 끝나고 나면 “그래서 뭐 하기로 했지?”가 남는다</li>
-                <li>✔ 같은 말(요지/근거/감정)이 반복된다</li>
-                <li>✔ 의견은 많은데 선택이 안 되고, 결정이 미뤄진다</li>
-                <li>✔ 사소한 말투/표현에서 분위기가 급격히 식는다</li>
-                <li>✔ “너는 왜 그렇게까지 따져?” vs “너는 왜 근거가 없어?”가 반복된다</li>
-                <li>✔ 실행은 하는데 방향이 자주 바뀌고, 기록이 남지 않는다</li>
-                <li>✔ 모임이 끝나면 결과보다 피로가 먼저 남는다</li>
-            </ul>
-
-            <p className="mt-4 text-sm leading-7 text-slate-700">
-                이런 현상은 성격 문제가 아니라,
-                <b className="text-slate-900"> ‘사고 구조가 서로 맞물리지 않는 상태’</b>에서 자주 생겨요.
-            </p>
-            </Card>
-
-            <Card title="좋은 케미가 있는 모임의 특징 5가지">
-            <ul className="space-y-2 text-sm leading-7 text-slate-700">
-                <li>✔ 말이 겹치지 않고, 누가 이어받아도 흐름이 끊기지 않는다</li>
-                <li>✔ ‘아이디어 → 정리 → 결정 → 실행’이 자연히 분업된다</li>
-                <li>✔ 갈등이 생겨도 “오해였네”로 수습되는 속도가 빠르다</li>
-                <li>✔ 회의가 길어져도, 결론 문장이 남는다</li>
-                <li>✔ 모임 이후 “찝찝함”보다 “진행감”이 남는다</li>
-            </ul>
-
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">대화</div>
-                <p className="mt-1 text-sm leading-7 text-slate-700">
-                    요지/근거/감정이 자연스럽게 분리되어, 서로 “틀린 말”로 듣지 않아요.
-                </p>
-                </div>
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">결정</div>
-                <p className="mt-1 text-sm leading-7 text-slate-700">
-                    선택 기준이 공유되고, 마지막에 “결론 문장”이 남습니다.
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="모임랭크의 케미 점수는 무엇을 반영하나요?">
-            <p className="text-sm leading-7 text-slate-700">
-                점수는 “같다/다르다”가 아니라,
-                <b className="text-slate-900"> 대화 흐름·결정 기준·역할 분담·갈등 포인트</b>를 종합해요.
-                특히 모임랭크는 MBTI 네 글자를 그대로 비교하기보다,
-                <b className="text-slate-900"> 인지기능(생각 습관)의 조합</b>이 어떻게 만나느냐를 중심으로 봅니다.
-            </p>
-
-            <div className="mt-4 space-y-3 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">점수가 높아지는 경우</div>
-                <ul className="space-y-1.5 text-sm leading-7 text-slate-700">
-                <li>✔ 한쪽이 요지를 잡고, 한쪽이 근거/디테일을 채운다</li>
-                <li>✔ 논리와 공감이 “순서”만 잘 맞춰도 이어진다</li>
-                <li>✔ 결론형과 탐색형이 단계(아이디어/결정)를 분리해 운영한다</li>
-                </ul>
-            </div>
-
-            <div className="mt-3 space-y-3 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">점수가 낮아지는 경우</div>
-                <ul className="space-y-1.5 text-sm leading-7 text-slate-700">
-                <li>✔ 같은 기준을 강하게 밀어붙여 주도권 싸움이 난다</li>
-                <li>✔ ‘요지/근거/감정’ 중 서로 중요하게 보는 축이 계속 어긋난다</li>
-                <li>✔ 피곤한 날에 말투/표현이 바로 오해로 번역된다</li>
-                </ul>
-            </div>
-            </Card>
-
-            <Card title="케미는 ‘사람 평가’가 아니라 ‘운영 힌트’예요">
-            <p className="text-sm leading-7 text-slate-700">
-                점수가 낮다고 “안 맞는 사람”이라는 뜻이 아니에요.
-                다만 지금 방식 그대로 두면,
-                <b className="text-slate-900"> 오해가 생길 확률이 높은 구간</b>이 있다는 의미에 가깝습니다.
-            </p>
-
-            <div className="mt-4 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">추천 운영법(가장 효과 좋은 3개)</div>
-                <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-700">
-                <li>
-                    ✔ <b className="text-slate-900">단계 선언</b>:
-                    “아이디어 단계/결정 단계”를 먼저 말하면 충돌이 확 줄어요.
-                </li>
-                <li>
-                    ✔ <b className="text-slate-900">기준 공개</b>:
-                    “나는 지금 OO 기준으로 보고 있어” 한 문장만 해도 오해가 줄어요.
-                </li>
-                <li>
-                    ✔ <b className="text-slate-900">결론 문장 1개</b>:
-                    끝날 때 “오늘 결론은 ___”만 남기면 다음이 달라집니다.
-                </li>
-                </ul>
-            </div>
-            </Card>
-
-            <Card title="자주 묻는 질문 (FAQ)">
-            <div className="space-y-5 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">Q. MBTI가 같으면 무조건 잘 맞나요?</b>
-                <p className="mt-1">
-                    아닙니다. 같은 유형이라도 <b className="text-slate-900">같은 축을 강하게 밀면</b> 충돌이 날 수 있어요.
-                    케미는 “같음”보다 <b className="text-slate-900">맞물림(역할 분담)</b>에서 좋아지는 경우가 많습니다.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 점수가 낮으면 관계를 피해야 하나요?</b>
-                <p className="mt-1">
-                    피해야 한다는 뜻이 아니라, <b className="text-slate-900">운영 장치가 필요</b>하다는 의미에 더 가깝습니다.
-                    (단계 선언/기준 공개/결론 문장 같은 룰이 특히 효과적이에요.)
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 평균 점수가 높으면 무조건 좋은 모임인가요?</b>
-                <p className="mt-1">
-                    평균보다 중요한 건 <b className="text-slate-900">최저점 관리</b>예요.
-                    최악 1~2 조합이 자주 부딪히는 구조면 체감이 급격히 나빠질 수 있습니다.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 케미 점수는 시간이 지나면 바뀌나요?</b>
-                <p className="mt-1">
-                    사람의 관계는 변하지만, 이 점수는 <b className="text-slate-900">사고 방식의 구조적 궁합</b>을 보므로
-                    큰 틀은 비슷하게 유지됩니다. 대신 운영(룰/역할/분위기)이 바뀌면 체감은 크게 달라질 수 있어요.
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="다음으로 보면 좋은 가이드">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <a
-                href="/guides/no-conclusion"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    왜 우리 모임은 자꾸 결론이 안 날까? (TJ 부족)
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    결론이 안 나는 모임의 구조적 원인과 처방 3가지
-                </p>
-                </a>
-
-                <a
-                href="/guides/cognitive-clash"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    MBTI 인지기능이 모임에서 충돌하는 순간
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    큰그림/디테일, 효율/감정 충돌을 줄이는 말하기 룰
-                </p>
-                </a>
-            </div>
-
-            </Card>
-        </>
-        ),
-
+      "대화는 계속 되는데 집에 가면 묘하게 피곤한 모임. 어떤 조합에서 어떤 오해가 시작되는지, 그리고 바로 써먹는 해결 루틴까지 정리했어요.",
+    keywords: ["친구모임", "MBTI", "케미", "어색함", "대화"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "친구 모임에서 자주 나오는 케미 패턴 TOP 3",
+        items: [
+          {
+            title: "1) ‘드립/팩트’가 서로 다른 언어로 들릴 때",
+            when: "농담으로 던졌는데 한 명이 진지하게 받아치면서 분위기가 뚝 떨어져요.",
+            why: "장난/팩트/감정 중 ‘지금 뭐가 우선인지’ 해석이 갈리면 같은 말도 공격처럼 들립니다.",
+            tip: "농담 후에 한 문장 덧붙이기: “나 공격 아니고 드립이야 😂(진짜로)” 대신 **“의도는 편하게 말한 거야”** 같은 문장.",
+          },
+          {
+            title: "2) ‘대화는 많은데 결론이 없는’ 수다 피로",
+            when: "계속 이야기했는데, 다음 만남 약속/계획은 안 정해지고 해산해요.",
+            why: "탐색형 대화가 길어지면 재밌긴 한데, ‘정리 역할’이 비면 피로만 남습니다.",
+            tip: "마지막 2분만 규칙: **“오늘 결론 1줄 + 다음에 할 것 1개”**.",
+          },
+          {
+            title: "3) ‘공감 요구’와 ‘해결 제안’이 충돌할 때",
+            when: "누군가 고민 얘기하면, 누군가는 해결책부터 말하고 누군가는 위로부터 해요.",
+            why: "상대가 원하는 게 ‘공감’인지 ‘해결’인지 다르면 선의도 잔소리/무관심으로 번역됩니다.",
+            tip: "시작 질문 하나로 정리: **“지금 공감이 필요해? 해결이 필요해?”**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "어색함이 시작되는 트리거 (이때 조심)",
+        items: [
+          {
+            title: "‘그게 뭐가 문제야?’ 라인이 나올 때",
+            detail:
+              "상대는 문제를 말하는 게 아니라 ‘기분/맥락’을 말하는 중일 수 있어요. 이 타이밍에 팩트로만 밀면 급격히 식습니다.",
+          },
+          {
+            title: "‘그래서 결론은?’이 너무 빨리 나올 때",
+            detail:
+              "아직 가볍게 떠드는 단계인데 결론 압박이 들어오면 “나 지금 평가받나?” 느낌이 생겨요.",
+          },
+          {
+            title: "한 명이 조용해졌는데 아무도 체크 안 할 때",
+            detail:
+              "친구 모임은 ‘업무’가 아니라서 더더욱, 조용해진 사람은 혼자 거리 두기 모드로 들어갑니다.",
+          },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "조심해야 할 점: 이건 DO / DON’T로만 기억해도 돼요",
+        items: {
+          do: [
+            "상대 말에 **요약 한 번**: “너 말은 A가 핵심이지?”",
+            "논쟁 느낌 나면 **기준 공개**: “나는 효율 기준으로 말했어.”",
+            "마무리는 **결론 1줄**: “다음엔 ○○ 하자.”",
+          ],
+          dont: [
+            "농담 뒤에 해명 없이 방치하기",
+            "‘팩트’로 감정 얘기를 덮기",
+            "대화 끝나고 아무 것도 안 정한 채 해산하기(피로만 남음)",
+          ],
+        },
+      },
+      {
+        type: "RULES",
+        title: "친구 모임이 ‘편해지는’ 운영 룰 4개",
+        items: [
+          {
+            title: "룰 1) ‘지금 단계’를 말로 붙이기",
+            how: "“지금은 수다(탐색) / 지금은 정리(결정)”만 구분해도 충돌이 줄어요.",
+            example: "“오케이 지금은 수다 타임! 결론은 10분 뒤에 잡자.”",
+          },
+          {
+            title: "룰 2) 결론은 1줄만",
+            how: "회의록처럼 길게 말고, 끝에 딱 1줄만 남겨요.",
+            example: "“오늘 결론: 다음엔 7시, 장소는 ○○.”",
+          },
+          {
+            title: "룰 3) 공감/해결 스위치 질문",
+            how: "고민 얘기 나오면 무조건 먼저 물어보는 질문 하나.",
+            example: "“지금 공감이 필요해, 해결이 필요해?”",
+          },
+          {
+            title: "룰 4) 말이 세게 들릴 수 있을 때는 ‘대상 고정’",
+            how: "사람 평가로 들리기 쉬운 순간엔 결과/상황에만 고정해서 말해요.",
+            example: "“너가 문제”가 아니라 “이 상황이 이렇게 꼬였어.”",
+          },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "상황별 ‘대체 문장’ (그대로 써도 되는 말)",
+        items: [
+          {
+            situation: "농담이 오해로 번졌을 때",
+            say: "“오해하게 했다면 미안. 의도는 편하게 말한 거였어.”",
+            instead: "“아 왜 그래~” (이건 거의 불 붙임)",
+          },
+          {
+            situation: "상대가 감정 얘기할 때 내가 해결 모드로 들어갈 때",
+            say: "“지금은 공감이 먼저야? 아니면 해결 같이 찾아볼까?”",
+          },
+          {
+            situation: "대화가 끝이 없이 늘어질 때",
+            say: "“좋아, 그럼 결론 1줄만 잡고 마무리하자.”",
+          },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "자주 묻는 질문",
+        items: [
+          {
+            q: "MBTI가 같으면 친구 모임은 무조건 편한가요?",
+            a: "꼭 그렇진 않아요. 같은 스타일끼리도 ‘같은 기준을 너무 세게’ 밀면 오히려 신경전이 생깁니다. 편함은 ‘같음’보다 ‘운영 룰’에서 자주 결정돼요.",
+          },
+          {
+            q: "어색해졌을 때 제일 빠른 한 방은요?",
+            a: "“오해하게 했다면 미안. 의도는 이거였어.” 이 한 문장이요. 감정 싸움이 ‘의도 확인’으로 바뀌면 급격히 풀립니다.",
+          },
+        ],
+      },
+    ],
+    related: ["friends-plan-chaos", "friends-money-split", "friends-gossip-minefield", "friends-new-member-vibe"],
   },
 
   {
-    slug: "no-conclusion",
-    title: "왜 우리 모임은 자꾸 결론이 안 날까? (TJ 부족)",
+    slug: "friends-plan-chaos",
+    groupType: "FRIENDS",
+    title: "친구 모임이 ‘약속 잡는 데만 2주’ 걸릴 때",
     description:
-      "회의가 길어지는 건 게으름이 아니라 ‘결정 방식’의 구성 문제일 수 있어요. 해결은 의외로 간단합니다.",
-    keywords: ["결론", "회의", "TJ", "정리", "결정"],
-    component: (
-        <>
-            <Card title="왜 우리 모임은 자꾸 결론이 안 날까? (TJ 부족)">
-            <p className="text-sm leading-7 text-slate-700">
-                결론이 안 나는 모임은 의외로 “의견이 없어서”가 아니라,
-                <b className="text-slate-900"> 정리·판단·결정 역할이 비어 있어서</b> 멈추는 경우가 많아요.
-                특히 TJ 성향(특히 T+J)이 약하면 회의가 풍부해질수록 “선택”이 더 어려워집니다.
-            </p>
-
-            <div className="mt-4 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">한 문장 핵심</div>
-                <p className="mt-1 text-sm leading-7 text-slate-700">
-                결론이 안 나는 이유 = <b className="text-slate-900">결정 기준이 공유되지 않은 상태에서 옵션만 늘어나는 구조</b>
-                </p>
-            </div>
-            </Card>
-
-            <Card title="결론이 안 나는 모임에서 자주 보이는 신호 9가지">
-            <ul className="space-y-2 text-sm leading-7 text-slate-700">
-                <li>✔ “다 좋은데…”로 끝나고 선택이 없다</li>
-                <li>✔ 옵션이 줄지 않고 계속 추가된다</li>
-                <li>✔ 회의가 끝나도 다음 액션이 비어 있다</li>
-                <li>✔ “그건 별로야”는 많은데 “그럼 이걸로”가 없다</li>
-                <li>✔ 결정 직전에 다시 처음으로 돌아간다</li>
-                <li>✔ 기준이 사람마다 달라서 대화가 평행선이 된다</li>
-                <li>✔ 기록이 없어서 다음에 같은 회의를 또 한다</li>
-                <li>✔ 누가 정리하려 하면 “너무 단정 짓지 마”가 나온다</li>
-                <li>✔ 결국 ‘제일 말 센 사람’ 의견으로 마감된다</li>
-            </ul>
-            </Card>
-
-            <Card title="TJ가 부족하면 생기는 구조적 문제">
-            <p className="text-sm leading-7 text-slate-700">
-                TJ(특히 T+J)는 모임에서 자주
-                <b className="text-slate-900"> 기준을 세우고, 선택지를 줄이고, 결론 문장을 만드는 기능</b>을 담당합니다.
-                이 축이 약하면 모임은 “합의”는 되는데 “결정”이 안 나는 패턴으로 가요.
-            </p>
-
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">많이 나오는 말</div>
-                <p className="mt-1 text-sm leading-7 text-slate-700">
-                    “좀 더 얘기해보자”, “결정은 다음에”, “일단 보류”
-                </p>
-                </div>
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">실제 문제</div>
-                <p className="mt-1 text-sm leading-7 text-slate-700">
-                    대화가 부족한 게 아니라 <b className="text-slate-900">수렴 규칙이 없는 것</b>
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="원인 3가지: 결론이 안 나는 모임의 숨은 구조">
-            <div className="space-y-4 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">① 기준이 없다</b><br />
-                “가성비/퀄리티/속도/분위기” 중 무엇이 우선인지 공유되지 않으면,
-                모두가 맞는 말을 하고도 결론이 안 나요.
-                </div>
-                <div>
-                <b className="text-slate-900">② 옵션이 줄지 않는다</b><br />
-                탐색(아이디어) 단계가 길어지고, 수렴(선택) 단계로 못 넘어갑니다.
-                </div>
-                <div>
-                <b className="text-slate-900">③ 결론 문장이 없다</b><br />
-                “오늘은 A로 간다” 같은 문장이 남지 않으면,
-                다음 모임에서 같은 논의를 다시 하게 됩니다.
-                </div>
-            </div>
-            </Card>
-
-            <Card title="바로 먹히는 처방 5가지 (TJ가 없어도 굴러가게)">
-            <div className="space-y-4 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">1) 기준 1줄을 먼저 정하기</b><br />
-                “오늘은 퀄리티 우선”, “이번엔 비용 상한 10만”, “속도 우선”처럼
-                <b className="text-slate-900"> 기준 한 줄</b>이 있으면 결론이 나기 시작해요.
-                </div>
-
-                <div>
-                <b className="text-slate-900">2) 타임박스 + A/B 고정</b><br />
-                10분 토론 후 “A/B 중 택1”로 강제 수렴.
-                옵션을 늘리는 대신 줄이는 규칙을 넣습니다.
-                </div>
-
-                <div>
-                <b className="text-slate-900">3) ‘정리 담당’을 사람 말고 역할로 지정</b><br />
-                “오늘은 OO가 결론 문장 1개로 마감”처럼 라운드제로 운영하면
-                특정인에게 부담이 몰리지 않아요.
-                </div>
-
-                <div>
-                <b className="text-slate-900">4) 결론 3갈래 템플릿</b><br />
-                회의 말미에 무조건 아래 중 하나로 분류합니다:
-                <div className="mt-2 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                    <ul className="space-y-1.5 text-sm leading-7 text-slate-700">
-                    <li>✔ <b className="text-slate-900">결정</b>: “A로 한다”</li>
-                    <li>✔ <b className="text-slate-900">보류</b>: “정보가 부족해 다음에” + 필요한 정보 1개</li>
-                    <li>✔ <b className="text-slate-900">실험</b>: “작게 해보고 다음에 판단” + 기간/기준</li>
-                    </ul>
-                </div>
-                </div>
-
-                <div>
-                <b className="text-slate-900">5) 기록은 ‘회의록’ 말고 ‘결론 3줄’</b><br />
-                긴 회의록이 아니라,
-                <b className="text-slate-900">결론 1줄 + 다음 액션 2개</b>만 남겨도 다음이 달라져요.
-                </div>
-            </div>
-            </Card>
-
-            <Card title="30초 자가진단: 우리 모임은 뭐가 비어있을까?">
-            <div className="space-y-3 text-sm leading-7 text-slate-700">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">체크</div>
-                <ul className="mt-2 space-y-1.5">
-                    <li>☐ 결정 기준이 회의 시작에 공유된다</li>
-                    <li>☐ 옵션을 줄이는 규칙이 있다(A/B, 상한, 우선순위)</li>
-                    <li>☐ 결론 문장이 남는다(“오늘은 A”)</li>
-                    <li>☐ 다음 액션이 최소 1개는 확정된다</li>
-                    <li>☐ 보류일 경우 “필요한 정보 1개”가 정해진다</li>
-                </ul>
-                </div>
-
-                <p className="text-sm leading-7 text-slate-700">
-                2개 이하라면, 분위기 문제가 아니라 <b className="text-slate-900">수렴 프로세스</b>가 부족할 확률이 높아요.
-                </p>
-            </div>
-            </Card>
-
-            <Card title="자주 묻는 질문 (FAQ)">
-            <div className="space-y-5 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">Q. TJ가 없으면 무조건 결론이 안 나나요?</b>
-                <p className="mt-1">
-                    꼭 그렇진 않아요. <b className="text-slate-900">사람 대신 룰</b>로 TJ 역할을 대신하면 됩니다.
-                    (기준 1줄, A/B 고정, 결론 3갈래 템플릿이 특히 효과적이에요.)
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 결론을 내리면 누군가가 손해 보는 느낌이 들어요.</b>
-                <p className="mt-1">
-                    그럴 땐 “결정” 대신 <b className="text-slate-900">실험</b>으로 바꾸세요.
-                    “2주만 해보고 기준으로 판단”처럼 임시 결론이면 부담이 확 줄어요.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 회의가 길어질 때 가장 빠른 한 방은 뭔가요?</b>
-                <p className="mt-1">
-                    <b className="text-slate-900">“오늘 기준이 뭐야?”</b> 한 문장입니다.
-                    기준이 정해지면 옵션이 갑자기 줄어요.
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="다음으로 보면 좋은 가이드">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <a
-                href="/guides/too-many-exec"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    실행형이 많으면 생기는 5가지 현상
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    빠른 모임을 ‘성과’로 바꾸는 스위치 2개
-                </p>
-                </a>
-
-                <a
-                href="/guides/beyond-average"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    모임 평균 점수보다 중요한 것
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    평균보다 강한 변수: 최저점·역할·갈등 루틴
-                </p>
-                </a>
-            </div>
-            </Card>
-
-        </>
-        ),
-
+      "단톡은 시끄러운데 날짜/장소는 끝까지 안 정해지는 모임. ‘누가 미루는지’가 아니라 ‘구조가 왜 결정을 못 하는지’를 룰로 해결해요.",
+    keywords: ["친구", "약속", "단톡", "결정장애", "모임운영"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "결정이 안 나는 친구 모임 패턴 TOP 3",
+        items: [
+          {
+            title: "1) ‘가능한 날’만 모으고 선택은 안 함",
+            when: "각자 가능한 날은 말하는데, 그중 ‘하나를 고르는’ 사람이 없어요.",
+            why: "의견 수집(탐색)과 선택(수렴)을 같은 채팅에 섞으면 끝이 없습니다.",
+            tip: "**탐색 24시간 → 수렴 2시간**으로 분리: “내일 9시까지 가능날, 그 후엔 내가 2개로 줄여 투표할게.”",
+          },
+          {
+            title: "2) ‘장소’가 취향 싸움으로 번짐",
+            when: "‘아무 데나’라면서 막상 후보 나오면 다 싫다고 해요.",
+            why: "기준이 숨겨져 있으면 후보는 계속 탈락만 합니다(가격/거리/분위기).",
+            tip: "기준 3개만 공개: **거리/예산/분위기(조용/활동)**",
+          },
+          {
+            title: "3) 결정하면 ‘내가 책임지는 느낌’이 싫음",
+            when: "누가 정하면 불만이 생길까봐 다들 슬쩍 빠져요.",
+            why: "결정=책임으로 인식되면 아무도 총대 안 잡습니다.",
+            tip: "총대 부담을 ‘실험’으로 낮추기: **“이번엔 테스트로 가보고 별로면 다음에 바꾸자.”**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이때부터 단톡이 망가져요",
+        items: [
+          { title: "‘아무 데나’가 3번 이상 반복될 때", detail: "아무 데나=아직 기준이 공개되지 않았다는 신호예요." },
+          { title: "후보 1개 나올 때마다 반대만 달릴 때", detail: "반대는 쉬운데 대안이 없으면 피로만 쌓입니다." },
+          { title: "일정 확정 직전에 잠수자가 나올 때", detail: "확정이 ‘구속’으로 느껴지는 사람은 그 타이밍에 빠집니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["탐색/수렴 시간 분리", "기준 3개 공개", "결정은 2안 투표로"],
+          dont: ["후보 무한 증식", "불만을 ‘사람 탓’으로 몰기", "확정 직전 다시 원점회귀"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "약속이 빨라지는 운영 룰 4개",
+        items: [
+          { title: "룰 1) 후보는 2개까지만", how: "선택지를 줄이면 갈등도 줄어듭니다.", example: "“A(조용) vs B(활동) 2개만 두고 고르자.”" },
+          { title: "룰 2) 총대는 ‘결정자’가 아니라 ‘정리자’", how: "정리만 맡으면 부담이 확 줄어요.", example: "“내가 정리만 할게. 선택은 투표로.”" },
+          { title: "룰 3) 투표는 마감시간이 있어야 함", how: "마감 없으면 투표는 대화로 바뀝니다.", example: "“오늘 10시 마감. 미응답은 다수로 간다!”" },
+          { title: "룰 4) 불만은 다음 회차에 반영", how: "오늘의 불만으로 오늘을 깨지 않기.", example: "“이번엔 이렇게 가고, 다음엔 네 취향 반영하자.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "그대로 복붙해도 되는 단톡 문장",
+        items: [
+          { situation: "가능한 날 수집", say: "“내일 9시까지 가능날만! 그 후엔 내가 2개로 줄여 투표 올릴게.”" },
+          { situation: "후보 2개 제시", say: "“후보는 A/B 두 개만. 각자 한 표! 이유는 한 줄만.”" },
+          { situation: "불만 나올 때", say: "“오케이, 그건 다음 회차에 반영하자. 오늘은 일단 확정!”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [
+          { q: "총대 잡는 사람만 손해 같아요.", a: "그래서 총대는 ‘정리’만, 선택은 ‘투표’로 분리하는 게 핵심이에요." },
+          { q: "잠수자 때문에 계속 깨져요.", a: "마감시간+미응답은 다수결 룰을 넣으면 잠수가 ‘방해’가 아니라 ‘위임’이 됩니다." },
+        ],
+      },
+    ],
+    related: ["friends-awkward-moment", "friends-money-split", "friends-gossip-minefield", "friends-new-member-vibe"],
   },
 
   {
-    slug: "too-many-exec",
-    title: "실행형이 많으면 생기는 5가지 현상",
+    slug: "friends-money-split",
+    groupType: "FRIENDS",
+    title: "친구 모임이 ‘돈 얘기’에서 미묘해질 때",
     description:
-      "빠르고 재밌지만, 방향이 없으면 ‘열심히 하다가 엇갈리는’ 일이 생겨요. 실행력이 강한 모임을 더 잘 굴리는 법.",
-    keywords: ["실행형", "속도", "즉흥", "P", "S"],
-    component: (
-        <>
-            <Card title="실행형이 많으면 생기는 5가지 현상">
-            <p className="text-sm leading-7 text-slate-700">
-                실행형이 많은 모임은 시작이 빠르고 에너지가 좋아요.
-                “일단 해보자”가 자연스럽게 나오고, 분위기도 잘 살아납니다.
-                다만 방향·기록·수렴이 약하면 <b className="text-slate-900">열심히 하는데도 결과가 엇갈리는 모임</b>이 되기 쉬워요.
-            </p>
-
-            <div className="mt-4 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">한 문장 핵심</div>
-                <p className="mt-1 text-sm leading-7 text-slate-700">
-                실행형 모임의 문제는 ‘속도’가 아니라, <b className="text-slate-900">속도가 쌓일 구조(목표·기록·우선순위)</b>가 없는 겁니다.
-                </p>
-            </div>
-            </Card>
-
-            <Card title="먼저 장점부터: 실행형 모임이 강한 이유">
-            <ul className="space-y-2 text-sm leading-7 text-slate-700">
-                <li>✔ 시작이 빠르다 (회의보다 행동)</li>
-                <li>✔ 분위기/텐션이 산다 (지루할 틈이 적다)</li>
-                <li>✔ 실행이 ‘즉시’ 나온다 (오늘 당장 할 일이 생긴다)</li>
-                <li>✔ 작은 성취가 자주 쌓인다 (사기 유지에 유리)</li>
-            </ul>
-
-            <p className="mt-4 text-sm leading-7 text-slate-700">
-                그래서 실행형이 많은 모임은 <b className="text-slate-900">재미·추진력</b> 측면에서 이미 상위권이에요.
-                문제는 이 에너지가 “성과”로 연결되느냐입니다.
-            </p>
-            </Card>
-
-            <Card title="그런데 같이 오는 5가지 현상 (진짜 자주 나옵니다)">
-            <ol className="list-decimal pl-5 space-y-2 text-sm leading-7 text-slate-700">
-                <li>
-                <b className="text-slate-900">방향이 자주 바뀐다</b> — 재밌는 쪽으로 핸들이 꺾이면서 목표가 흔들림
-                </li>
-                <li>
-                <b className="text-slate-900">기록이 없다</b> — “분명 뭘 했는데…” 남는 게 없음
-                </li>
-                <li>
-                <b className="text-slate-900">중간 점검이 없다</b> — 끝나고 나서 “왜 이랬지?”가 나옴
-                </li>
-                <li>
-                <b className="text-slate-900">우선순위가 흐릿하다</b> — 할 일은 많은데 지금 뭐부터인지 불명확
-                </li>
-                <li>
-                <b className="text-slate-900">오해도 빨리 생긴다</b> — 말이 짧아지고 속도가 빨라지면 해석이 갈림
-                </li>
-            </ol>
-            </Card>
-
-            <Card title="왜 이런 일이 생길까? 실행형 모임의 ‘구조적 빈칸’">
-            <div className="space-y-4 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">① 목표가 ‘하나’로 고정되지 않는다</b><br />
-                실행력이 강하면 하고 싶은 게 많아져요. 그런데 목표가 여러 개면 실행도 여러 갈래로 흩어집니다.
-                </div>
-                <div>
-                <b className="text-slate-900">② 결과물이 ‘문장’으로 남지 않는다</b><br />
-                기록이 없으면 다음 모임에서 같은 얘기를 다시 하고, 결국 “열심히 했는데 제자리”가 됩니다.
-                </div>
-                <div>
-                <b className="text-slate-900">③ 수렴(선택) 단계가 생략된다</b><br />
-                “좋아! 하자!”는 빠른데, “그래서 뭘 안 하고 뭘 할지”가 빠집니다.
-                </div>
-            </div>
-            </Card>
-
-            <Card title="실행력을 성과로 바꾸는 스위치 3개">
-            <div className="space-y-4 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">1) 이번 주 목표 1개 고정</b><br />
-                즉흥은 유지해도 좋아요. 대신 <b className="text-slate-900">‘이번 주 목표는 하나’</b>만 고정하세요.
-                목표가 하나면 실행이 흩어지지 않습니다.
-                </div>
-
-                <div>
-                <b className="text-slate-900">2) 기록은 회의록이 아니라 ‘결론 3줄’</b><br />
-                긴 문서 말고 아래만 남기면 됩니다:
-                <div className="mt-2 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                    <ul className="space-y-1.5 text-sm leading-7 text-slate-700">
-                    <li>✔ 오늘 결론 1줄</li>
-                    <li>✔ 다음 액션 2개 (담당/기한 포함)</li>
-                    <li>✔ 다음 모임에서 확인할 1개</li>
-                    </ul>
-                </div>
-                </div>
-
-                <div>
-                <b className="text-slate-900">3) 10분마다 ‘점검 체크포인트’ 넣기</b><br />
-                속도가 빠를수록 중간 점검이 고급입니다.
-                “지금 목표랑 맞아?” 한 문장만 있어도 핸들 꺾임이 줄어요.
-                </div>
-            </div>
-            </Card>
-
-            <Card title="바로 써먹는 운영 템플릿 (실행형 모임 전용)">
-            <div className="space-y-4 text-sm leading-7 text-slate-700">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">모임 시작 2분</div>
-                <p className="mt-1">
-                    <b className="text-slate-900">“오늘/이번 주 목표 1개”</b>를 문장으로 고정한다.
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">중간 10분마다</div>
-                <p className="mt-1">
-                    <b className="text-slate-900">“지금 이게 목표랑 연결돼?”</b>만 확인한다.
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">마감 3분</div>
-                <p className="mt-1">
-                    <b className="text-slate-900">결론 1줄 + 액션 2개</b>만 남기고 종료한다.
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="30초 자가진단: 우리 모임은 ‘속도’가 아니라 ‘구조’가 있나?">
-            <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <ul className="space-y-1.5 text-sm leading-7 text-slate-700">
-                <li>☐ 목표가 1개로 고정된다</li>
-                <li>☐ 모임이 끝나면 결론 문장이 남는다</li>
-                <li>☐ 다음 액션에 담당/기한이 붙는다</li>
-                <li>☐ 중간 점검(10분 체크)이 있다</li>
-                <li>☐ 즉흥 아이디어는 “다음 후보”로 분리 저장된다</li>
-                </ul>
-            </div>
-
-            <p className="mt-4 text-sm leading-7 text-slate-700">
-                2개 이하라면, 실행력은 충분한데 <b className="text-slate-900">쌓이는 구조가 아직 없는 상태</b>일 가능성이 높아요.
-            </p>
-            </Card>
-
-            <Card title="자주 묻는 질문 (FAQ)">
-            <div className="space-y-5 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">Q. 실행형이 많으면 무조건 산만해지나요?</b>
-                <p className="mt-1">
-                    아니요. 실행형은 오히려 <b className="text-slate-900">목표 1개만 고정하면</b> 가장 빠르게 성과를 냅니다.
-                    산만함은 실행형의 성격이 아니라 구조 부재에서 나와요.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 기록 담당을 두면 모임이 딱딱해져요.</b>
-                <p className="mt-1">
-                    그래서 회의록이 아니라 <b className="text-slate-900">결론 3줄</b>만 남기자고 하는 거예요.
-                    1분이면 끝나고, 부담도 적습니다.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 즉흥 아이디어가 모임의 재미인데, 줄이면 재미가 죽지 않나요?</b>
-                <p className="mt-1">
-                    줄이는 게 아니라 <b className="text-slate-900">보관</b>하세요.
-                    “다음 후보 리스트”로 분리해두면 재미도 살고, 목표도 지켜집니다.
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="다음으로 보면 좋은 가이드">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <a
-                href="/guides/no-conclusion"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    왜 우리 모임은 자꾸 결론이 안 날까? (TJ 부족)
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    결론이 안 나는 건 ‘분위기’가 아니라 ‘수렴 역할’ 문제
-                </p>
-                </a>
-
-                <a
-                href="/guides/beyond-average"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    모임 평균 점수보다 중요한 것
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    평균보다 강한 변수: 최저점·역할·갈등 루틴
-                </p>
-                </a>
-            </div>
-
-            </Card>
-        
-        </>
-        ),
-
+      "정산, 더치, 선결제, 회비… 사소한 돈 문제가 관계 온도를 확 바꿔요. ‘누가 더 냈다’보다 ‘규칙이 없어서’ 생기는 문제를 정리했어요.",
+    keywords: ["친구", "정산", "더치", "회비", "갈등"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "돈 때문에 미묘해지는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) ‘나중에 하자’가 결국 안 되는 정산",
+            when: "그날은 넘어가는데, 며칠 뒤 말 꺼내기 애매해져요.",
+            why: "정산은 시간이 지날수록 ‘돈’이 아니라 ‘사람’ 이슈가 됩니다.",
+            tip: "현장에서 끝내기: **“지금 30초만 정산하고 깔끔하게 가자.”**",
+          },
+          {
+            title: "2) ‘선결제’가 암묵적 희생이 될 때",
+            when: "항상 같은 사람이 먼저 결제하고, 나중에 말 못 해요.",
+            why: "선결제=배려가 누적되면 ‘당연함’으로 오해됩니다.",
+            tip: "순번제 룰: **“오늘은 A, 다음엔 B”**를 공개적으로.",
+          },
+          {
+            title: "3) 취향 차이가 ‘불공평’으로 번역될 때",
+            when: "누군가는 비싼 메뉴, 누군가는 안 먹는 메뉴가 섞여요.",
+            why: "같이 내는 구조가 ‘체감 손해’를 만들면 감정이 쌓입니다.",
+            tip: "항목 분리: **공통(기본) + 개인(추가)**로 나누기.",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이때 관계 온도가 떨어져요",
+        items: [
+          { title: "정산 얘기를 ‘농담’으로만 돌릴 때", detail: "농담은 해결이 아니라 미뤄두기라서요." },
+          { title: "‘내가 더 냈는데’가 머릿속에서 계산될 때", detail: "그 순간부터 모임은 ‘관계’가 아니라 ‘장부’가 됩니다." },
+          { title: "정산 앱/계좌 링크를 늦게 올릴 때", detail: "늦을수록 보내는 사람이 더 민망해집니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["현장 정산 원칙", "선결제 순번제", "공통/개인 항목 분리"],
+          dont: ["정산을 ‘눈치’로 해결", "늘 같은 사람이 먼저 결제", "비용 얘기를 사람 성향 탓으로 돌리기"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "돈 문제가 안 커지는 운영 룰 4개",
+        items: [
+          { title: "룰 1) ‘당일 정산’이 기본", how: "시간이 지나면 말 꺼내기 난이도가 올라갑니다.", example: "“오늘은 여기서 바로 정산하고 가자.”" },
+          { title: "룰 2) 선결제는 순번제로", how: "배려를 시스템으로 만들기.", example: "“오늘 A가 했으니 다음엔 B가 할게.”" },
+          { title: "룰 3) 공통/개인 비용 분리", how: "체감 손해를 줄이는 구조.", example: "“기본은 N분의1, 추가는 먹은 사람끼리.”" },
+          { title: "룰 4) 회비는 ‘명확한 범위’", how: "회비가 모호하면 불만이 생깁니다.", example: "“회비는 장소/안주까지만, 택시는 각자.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "정산이 어색하지 않게 만드는 문장",
+        items: [
+          { situation: "현장 정산 제안", say: "“우리 깔끔하게 오늘 여기서 바로 정산하고 가자!”" },
+          { situation: "선결제 반복될 때", say: "“나만 계속 결제하는 느낌이어서… 순번제로 하자.”" },
+          { situation: "메뉴 차이 클 때", say: "“기본은 같이, 추가는 먹은 사람끼리로 나누자.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [
+          { q: "돈 얘기하면 쪼잔해 보일까봐 무서워요.", a: "규칙을 먼저 만들면 ‘사람’이 아니라 ‘시스템’ 얘기가 돼서 덜 민망해요." },
+          { q: "누가 늦게 보내요.", a: "마감 시간을 정해두면 좋아요: “내일 점심 전까지 부탁!”처럼요." },
+        ],
+      },
+    ],
+    related: ["friends-awkward-moment", "friends-plan-chaos", "friends-gossip-minefield", "friends-new-member-vibe"],
   },
 
   {
-    slug: "explode-safe",
-    title: "폭발형 케미를 안전하게 쓰는 법",
+    slug: "friends-gossip-minefield",
+    groupType: "FRIENDS",
+    title: "친구 모임이 ‘뒷얘기’로 갑자기 위험해질 때",
     description:
-      "텐션이 높은 조합은 잘만 쓰면 ‘기획 폭발’인데, 방치하면 ‘말투 폭발’이에요. 안전장치만 달면 됩니다.",
-    keywords: ["폭발형", "갈등", "말투", "커뮤니케이션", "조율"],
-    component: (
-        <>
-            <Card title="폭발형 케미를 안전하게 쓰는 법">
-            <p className="text-sm leading-7 text-slate-700">
-                ‘폭발형’은 나쁜 조합이라기보다, <b className="text-slate-900">서로 건드리는 버튼이 겹치기 쉬운 조합</b>이에요.
-                잘만 다루면 기획도 빠르고 결과물도 강한데, 방치하면 “말투” 하나로 분위기가 갈라집니다.
-            </p>
-
-            <div className="mt-4 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">한 문장 핵심</div>
-                <p className="mt-1 text-sm leading-7 text-slate-700">
-                폭발형은 감정으로 풀면 꼬이고, <b className="text-slate-900">룰(프로세스)로 풀면 가장 빨리 안정</b>됩니다.
-                </p>
-            </div>
-            </Card>
-
-            <Card title="폭발형이 생기는 이유: ‘말의 내용’이 아니라 ‘말의 구조’가 다름">
-            <p className="text-sm leading-7 text-slate-700">
-                폭발형은 보통 “내가 틀렸어?”가 아니라
-                <b className="text-slate-900"> ‘지금 네가 어떤 기준으로 말하는지’</b>를 못 맞추면서 생겨요.
-                같은 주제를 두고도 서로 다른 전제/속도/표현 방식으로 대화하니까
-                상대는 “답답하다/차갑다/피곤하다”로 해석하기 쉽습니다.
-            </p>
-
-            <div className="mt-4 space-y-2 text-sm leading-7 text-slate-700">
-                <div>✔ 전제가 다르면: 같은 말도 다른 의미로 들림</div>
-                <div>✔ 속도가 다르면: 한쪽은 “왜 아직도?” 다른 쪽은 “왜 벌써?”</div>
-                <div>✔ 표현이 다르면: 한쪽은 “팩트” 다른 쪽은 “공격”으로 받아들임</div>
-            </div>
-            </Card>
-
-            <Card title="폭발형의 장점: 사실 ‘고성능 조합’일 때가 많아요">
-            <p className="text-sm leading-7 text-slate-700">
-                폭발형은 텐션이 높고 기준이 강해서, 합만 맞으면 <b className="text-slate-900">성과가 빠르고 뚜렷</b>합니다.
-                특히 기획/의사결정/피드백이 필요한 상황에서 “밀도 있는 대화”가 가능해요.
-            </p>
-
-            <ul className="mt-4 space-y-2 text-sm leading-7 text-slate-700">
-                <li>✔ 서로 약점을 바로 찌른다 → 개선 속도가 빠름</li>
-                <li>✔ 에너지가 높다 → 추진력이 생김</li>
-                <li>✔ 기준이 분명하다 → 결과물이 날카로워짐</li>
-            </ul>
-            </Card>
-
-            <Card title="폭발형이 ‘폭발’로 가는 4가지 트리거">
-            <ol className="list-decimal pl-5 space-y-2 text-sm leading-7 text-slate-700">
-                <li>
-                <b className="text-slate-900">전제 불일치</b> — 서로 다른 문제를 풀고 있는데 같은 문제라고 착각
-                </li>
-                <li>
-                <b className="text-slate-900">용어 모호</b> — “빨리”, “대충”, “그냥” 같은 단어가 각자 다르게 해석됨
-                </li>
-                <li>
-                <b className="text-slate-900">피드백 대상 혼동</b> — 결과물 평가가 사람 평가로 들리는 순간
-                </li>
-                <li>
-                <b className="text-slate-900">마감/피곤 누적</b> — 에너지가 떨어진 날엔 평소 말투도 공격으로 들림
-                </li>
-            </ol>
-            </Card>
-
-            <Card title="안전장치 6가지 (이거만 해도 급발진 확 줄어요)">
-            <div className="space-y-4 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">1) 전제 확인 한 문장</b><br />
-                “지금 네 말은 A가 맞다는 가정이지?”  
-                전제가 맞으면 절반은 해결됩니다.
-                </div>
-
-                <div>
-                <b className="text-slate-900">2) 단계 선언</b><br />
-                “지금은 아이디어 단계 / 지금은 결정 단계”  
-                단계만 구분해도 말싸움이 줄어요.
-                </div>
-
-                <div>
-                <b className="text-slate-900">3) 용어를 숫자/기준으로</b><br />
-                “빨리” → “오늘 18시까지”, “대충” → “필수 3개만”
-                </div>
-
-                <div>
-                <b className="text-slate-900">4) 피드백은 ‘사람’ 말고 ‘대상’</b><br />
-                “너 왜 그래” 대신 “이 문장/이 일정/이 구조가 왜 문제인지”로 고정
-                </div>
-
-                <div>
-                <b className="text-slate-900">5) 10분마다 수렴 체크</b><br />
-                “결론/보류/다음 액션” 3갈래로 쪼개면 불필요한 에너지 소모가 줄어요.
-                </div>
-
-                <div>
-                <b className="text-slate-900">6) 감정 온도계 한 번</b><br />
-                “지금 말이 세게 들렸으면 미안, 의도는 결과물 얘기야.”  
-                이 한 문장이 모임을 살립니다.
-                </div>
-            </div>
-            </Card>
-
-            <Card title="폭발형 모임 전용 운영 룰 (그대로 복붙해서 쓰기)">
-            <div className="space-y-4 text-sm leading-7 text-slate-700">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">룰 1: 반박 전에 요약</div>
-                <p className="mt-1">
-                    “네 말 요약하면 A 맞지?” → “내 관점은 B야” 순서로만 말하기
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">룰 2: 기준을 먼저 공개</div>
-                <p className="mt-1">
-                    “나는 지금 <b className="text-slate-900">효율/리스크/사용자</b> 기준으로 말할게”
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">룰 3: 결론 문장 1개로 마감</div>
-                <p className="mt-1">
-                    “오늘 결론: OO 한다 / 보류한다 / 다음에 OO 확인” 중 하나로 끝내기
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="폭발을 막는 ‘금지어’ & ‘대체 문장’ (효과 진짜 큼)">
-            <div className="space-y-4 text-sm leading-7 text-slate-700">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">금지어: “그게 말이 돼?”</div>
-                <p className="mt-1">
-                    대체: “그 접근의 전제가 뭐야? 전제부터 맞추자.”
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">금지어: “왜 그렇게 예민해?”</div>
-                <p className="mt-1">
-                    대체: “내 말이 세게 들렸을 수 있어. 의도는 공격이 아니라 확인이야.”
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">금지어: “그냥 해”</div>
-                <p className="mt-1">
-                    대체: “필수 3개만 먼저 하고, 나머진 다음 라운드에서 보자.”
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="30초 체크리스트: 지금 우리 모임은 안전장치가 있나?">
-            <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <ul className="space-y-1.5 text-sm leading-7 text-slate-700">
-                <li>☐ 반박 전에 요약을 한다</li>
-                <li>☐ 기준을 먼저 말한다</li>
-                <li>☐ “빨리/대충” 같은 단어를 숫자로 바꾼다</li>
-                <li>☐ 피드백은 사람 말고 결과물에만 한다</li>
-                <li>☐ 10분마다 결론/보류/액션으로 수렴한다</li>
-                </ul>
-            </div>
-
-            <p className="mt-4 text-sm leading-7 text-slate-700">
-                2개 이하라면 폭발형이 “원래 그런 조합”이 아니라,
-                <b className="text-slate-900">운영 장치가 아직 없는 상태</b>일 가능성이 큽니다.
-            </p>
-            </Card>
-
-            <Card title="자주 묻는 질문 (FAQ)">
-            <div className="space-y-5 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">Q. 폭발형이면 그냥 거리 두는 게 맞나요?</b>
-                <p className="mt-1">
-                    꼭 그렇진 않아요. 폭발형은 룰만 잡히면 <b className="text-slate-900">성과가 가장 빠르게 나는 조합</b>이기도 해요.
-                    “사람을 바꾸기”보다 “대화 구조를 바꾸기”가 훨씬 쉽습니다.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 말투가 세진다는 건 누구 잘못인가요?</b>
-                <p className="mt-1">
-                    대부분 “누가 나빠서”가 아니라 “속도/전제/기준이 엇갈려서” 그래요.
-                    폭발형은 특히 <b className="text-slate-900">전제 확인</b>이 가장 큰 해법입니다.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 룰을 만들면 딱딱해지지 않나요?</b>
-                <p className="mt-1">
-                    오히려 반대예요. 폭발형은 감정으로 풀면 딱딱해지고,
-                    <b className="text-slate-900">룰로 풀면 마음이 편해져서</b> 대화가 부드러워집니다.
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="다음으로 보면 좋은 가이드">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <a
-                href="/guides/cognitive-clash"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    MBTI 인지기능이 모임에서 충돌하는 순간
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    갈등 포인트 4종 + 대화 스킬
-                </p>
-                </a>
-
-                <a
-                href="/guides/no-conclusion"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    왜 우리 모임은 자꾸 결론이 안 날까? (TJ 부족)
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    수렴/결정 역할 공백을 메우는 방법
-                </p>
-                </a>
-            </div>
-
-            </Card>
-
-        </>
-        ),
-
+      "처음엔 가벼운 수다였는데, 나중엔 누군가 상처받는 방향으로 굴러가는 순간이 있어요. ‘재밌는 수다’와 ‘지뢰’의 경계를 정리했어요.",
+    keywords: ["친구", "수다", "뒷담화", "관계", "갈등"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "뒷얘기가 지뢰가 되는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) ‘공감’이 ‘동조’로 강요될 때",
+            when: "누군가를 까는 흐름에서, 동의 안 하면 ‘너도 그 편?’이 돼요.",
+            why: "관계 소속감을 확인하려는 순간, 수다는 검열이 됩니다.",
+            tip: "선 긋기 문장: **“난 그 상황을 몰라서 판단은 보류할게.”**",
+          },
+          {
+            title: "2) 농담으로 포장된 인신공격",
+            when: "“장난이야~” 뒤에 누군가 표정이 굳어요.",
+            why: "사람을 소재로 하면 웃음이 아니라 ‘평가’로 들립니다.",
+            tip: "대상 바꾸기: 사람→상황. **“그 사람” 대신 “그 상황”**",
+          },
+          {
+            title: "3) 단톡/스토리로 ‘전파’될 위험",
+            when: "누군가 캡처/전달로 번질까 불안해요.",
+            why: "전파 리스크가 생기면 모임 신뢰가 급격히 깨집니다.",
+            tip: "안전문장: **“이건 여기서만. 밖으로 안 나가게 하자.”**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 멈추는 게 좋아요",
+        items: [
+          { title: "한 사람이 웃는데 눈이 안 웃을 때", detail: "웃음이 ‘맞장구’가 되어버린 순간일 수 있어요." },
+          { title: "대화가 ‘사실 확인’ 없이 단정될 때", detail: "단정은 관계를 갈라놓습니다." },
+          { title: "“너는 어떻게 생각해?”가 압박으로 들릴 때", detail: "중립이 허용되지 않는 분위기예요." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["판단 보류 문장 준비", "사람→상황으로 대상 이동", "전파 금지 합의"],
+          dont: ["동조 강요", "장난으로 인신공격", "단정/낙인 찍기"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "수다를 안전하게 만드는 룰 4개",
+        items: [
+          { title: "룰 1) ‘사실/해석/감정’ 분리", how: "섞이면 단정이 됩니다.", example: "“사실은 A, 내 해석은 B, 감정은 C야.”" },
+          { title: "룰 2) 사람 평가는 금지", how: "평가 대신 상황 피드백.", example: "“그 행동은 별로였어”는 OK, “그 사람은 별로”는 NO." },
+          { title: "룰 3) 중립 허용", how: "동조가 아니라 안전.", example: "“모르면 판단 보류해도 돼.”" },
+          { title: "룰 4) 단톡 전파 금지", how: "신뢰를 룰로 지키기.", example: "“캡처/전달은 금지. 여기서 끝.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "분위기 안 깨고 선 긋는 문장",
+        items: [
+          { situation: "동조 압박 받을 때", say: "“난 그 상황을 몰라서 판단은 보류할게.”" },
+          { situation: "장난이 선 넘을 때", say: "“그건 사람 평가처럼 들릴 수 있어서… 상황 얘기만 하자.”" },
+          { situation: "전파가 걱정될 때", say: "“이 얘긴 여기서만. 밖으로 나가면 서로 불편해.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [
+          { q: "수다 자체가 나쁜 건가요?", a: "아니에요. ‘사람 평가/단정/전파’만 빠지면 수다는 관계를 더 가깝게도 만들어요." },
+          { q: "선 긋는 사람이 분위기 깬다고 할 때는요?", a: "“분위기 깬 게 아니라, 우리 편하자고 안전장치 두는 거야.”라고 말하면 싸움이 줄어요." },
+        ],
+      },
+    ],
+    related: ["friends-awkward-moment", "friends-plan-chaos", "friends-money-split", "friends-new-member-vibe"],
   },
 
   {
-    slug: "too-many-strategy",
-    title: "전략형이 너무 많으면 벌어지는 일",
+    slug: "friends-new-member-vibe",
+    groupType: "FRIENDS",
+    title: "친구 모임에 ‘새 멤버’가 들어왔을 때 분위기 안 깨는 법",
     description:
-      "아이디어는 넘치는데 실행이 늦어지는 모임. 전략형 강점은 살리면서 속도를 올리는 방법.",
-    keywords: ["전략형", "아이디어", "회의", "결정", "실행"],
-    component: (
-        <>
-            <Card title="전략형이 너무 많으면 벌어지는 일">
-            <p className="text-sm leading-7 text-slate-700">
-                전략형(큰그림/가능성/구조 설계)에 강한 사람이 많으면
-                모임이 “똑똑한데 느린” 상태가 되기 쉬워요.
-                아이디어 품질은 높은데, <b className="text-slate-900">결정·실행 페이즈로 넘어가는 스위치</b>가 약해지는 거죠.
-            </p>
+      "기존 멤버들은 편한데 새 사람은 끼기 어려운 순간이 있어요. 배려가 과하면 또 어색해지고요. 자연스럽게 섞이는 운영 룰을 정리했어요.",
+    keywords: ["친구모임", "새친구", "소개", "분위기", "적응"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "새 멤버가 어색해지는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 내부 밈/추억 얘기로만 달릴 때",
+            when: "기존 멤버끼리만 빵 터지고 새 멤버는 웃기만 해요.",
+            why: "‘같이 있음’이 아니라 ‘구경’이 되면 피곤해집니다.",
+            tip: "추억은 짧게, 연결 질문: **“너는 비슷한 경험 있어?”**",
+          },
+          {
+            title: "2) 과한 배려가 오히려 부담일 때",
+            when: "계속 “괜찮아?” “불편하지?” 체크해서 더 어색해요.",
+            why: "배려가 ‘검사’처럼 느껴지면 긴장이 올라갑니다.",
+            tip: "직접 체크 대신 구조로 배려: **자리/주제/턴**을 자연스럽게 돌리기.",
+          },
+          {
+            title: "3) ‘누구 편’ 게임이 생길 때",
+            when: "기존 멤버들 사이에 새 멤버가 끼어들 틈이 없어요.",
+            why: "관계가 이미 굳어 있으면, 새 멤버는 ‘포지션’이 없습니다.",
+            tip: "짧은 페어링: **2:2 대화 → 전체 공유**로 섞기.",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 타이밍에 새 멤버가 빠져요",
+        items: [
+          { title: "밈 설명이 3번 연속 나올 때", detail: "설명은 참여가 아니라 ‘수업’이 됩니다." },
+          { title: "대화 속도가 너무 빠를 때", detail: "새 멤버는 끼어드는 타이밍을 못 잡아요." },
+          { title: "기존 멤버끼리만 스킨십/속어가 많을 때", detail: "거리감이 확 생깁니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["연결 질문 던지기", "2:2→전체 공유 구조", "밈/추억은 30초 제한"],
+          dont: ["과한 상태 체크", "내부자 대화만 지속", "새 멤버를 면접처럼 캐묻기"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "새 멤버가 자연스럽게 섞이는 룰 4개",
+        items: [
+          { title: "룰 1) 추억은 30초만", how: "길어지면 구경이 됩니다.", example: "“짧게만! 그때 이런 일이 있었고 끝.”" },
+          { title: "룰 2) 연결 질문 1개", how: "새 멤버가 말할 ‘문’을 열어줘요.", example: "“너는 이런 상황이면 어떻게 해?”" },
+          { title: "룰 3) 페어링 10분", how: "전체 대화보다 부담이 덜해요.", example: "“10분만 2:2로 얘기하고 다시 합치자.”" },
+          { title: "룰 4) 소개는 ‘정보’보다 ‘취향’", how: "직업/스펙보다 취향이 빨리 친해집니다.", example: "“요즘 뭐에 꽂혔어?”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "새 멤버가 편해지는 문장",
+        items: [
+          { situation: "내부 밈 터질 때", say: "“이건 우리끼리 밈인데… 너는 이런 스타일 좋아해?”" },
+          { situation: "새 멤버가 조용할 때", say: "“너는 요즘 제일 재밌는 게 뭐야?”" },
+          { situation: "과한 배려가 나올 때", say: "“편하게 해! 그냥 취향 얘기부터 하자.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [
+          { q: "새 멤버가 낯가림이 심해요.", a: "전체 대화보다 1:1 또는 2:2 대화가 훨씬 편해요. 구조를 바꾸는 게 제일 빨라요." },
+          { q: "기존 멤버가 ‘원래 우리 스타일’이라며 안 바꾸려 해요.", a: "“바꾸자는 게 아니라, 새 사람도 편하게 하자는 장치”라고 말하면 저항이 줄어요." },
+        ],
+      },
+    ],
+    related: ["friends-awkward-moment", "friends-plan-chaos", "friends-money-split", "friends-gossip-minefield"],
+  },
 
-            <div className="mt-4 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">한 문장 핵심</div>
-                <p className="mt-1 text-sm leading-7 text-slate-700">
-                전략형 과다는 “의견이 많아서”가 아니라,
-                <b className="text-slate-900"> 검토/최적화 페이즈가 끝나지 않아서</b> 느려집니다.
-                </p>
-            </div>
-            </Card>
-
-            <Card title="전략형 많은 모임의 장점부터 (이건 진짜 강점이에요)">
-            <p className="text-sm leading-7 text-slate-700">
-                전략형이 많으면 모임의 퀄리티 바닥이 높아져요.
-                반례·리스크·구조가 빨리 나오고, “대충”으로 끝나는 걸 싫어해서 결과물이 좋아지는 편입니다.
-            </p>
-
-            <ul className="mt-4 space-y-2 text-sm leading-7 text-slate-700">
-                <li>✔ 허술한 계획이 초반에 걸러짐</li>
-                <li>✔ 리스크를 미리 본다 (사고 방지)</li>
-                <li>✔ 구조화가 빨라서 ‘설명’이 잘 된다</li>
-                <li>✔ 더 나은 옵션이 자주 나온다</li>
-            </ul>
-            </Card>
-
-            <Card title="그런데 이렇게 ‘고급 문제’가 같이 옵니다">
-            <p className="text-sm leading-7 text-slate-700">
-                문제는 능력이 아니라 <b className="text-slate-900">운영 구조</b>예요.
-                전략형이 많으면 회의가 자연스럽게 “검토 모드”로 들어가고,
-                검토가 길어질수록 실행은 늦어집니다.
-            </p>
-
-            <ol className="mt-4 list-decimal pl-5 space-y-2 text-sm leading-7 text-slate-700">
-                <li><b className="text-slate-900">반례가 너무 빨리 나온다</b> → 시도 자체가 늦어짐</li>
-                <li><b className="text-slate-900">최적해를 찾느라 결론이 밀린다</b> → “좀 더 보자”가 반복</li>
-                <li><b className="text-slate-900">기준이 많다</b> → 모두를 만족시키려다 아무도 결정 못함</li>
-                <li><b className="text-slate-900">대화가 ‘설계’에서 끝난다</b> → 실행 항목이 비어 있음</li>
-                <li><b className="text-slate-900">피로가 쌓인다</b> → 회의 후 “뭔가 했는데 남는 게 없음”</li>
-            </ol>
-            </Card>
-
-            <Card title="전략형 과다의 진짜 원인: ‘페이즈가 섞여서’ 느립니다">
-            <p className="text-sm leading-7 text-slate-700">
-                전략형 모임은 보통 이 3가지가 섞여서 동시에 벌어져요.
-            </p>
-
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">탐색</div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    아이디어를 넓히는 단계
-                </p>
-                </div>
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">수렴</div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    기준으로 줄이고 고르는 단계
-                </p>
-                </div>
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">실행</div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    작게라도 움직여서 검증하는 단계
-                </p>
-                </div>
-            </div>
-
-            <p className="mt-4 text-sm leading-7 text-slate-700">
-                이 세 단계가 섞이면 “아이디어 내다 반례 들고, 반례 보다가 다시 아이디어 내고”가 반복돼요.
-                그래서 해결은 사람 설득이 아니라 <b className="text-slate-900">단계 분리</b>입니다.
-            </p>
-            </Card>
-
-            <Card title="바로 먹히는 처방: ‘10-10-10 페이즈 분리’">
-            <p className="text-sm leading-7 text-slate-700">
-                전략형이 많을수록 오히려 간단한 룰이 강합니다.
-                아래 30분 템플릿을 그대로 쓰면 체감이 커요.
-            </p>
-
-            <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">① 탐색 10분</div>
-                <p className="mt-1">
-                    “가능한 옵션을 늘리는 시간” — 반례/비판 금지, 어떤 아이디어든 OK
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">② 수렴 10분</div>
-                <p className="mt-1">
-                    “기준 1개로 줄이는 시간” — 예: 비용/속도/리스크/사용자 중 딱 1개
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">③ 실행 10분</div>
-                <p className="mt-1">
-                    “오늘 가능한 1개만” — 완성 말고 검증(초안/테스트/샘플)로 끝내기
-                </p>
-                </div>
-            </div>
-
-            <p className="mt-4 text-sm leading-7 text-slate-700">
-                이 방식의 핵심은 “최적해”가 아니라
-                <b className="text-slate-900">최소 실행으로 빨리 검증</b>하는 거예요.
-            </p>
-            </Card>
-
-            <Card title="전략형 모임을 빠르게 만드는 ‘스위치 3개’">
-            <div className="space-y-4 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">1) 기준을 ‘하나만’ 고정</b><br />
-                전략형은 기준이 많을수록 끝이 없습니다. 오늘은 딱 하나만.
-                </div>
-
-                <div>
-                <b className="text-slate-900">2) ‘결정문’ 강제</b><br />
-                회의 끝에 “오늘 결론 한 문장”이 없으면, 사실 회의가 끝난 게 아니에요.
-                </div>
-
-                <div>
-                <b className="text-slate-900">3) 실험 단위를 작게</b><br />
-                “완성”을 목표로 잡으면 느려집니다. “검증”을 목표로 잡으면 빨라져요.
-                </div>
-            </div>
-            </Card>
-
-            <Card title="금지어 & 대체 문장 (전략형 모임에서 특히 중요)">
-            <div className="space-y-4 text-sm leading-7 text-slate-700">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">금지어: “좀 더 생각해보자”</div>
-                <p className="mt-1">대체: “결정 기준 1개만 정하고, A/B로 줄이자.”</p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">금지어: “그건 아닌데…”</div>
-                <p className="mt-1">대체: “반례는 맞아. 대신 오늘은 ‘검증 가능한 1개’만 하자.”</p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">금지어: “최적해로 가자”</div>
-                <p className="mt-1">대체: “이번 라운드는 ‘충분히 좋은 해’로 가고, 다음 라운드에서 고치자.”</p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="30초 체크리스트: 우리 모임이 ‘전략형 과다’ 상태인가?">
-            <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <ul className="space-y-1.5 text-sm leading-7 text-slate-700">
-                <li>☐ 회의에서 반례/리스크가 너무 빨리 나온다</li>
-                <li>☐ 선택지가 줄지 않고 계속 늘어난다</li>
-                <li>☐ 회의 후 “결론 한 문장”이 없다</li>
-                <li>☐ 실행보다 ‘설명/설계’가 더 길다</li>
-                <li>☐ 다음 액션이 사람에게 할당되지 않는다</li>
-                </ul>
-            </div>
-
-            <p className="mt-4 text-sm leading-7 text-slate-700">
-                3개 이상이라면, 사람 문제가 아니라
-                <b className="text-slate-900">운영 단계(탐색/수렴/실행) 분리가 필요한 상태</b>일 확률이 높아요.
-            </p>
-            </Card>
-
-            <Card title="자주 묻는 질문 (FAQ)">
-            <div className="space-y-5 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">Q. 전략형이 많으면 무조건 느려지나요?</b>
-                <p className="mt-1">
-                    아니요. 페이즈만 분리하면 오히려 <b className="text-slate-900">퀄리티와 속도를 동시에</b> 가져갈 수 있어요.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 반례 제시가 많아서 분위기가 딱딱해요.</b>
-                <p className="mt-1">
-                    탐색 단계에서는 반례 금지(아이디어 확장), 수렴 단계에서만 반례 허용으로 룰을 나누면 체감이 큽니다.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 결국 누가 결정해야 하나요?</b>
-                <p className="mt-1">
-                    “사람”을 고정하기보다 “오늘의 결론 담당”을 라운드제로 돌리면 공정하고 빠릅니다.
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="다음으로 보면 좋은 가이드">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <a
-                href="/guides/too-many-exec"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    실행형이 많으면 생기는 5가지 현상
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    속도는 빠른데 방향이 흔들릴 때
-                </p>
-                </a>
-
-                <a
-                href="/guides/no-conclusion"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    왜 우리 모임은 자꾸 결론이 안 날까? (TJ 부족)
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    결정 역할 공백을 메우는 처방
-                </p>
-                </a>
-            </div>
-
-            </Card>
-
-        </>
-        ),
-
+  // =========================
+  // WORK (5)
+  // =========================
+  {
+    slug: "work-meeting-stuck",
+    groupType: "WORK",
+    title: "회사 모임/회의가 자꾸 ‘제자리’일 때",
+    description:
+      "회의는 하는데 끝나면 아무 것도 안 남는 느낌. 결정이 안 나는 구조와, 팀 분위기 안 깨고 결론 내는 말/룰을 정리했어요.",
+    keywords: ["회사", "회의", "결론", "MBTI", "팀워크"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "회사 회의에서 자주 터지는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 옵션만 늘고 선택은 안 되는 회의",
+            when: "‘좋은 아이디어’는 계속 나오는데 결정은 미뤄져요.",
+            why: "기준이 공유되지 않으면 모두 맞는 말을 해도 결론이 안 납니다.",
+            tip: "회의 시작에 기준 1줄: “오늘은 **속도 우선**으로 결정합시다.”",
+          },
+          {
+            title: "2) 피드백이 ‘사람 평가’로 들리는 순간",
+            when: "결과물 얘기인데도 상대 표정이 굳어요.",
+            why: "표현이 짧아질수록 ‘공격’으로 번역될 확률이 올라갑니다.",
+            tip: "대상 고정: “너가” 대신 “이 문장/이 일정/이 조건이”.",
+          },
+          {
+            title: "3) 정리 담당 부재",
+            when: "회의 끝나고 “그래서 뭐 하기로 했지?”가 나와요.",
+            why: "결론 문장이 없으면 회의는 ‘대화’로만 소비됩니다.",
+            tip: "마지막 1분: **결론 1줄 + 액션 2개(담당/기한)**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 타이밍에 가장 많이 꼬입니다",
+        items: [
+          { title: "결정 직전에 다시 처음으로 돌아갈 때", detail: "기준/범위를 다시 잡지 않으면 무한루프에 들어가요." },
+          { title: "‘그건 아닌데…’만 늘어날 때", detail: "반대는 많은데 대안이 없으면 감정만 쌓입니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["기준 1줄 먼저", "결론 문장 1개로 마감", "피드백 대상은 결과물"],
+          dont: ["결정 없이 해산", "사람 성향 탓으로 몰기", "반대만 하고 대안 없이 끝내기"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "바로 먹히는 회의 룰 3개",
+        items: [
+          { title: "룰 1) 10분 탐색 → 10분 수렴", how: "탐색(아이디어)과 수렴(선택)을 섞지 않기" },
+          { title: "룰 2) A/B로 강제 축소", how: "옵션이 3개 넘으면 결론이 늦어집니다." },
+          { title: "룰 3) 결론 1줄 + 액션 2개", how: "회의록 말고 ‘결론’만 남겨도 다음이 달라져요." },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "팀 분위기 안 깨고 결론 내는 말",
+        items: [
+          { situation: "옵션이 너무 많을 때", say: "“좋아요. 그럼 A/B로만 줄여서 오늘은 여기까지만 결정하죠.”" },
+          { situation: "피드백이 세게 들릴까 걱정될 때", say: "“사람이 아니라 결과물 기준으로만 얘기할게요.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "결론 내면 누가 손해 보는 느낌이 들어요.", a: "그럼 ‘결정’ 대신 ‘2주 실험’으로 바꾸면 갈등이 확 줄어요." }],
+      },
+    ],
+    related: ["work-dominating-voices", "work-decision-paralysis", "work-feedback-coldwar", "work-async-misread"],
   },
 
   {
-    slug: "cognitive-clash",
-    title: "MBTI 인지기능이 모임에서 충돌하는 순간",
+    slug: "work-dominating-voices",
+    groupType: "WORK",
+    title: "회의가 ‘몇 명만 말하고’ 끝날 때",
     description:
-      "갈등은 성격이 나빠서가 아니라, ‘정보를 보는 방식/결정 기준’이 달라서 생겨요. 충돌 포인트만 알면 해결이 쉽습니다.",
-    keywords: ["인지기능", "충돌", "갈등", "대화", "MBTI"],
-    component: (
-        <>
-            <Card title="MBTI 인지기능이 모임에서 충돌하는 순간">
-            <p className="text-sm leading-7 text-slate-700">
-                모임에서의 갈등은 보통 “성격이 안 맞아서”가 아니라,
-                <b className="text-slate-900"> 정보를 처리하는 방식과 결정 기준(인지기능)이 달라서</b> 생깁니다.
-                같은 회의를 해도 누군가는 “핵심이 뭐야?”를 찾고,
-                누군가는 “근거가 부족한데?”를 먼저 느껴요.
-            </p>
-
-            <div className="mt-4 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">한 문장 핵심</div>
-                <p className="mt-1 text-sm leading-7 text-slate-700">
-                충돌은 말의 내용보다 <b className="text-slate-900">말이 만들어지는 구조</b>에서 납니다.
-                </p>
-            </div>
-            </Card>
-
-            <Card title="인지기능 충돌은 ‘의견 차이’가 아니라 ‘입력값 차이’예요">
-            <p className="text-sm leading-7 text-slate-700">
-                같은 주제를 말해도 사람마다 머릿속에 들어오는 입력값이 달라요.
-                그래서 누군가에겐 “당연한 결론”이, 다른 누군가에겐 “근거 없는 점프”처럼 들릴 수 있습니다.
-            </p>
-
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">정보를 보는 방식</div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    큰 그림/가능성(N) vs 사실/디테일(S)
-                </p>
-                </div>
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">결정 기준</div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    논리/효율(T) vs 가치/관계(F)
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="모임에서 자주 터지는 충돌 4종 (실제 체감 포인트)">
-            <ol className="mt-2 list-decimal pl-5 space-y-3 text-sm leading-7 text-slate-700">
-                <li>
-                <b className="text-slate-900">큰그림 vs 디테일</b><br />
-                “요지는?”(N) ↔ “근거는?”(S)
-                <div className="mt-1 text-xs text-slate-500">
-                    증상: 한쪽은 ‘장황하다’고 느끼고, 다른쪽은 ‘뇌피셜’이라고 느껴요.
-                </div>
-                </li>
-                <li>
-                <b className="text-slate-900">효율 vs 감정</b><br />
-                “그래서 더 낫냐?”(T) ↔ “그 말이 상처야”(F)
-                <div className="mt-1 text-xs text-slate-500">
-                    증상: 한쪽은 ‘예민하다’고 느끼고, 다른쪽은 ‘차갑다’고 느껴요.
-                </div>
-                </li>
-                <li>
-                <b className="text-slate-900">결정형 vs 탐색형</b><br />
-                “정하자”(J) ↔ “조금 더 보자”(P)
-                <div className="mt-1 text-xs text-slate-500">
-                    증상: 한쪽은 ‘질질 끈다’고 느끼고, 다른쪽은 ‘너무 성급하다’고 느껴요.
-                </div>
-                </li>
-                <li>
-                <b className="text-slate-900">속도 차이</b><br />
-                바로 결론 내는 사람 ↔ 충분히 소화하는 사람
-                <div className="mt-1 text-xs text-slate-500">
-                    증상: 한쪽은 ‘답답하다’, 다른쪽은 ‘몰아붙인다’고 느껴요.
-                </div>
-                </li>
-            </ol>
-            </Card>
-
-            <Card title="충돌을 줄이는 핵심 원리: ‘기준’과 ‘단계’를 먼저 공개하세요">
-            <p className="text-sm leading-7 text-slate-700">
-                인지기능 충돌은 서로를 설득해서 해결되지 않습니다.
-                대신, 대화를 시작할 때 <b className="text-slate-900">내가 지금 무엇을 기준으로 말하는지</b>를 먼저 공개하면
-                오해가 크게 줄어요.
-            </p>
-
-            <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">① 기준 공개</div>
-                <p className="mt-1">
-                    “나는 지금 <b className="text-slate-900">리스크</b> 기준으로 말할게.”
-                    / “나는 지금 <b className="text-slate-900">분위기</b> 기준으로 말할게.”
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">② 단계 선언</div>
-                <p className="mt-1">
-                    “지금은 아이디어 단계야(탐색).”
-                    / “이제 A/B로 줄이는 단계야(수렴).”
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">③ 요약 확인</div>
-                <p className="mt-1">
-                    “네 말 요약하면 A 맞지?” — 이 한 줄이 ‘급싸’를 줄여요.
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="상황별 ‘대체 문장’ 템플릿 (바로 복붙해서 써요)">
-            <div className="space-y-3 text-sm leading-7 text-slate-700">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">
-                    큰그림(N)이 디테일(S) 요구에 막힐 때
-                </div>
-                <p className="mt-1">
-                    “좋아. 요지는 이거고, <b className="text-slate-900">근거 2개만</b> 붙여볼게.”
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">
-                    디테일(S)이 큰그림(N)에 답답함을 느낄 때
-                </div>
-                <p className="mt-1">
-                    “디테일 들어가기 전에 <b className="text-slate-900">결론 1줄</b>만 먼저 잡자.”
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">
-                    효율(T) 말이 차갑게 들릴 수 있을 때
-                </div>
-                <p className="mt-1">
-                    “사람이 아니라 결과물 기준으로 말할게. <b className="text-slate-900">지금 더 나은 선택</b>을 찾자는 뜻이야.”
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">
-                    감정(F) 말이 ‘비논리’로 들릴 수 있을 때
-                </div>
-                <p className="mt-1">
-                    “논리 반박이 아니라, <b className="text-slate-900">운영 리스크(사람 피로도)</b> 얘기야.”
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">
-                    J vs P 충돌(정하자 vs 더 보자)
-                </div>
-                <p className="mt-1">
-                    “<b className="text-slate-900">오늘은 A/B까지만</b> 줄이고, 최종 결정은 내일 하자.”
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="모임 운영 팁: 인지기능 충돌은 ‘룰’로 해결하는 게 가장 빠릅니다">
-            <p className="text-sm leading-7 text-slate-700">
-                텐션이 올라갈수록 설득은 잘 안 먹혀요.
-                대신 <b className="text-slate-900">프로세스(룰)</b>를 걸면, 감정 소모 없이 정리됩니다.
-            </p>
-
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">룰 1: 결론문 강제</div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    회의 끝에 “오늘 결론 한 문장 + 다음 액션 3개” 없으면 종료 X
-                </p>
-                </div>
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">룰 2: 단계 분리</div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    탐색(아이디어) ↔ 수렴(A/B) ↔ 실행(검증) 섞지 않기
-                </p>
-                </div>
-            </div>
-
-            <div className="mt-3 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">룰 3: 전제 확인</div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                “지금 전제는 A 맞지?”를 습관화하면, 싸움의 60%가 사라져요.
-                </p>
-            </div>
-            </Card>
-
-            <Card title="30초 체크리스트: 지금 우리 모임은 ‘인지기능 충돌’ 상태인가?">
-            <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <ul className="space-y-1.5 text-sm leading-7 text-slate-700">
-                <li>☐ 같은 얘기를 반복하는데 서로 “못 알아듣는다” 느낌이 든다</li>
-                <li>☐ ‘논리’와 ‘기분’이 자꾸 섞여서 싸운다</li>
-                <li>☐ 결정 속도 차이로 누군가는 답답하고 누군가는 압박을 느낀다</li>
-                <li>☐ 반박이 많아지고 말투가 예민해진다</li>
-                <li>☐ 회의 후 “남는 감정”이 있다</li>
-                </ul>
-            </div>
-
-            <p className="mt-4 text-sm leading-7 text-slate-700">
-                3개 이상이면 사람 탓하기 전에,
-                <b className="text-slate-900">기준 공개 + 단계 선언</b>부터 적용해보는 게 제일 빠릅니다.
-            </p>
-            </Card>
-
-            <Card title="자주 묻는 질문 (FAQ)">
-            <div className="space-y-5 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">Q. 인지기능 충돌이면 결국 안 맞는 건가요?</b>
-                <p className="mt-1">
-                    아니요. 충돌은 “조율 포인트가 명확하다”는 뜻이기도 해요.
-                    룰만 잡히면 오히려 <b className="text-slate-900">보완 관계</b>로 강해질 수 있습니다.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 한 명이 계속 차갑게 말하는데요?</b>
-                <p className="mt-1">
-                    “감정”으로 받기 전에 “기준”을 물어보세요.
-                    “지금 효율 기준이야?”라고 확인하면, 공격으로 느껴질 확률이 줄어요.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 반대로 너무 돌려 말해서 답답해요.</b>
-                <p className="mt-1">
-                    결론형 문장을 요청하면 됩니다.
-                    “좋아. 지금 말의 결론을 <b className="text-slate-900">한 문장</b>으로만 부탁해.”
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="다음으로 보면 좋은 가이드">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <a
-                href="/guides/explode-safe"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    폭발형 케미를 안전하게 쓰는 법
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    텐션이 높은 조합을 룰로 안정화
-                </p>
-                </a>
-
-                <a
-                href="/guides/no-conclusion"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    왜 우리 모임은 자꾸 결론이 안 날까? (TJ 부족)
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    결정 역할 공백을 메우는 처방
-                </p>
-                </a>
-            </div>
-
-            </Card>
-        </>
-        ),
-
+      "말 잘하는 사람만 계속 말하고, 조용한 사람은 회의 끝나고 따로 말하는 팀. 발언량 편차를 ‘사람 문제’가 아니라 ‘룰’로 줄이는 방법.",
+    keywords: ["회사", "회의", "발언", "팀워크", "의사결정"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "발언 편차가 생기는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 반응 속도가 빠른 사람이 회의 흐름을 잡음",
+            when: "생각 정리 전에 누군가 결론을 만들어버려요.",
+            why: "즉흥 발언이 ‘리더십’으로 해석되면 조용한 사람은 더 침묵합니다.",
+            tip: "30초 침묵 룰: **“질문 후 30초는 생각 시간”**",
+          },
+          {
+            title: "2) 질문이 ‘의견’이 아니라 ‘판정’처럼 들림",
+            when: "질문인데 느낌은 심문이에요.",
+            why: "질문이 평가로 들리면 방어가 올라가고, 안전한 사람만 말합니다.",
+            tip: "질문 프레임 바꾸기: **“이 안의 리스크를 같이 찾자”**",
+          },
+          {
+            title: "3) 조용한 사람의 의견이 ‘나중에’로 밀림",
+            when: "회의 중엔 말 못 하다가 DM으로만 의견이 나와요.",
+            why: "회의가 ‘실시간 토론’만 허용하면 생각형은 배제됩니다.",
+            tip: "사전 입력 3줄: **회의 전 ‘의견/리스크/대안’ 3줄** 받기",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 구조를 바꿔야 해요",
+        items: [
+          { title: "회의 후에만 중요한 의견이 나올 때", detail: "회의가 ‘말하는 사람만의 공간’이 된 상태예요." },
+          { title: "반대 의견이 거의 안 나올 때", detail: "합의가 아니라 침묵일 수 있어요." },
+          { title: "발언이 ‘사람’ 중심으로 평가될 때", detail: "심리적 안전이 떨어집니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["생각 시간 확보", "라운드 발언", "사전 3줄 입력"],
+          dont: ["즉시 결론 유도", "질문=평가", "조용한 사람을 ‘참여 부족’으로 단정"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "발언 밸런스 잡는 룰 4개",
+        items: [
+          { title: "룰 1) 질문 후 30초 침묵", how: "빠른 사람의 독주를 막습니다.", example: "“30초만 생각하고 한 줄씩 말하죠.”" },
+          { title: "룰 2) 라운드로 한 줄 발언", how: "모두에게 턴이 생깁니다.", example: "“각자 한 줄로 찬/반/조건만.”" },
+          { title: "룰 3) 반대는 ‘대안’과 세트", how: "반대만 쌓이는 걸 막아요.", example: "“반대면 대안 1개 같이.”" },
+          { title: "룰 4) 회의 후 10분 리캡", how: "침묵 의견을 회수합니다.", example: "“끝나고 10분 동안 추가 의견 받습니다.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "팀이 덜 불편해지는 말",
+        items: [
+          { situation: "독주가 보일 때", say: "“좋아요. 이번엔 라운드로 한 줄씩만 듣고 다시 합치죠.”" },
+          { situation: "질문이 세게 들릴까 걱정될 때", say: "“평가가 아니라 리스크를 같이 찾자는 질문이에요.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [
+          { q: "조용한 사람이 정말 의견이 없는 경우도 있잖아요?", a: "그래서 ‘회의 중 발언’이 아니라 ‘사전/사후 입력’ 채널을 같이 열어두는 게 좋아요." },
+          { q: "라운드 발언이 어색해요.", a: "처음엔 ‘한 줄’만 허용하면 부담이 확 줄어요." },
+        ],
+      },
+    ],
+    related: ["work-meeting-stuck", "work-decision-paralysis", "work-feedback-coldwar", "work-async-misread"],
   },
 
   {
-    slug: "no-vibe",
-    title: "분위기 담당이 사라졌을 때",
+    slug: "work-decision-paralysis",
+    groupType: "WORK",
+    title: "결정이 ‘완벽해야’ 한다는 분위기 때문에 늦어질 때",
     description:
-      "갑자기 모임이 딱딱해지고 말이 줄어드는 순간이 있어요. ‘분위기 담당’은 사람이 아니라 기능입니다.",
-    keywords: ["분위기", "소통", "공감", "침묵", "F"],
-    component: (
-        <>
-            <Card title="분위기 담당이 사라졌을 때">
-            <p className="text-sm leading-7 text-slate-700">
-                모임이 갑자기 딱딱해지고 말이 줄어드는 순간이 있어요.
-                보통 “사이가 나빠졌다”라고 생각하지만, 실제로는
-                <b className="text-slate-900"> 모임 운영에서 ‘공감/완충/리액션’ 기능이 비어버린 상태</b>인 경우가 많습니다.
-            </p>
-
-            <div className="mt-4 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">한 문장 핵심</div>
-                <p className="mt-1 text-sm leading-7 text-slate-700">
-                분위기는 “사람”이 아니라 <b className="text-slate-900">기능</b>이에요. 기능은 시스템으로 복구할 수 있습니다.
-                </p>
-            </div>
-            </Card>
-
-            <Card title="분위기가 사라졌다는 신호 6가지 (모임이 ‘일’처럼 느껴질 때)">
-            <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-700">
-                <li>✔ 말할 땐 많은데, 끝나고 찝찝함이 남는다</li>
-                <li>✔ 반박이 ‘내용’이 아니라 ‘태도/말투’로 들리기 시작한다</li>
-                <li>✔ 농담이 사라지고 대화가 바로 결론/지적 쪽으로만 간다</li>
-                <li>✔ 누군가 말하면 다른 사람들이 “정답 채점” 모드로 반응한다</li>
-                <li>✔ 조용한 사람이 늘어난다 (에너지 아끼기 모드)</li>
-                <li>✔ 회의/대화 후 “내가 굳이…” 느낌이 커진다</li>
-            </ul>
-
-            <p className="mt-4 text-sm leading-7 text-slate-700">
-                이건 대개 성격 문제가 아니라,
-                <b className="text-slate-900"> 리액션·완충·정서적 안전감</b>이 약해졌다는 뜻이에요.
-            </p>
-            </Card>
-
-            <Card title="왜 이런 일이 생길까요? (인지기능 관점으로 보면 단순해져요)">
-            <p className="text-sm leading-7 text-slate-700">
-                모임은 ‘결정’만으로 굴러가지 않습니다.
-                결정은 빨라도, 그 과정에서 <b className="text-slate-900">사람이 소모</b>되면 오래 못 가요.
-            </p>
-
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">T 성향이 강할 때</div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    “팩트/효율”이 빠른 대신,
-                    표현이 짧아져서 <b className="text-slate-900">정서적 완충</b>이 빠질 수 있어요.
-                </p>
-                </div>
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">J 성향이 강할 때</div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    결론이 빨라지는 대신,
-                    “의견 말하는 과정”이 줄어서 <b className="text-slate-900">참여감</b>이 떨어질 수 있어요.
-                </p>
-                </div>
-            </div>
-
-            <p className="mt-4 text-sm leading-7 text-slate-700">
-                요약하면, 분위기 담당이 없으면 모임이 “정답 찾기 게임”처럼 굴러가고,
-                그때부터 말이 줄어드는 사람이 생깁니다.
-            </p>
-            </Card>
-
-            <Card title="분위기 담당이 없어도 모임이 고급스럽게 굴러가는 ‘복구 스위치 4개’">
-            <p className="text-sm leading-7 text-slate-700">
-                분위기를 살리는 방법은 “더 웃겨보기”가 아니에요.
-                <b className="text-slate-900"> 운영 규칙을 아주 조금만 바꾸면</b> 자동으로 살아납니다.
-            </p>
-
-            <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">① 1문장 체크인 (시작 30초)</div>
-                <p className="mt-1">
-                    “오늘 컨디션 한 단어”만 공유해요. (예: “피곤”, “여유”, “예민”)
-                    <br />
-                    <span className="text-xs text-slate-500">
-                    이게 정서적 안전감을 확 올립니다.
-                    </span>
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">② 반박 전 ‘좋은 점 1개’ 규칙</div>
-                <p className="mt-1">
-                    “근데…” 하기 전에 “좋은 점 하나”를 먼저 말하기.
-                    <br />
-                    <span className="text-xs text-slate-500">
-                    설득력이 떨어지는 게 아니라, 오히려 반박이 더 잘 먹힙니다.
-                    </span>
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">③ 피드백 대상을 ‘사람’에서 ‘문장’으로</div>
-                <p className="mt-1">
-                    “너는 왜…” 대신 “이 문장/이 일정/이 조건”을 기준으로 말하기.
-                    <br />
-                    <span className="text-xs text-slate-500">
-                    분위기 깨지는 싸움의 80%가 이걸로 예방됩니다.
-                    </span>
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-900">④ 마감은 ‘결론 1줄 + 다음 액션 3개’</div>
-                <p className="mt-1">
-                    회의가 길어질수록 피로가 쌓여서 분위기가 죽어요.
-                    딱 3줄로 마감하면 다음 만남이 편해집니다.
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="상황별 ‘대체 문장’ (말투 때문에 분위기 깨질 때 바로 쓰는 문장)">
-            <div className="space-y-3 text-sm leading-7 text-slate-700">
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">
-                    너무 직설적으로 들릴까 봐 걱정될 때
-                </div>
-                <p className="mt-1">
-                    “사람 얘기가 아니라 <b className="text-slate-900">결과물 기준</b>으로 말해볼게.”
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">
-                    상대가 예민하게 반응할 때
-                </div>
-                <p className="mt-1">
-                    “내 의도는 공격이 아니라 <b className="text-slate-900">리스크 줄이기</b>야. 네 말 요약하면 A 맞지?”
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">
-                    침묵이 길어질 때 (참여감 떨어질 때)
-                </div>
-                <p className="mt-1">
-                    “각자 <b className="text-slate-900">한 문장</b>만 말해볼래? 찬성/반대 말고 ‘우려 1개’만.”
-                </p>
-                </div>
-
-                <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <div className="text-xs font-extrabold text-slate-800">
-                    분위기 살리려다 억지 유머가 될 것 같을 때
-                </div>
-                <p className="mt-1">
-                    유머 대신 “좋은 점 1개”가 더 고급입니다. <b className="text-slate-900">진짜로</b>요.
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="30초 체크리스트: 지금 우리 모임은 ‘분위기 기능 공백’인가?">
-            <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-                <ul className="space-y-1.5 text-sm leading-7 text-slate-700">
-                <li>☐ 의견은 있는데 말하기가 귀찮아졌다</li>
-                <li>☐ 회의가 끝나면 감정이 남는다</li>
-                <li>☐ 대화가 “맞고 틀림”으로만 굴러간다</li>
-                <li>☐ 누군가의 말투가 계속 거슬린다</li>
-                <li>☐ 농담이 사라졌다</li>
-                </ul>
-            </div>
-
-            <p className="mt-4 text-sm leading-7 text-slate-700">
-                3개 이상이면, 분위기 담당을 찾기보다
-                <b className="text-slate-900"> ‘체크인 + 좋은 점 1개 + 결과물 피드백’</b> 룰을 먼저 넣는 게 빠릅니다.
-            </p>
-            </Card>
-
-            <Card title="자주 묻는 질문 (FAQ)">
-            <div className="space-y-5 text-sm leading-7 text-slate-700">
-                <div>
-                <b className="text-slate-900">Q. 분위기 담당은 꼭 F 유형이 해야 하나요?</b>
-                <p className="mt-1">
-                    아니요. 분위기 담당은 유형이 아니라 <b className="text-slate-900">기능</b>이에요.
-                    룰로 만들면 누가 해도 됩니다.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 분위기 살리려고 하면 가볍게 보일까 봐 싫어요.</b>
-                <p className="mt-1">
-                    분위기는 가벼움이 아니라 <b className="text-slate-900">심리적 안전감</b>이에요.
-                    체크인/요약/좋은 점 한 줄은 오히려 더 프로페셔널합니다.
-                </p>
-                </div>
-
-                <div>
-                <b className="text-slate-900">Q. 말이 줄어든 사람을 어떻게 다시 끌어오죠?</b>
-                <p className="mt-1">
-                    “의견 줘” 대신, 질문을 바꾸세요.
-                    “찬반 말고 <b className="text-slate-900">우려 1개</b>만”처럼 부담을 낮추면 다시 말이 나옵니다.
-                </p>
-                </div>
-            </div>
-            </Card>
-
-            <Card title="다음으로 보면 좋은 가이드">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <a
-                href="/guides/cognitive-clash"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    MBTI 인지기능이 모임에서 충돌하는 순간
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    오해가 생기는 구조를 먼저 이해하기
-                </p>
-                </a>
-
-                <a
-                href="/guides/beyond-average"
-                className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-                >
-                <div className="text-xs font-extrabold text-slate-900">
-                    모임 평균 점수보다 중요한 것
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                    최저점 관리 + 역할 + 룰이 핵심
-                </p>
-                </a>
-            </div>
-            </Card>
-        </>
-        ),
-
+      "리스크를 줄이려다 속도가 죽는 팀. 완벽주의를 버리자는 게 아니라, 완벽을 ‘단계화’해서 팀이 안전하게 빨라지는 방법.",
+    keywords: ["회사", "결정", "완벽주의", "리스크", "속도"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "결정이 늦어지는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 정보가 100% 모일 때까지 대기",
+            when: "추가 자료만 계속 요청하고 결론이 밀려요.",
+            why: "정보 수집이 ‘안전’처럼 느껴지면 결정은 영원히 미뤄집니다.",
+            tip: "충분조건 선언: **“지금 정보로 2주 실험 결정”**",
+          },
+          {
+            title: "2) 반대가 ‘책임 회피’로 보이는 팀",
+            when: "반대 의견을 내면 ‘발목’으로 낙인 찍혀요.",
+            why: "반대가 위험해지면, 팀은 침묵으로 합의합니다(더 위험).",
+            tip: "반대 장려 룰: **“반대 1개는 팀의 보험”**",
+          },
+          {
+            title: "3) 결정을 ‘영구’로 착각",
+            when: "한 번 정하면 다시 못 바꾸는 느낌이에요.",
+            why: "결정이 돌처럼 굳으면 모두가 겁을 먹습니다.",
+            tip: "결정=버전: **V1(2주) → V2(1달)**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 말이 나오면 이미 늦어지는 중",
+        items: [
+          { title: "“좀 더 알아보고…”가 반복될 때", detail: "추가 조사 자체가 목적이 되는 순간입니다." },
+          { title: "“책임은 누가?”가 결론보다 먼저 나올 때", detail: "결정이 아니라 처벌 회피 게임이 됩니다." },
+          { title: "작은 결정도 결재 라인이 길 때", detail: "속도는 구조에서 무너집니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["결정은 버전으로", "2주 실험 프레임", "반대=보험으로 인정"],
+          dont: ["정보 100% 집착", "반대자 낙인", "결정을 영구화"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "결정을 빨라지게 하는 룰 4개",
+        items: [
+          { title: "룰 1) 결정은 V1로", how: "처음부터 완벽을 요구하지 않기.", example: "“V1은 2주만 써보고 바꿀 수 있어요.”" },
+          { title: "룰 2) 리스크는 ‘상한선’만", how: "리스크를 무한 열거하지 않기.", example: "“최악의 경우 손해는 어디까지?”" },
+          { title: "룰 3) 반대는 ‘대안/조건’으로", how: "반대가 생산적이게 됩니다.", example: "“나는 반대, 대신 이 조건이면 찬성.”" },
+          { title: "룰 4) 실행 후 리뷰를 캘린더에 박기", how: "결정의 공포를 낮춰요.", example: "“2주 뒤 리뷰 미팅 확정.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "완벽주의 팀에서 안전하게 속도 내는 말",
+        items: [
+          { situation: "정보 더 모으자는 흐름", say: "“좋아요. 그럼 지금 정보로 V1(2주 실험)만 결정하고, 추가 정보는 V2에 반영하죠.”" },
+          { situation: "반대가 낙인 될 때", say: "“반대는 팀의 보험이에요. 대신 대안/조건도 같이 주세요.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [
+          { q: "실험하다 실패하면요?", a: "그래서 ‘리스크 상한선’을 먼저 정하는 거예요. 실패 비용을 통제하면 실험은 안전해집니다." },
+        ],
+      },
+    ],
+    related: ["work-meeting-stuck", "work-dominating-voices", "work-feedback-coldwar", "work-async-misread"],
   },
 
   {
-    slug: "beyond-average",
-    title: "모임 평균 점수보다 중요한 것",
+    slug: "work-feedback-coldwar",
+    groupType: "WORK",
+    title: "피드백이 쌓이는데 ‘말로는 안 하는’ 팀의 냉전",
     description:
-      "평균이 높아도 힘든 모임이 있고, 평균이 낮아도 잘 굴러가는 모임이 있어요. 진짜 변수는 따로 있습니다.",
-    keywords: ["평균", "팀워크", "리더", "역할", "규칙"],
-    component: (
-  <>
-    <Card title="모임 평균 점수보다 중요한 것">
-      <p className="text-sm leading-7 text-slate-700">
-        평균 점수가 높으면 “편한 날”이 많아지는 건 맞아요.
-        그런데 모임이 오래 굴러가느냐는 점수보다
-        <b className="text-slate-900"> 운영 구조(역할·룰·결정 방식)</b>에 더 크게 좌우됩니다.
-      </p>
-
-      <div className="mt-4 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-        <div className="text-xs font-extrabold text-slate-800">한 문장 핵심</div>
-        <p className="mt-1 text-sm leading-7 text-slate-700">
-          평균은 참고고, 승부는 <b className="text-slate-900">최저점 관리 + 결정 구조 + 갈등 수습 루틴</b>입니다.
-        </p>
-      </div>
-    </Card>
-
-    <Card title="평균 점수의 함정: ‘좋은 날’과 ‘좋은 모임’은 다를 수 있어요">
-      <p className="text-sm leading-7 text-slate-700">
-        평균이 높아도 힘든 모임이 있고, 평균이 낮아도 잘 굴러가는 모임이 있어요.
-        이유는 간단해요. 모임 운영에서 체감 피로도는
-        <b className="text-slate-900"> ‘몇 번이냐’보다 ‘얼마나 크게 한 번 터지냐’</b>에 더 민감합니다.
-      </p>
-
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-          <div className="text-xs font-extrabold text-slate-900">평균이 높은데 힘든 모임</div>
-          <p className="mt-1 text-sm leading-6 text-slate-700">
-            대부분은 괜찮은데, <b className="text-slate-900">최악 1~2조합</b>이 자주 부딪혀서 분위기를 깨는 구조.
-          </p>
-        </div>
-        <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-          <div className="text-xs font-extrabold text-slate-900">평균이 낮은데 잘 굴러가는 모임</div>
-          <p className="mt-1 text-sm leading-6 text-slate-700">
-            조율이 필요한 조합이 있어도, <b className="text-slate-900">룰/역할/수습 루틴</b>이 있어서 큰 사고가 안 나는 구조.
-          </p>
-        </div>
-      </div>
-    </Card>
-
-    <Card title="진짜 중요한 지표 1: 최저점(바닥 점수) 조합이 ‘구조적으로’ 자주 붙는가">
-      <p className="text-sm leading-7 text-slate-700">
-        모임을 힘들게 만드는 건 보통 “낮은 점수” 그 자체가 아니라,
-        <b className="text-slate-900">낮은 점수 조합이 중요한 순간마다 마주치는 구조</b>예요.
-      </p>
-
-      <div className="mt-4 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-        <div className="text-xs font-extrabold text-slate-900">예시</div>
-        <p className="mt-1 text-sm leading-7 text-slate-700">
-          “결정해야 하는 타이밍”마다 항상 같은 두 사람이 붙는다 → 평균이 높아도 모임 체감은 낮아집니다.
-        </p>
-      </div>
-
-      <div className="mt-4 space-y-2 text-sm leading-7 text-slate-700">
-        <div>✔ 최악 조합이 ‘결정/돈/일정’ 같은 민감 주제를 자주 다루나요?</div>
-        <div>✔ 최악 조합이 ‘발언권’이 큰 위치에 있나요?</div>
-        <div>✔ 충돌이 나면 수습하는 사람이 있나요?</div>
-      </div>
-    </Card>
-
-    <Card title="진짜 중요한 지표 2: 결정 구조가 있는가 (결론이 안 나는 모임의 핵심)">
-      <p className="text-sm leading-7 text-slate-700">
-        평균이 높아도 모임이 지치는 대표 이유는
-        <b className="text-slate-900"> ‘결정 방식이 정해져 있지 않아서’</b>예요.
-        사람 성향 문제가 아니라, 프로세스 문제입니다.
-      </p>
-
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-          <div className="text-xs font-extrabold text-slate-900">결정 구조가 없을 때</div>
-          <ul className="mt-2 space-y-1.5 text-sm leading-6 text-slate-700">
-            <li>• 옵션은 늘고, 선택은 안 됨</li>
-            <li>• 회의는 길고, 액션은 없음</li>
-            <li>• “다음에 다시”가 쌓임</li>
-          </ul>
-        </div>
-        <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-          <div className="text-xs font-extrabold text-slate-900">결정 구조가 있을 때</div>
-          <ul className="mt-2 space-y-1.5 text-sm leading-6 text-slate-700">
-            <li>• 기준이 먼저 정해짐</li>
-            <li>• A/B로 좁혀짐</li>
-            <li>• “결론 1줄 + 액션 3개”로 마감</li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="mt-4 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-        <div className="text-xs font-extrabold text-slate-900">바로 적용되는 룰</div>
-        <p className="mt-1 text-sm leading-7 text-slate-700">
-          “기준 1줄 → A/B로 축소 → 결론 1줄 + 액션 3개”
-          이 3단계만 있어도 평균 점수 체감이 확 올라가요.
-        </p>
-      </div>
-    </Card>
-
-    <Card title="진짜 중요한 지표 3: 갈등 해결 루틴이 있는가 (싸움이 아니라 ‘수습’이 핵심)">
-      <p className="text-sm leading-7 text-slate-700">
-        갈등은 0으로 만들 수 없어요.
-        대신 <b className="text-slate-900">갈등이 길어지는 걸 막는 루틴</b>은 만들 수 있습니다.
-        평균이 높은 모임이 무너지는 건 보통 “갈등” 때문이 아니라
-        <b className="text-slate-900">갈등을 방치하는 습관</b> 때문이에요.
-      </p>
-
-      <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-        <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-          <div className="text-xs font-extrabold text-slate-900">① 전제 맞추기</div>
-          <p className="mt-1">
-            “네 말은 A가 맞다는 가정이지?” — 전제가 다르면 대화가 평행선입니다.
-          </p>
-        </div>
-        <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-          <div className="text-xs font-extrabold text-slate-900">② 피드백 대상 바꾸기</div>
-          <p className="mt-1">
-            사람 말고 결과물로: “너 왜 그래” → “이 문장/일정/조건”
-          </p>
-        </div>
-        <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-          <div className="text-xs font-extrabold text-slate-900">③ 3갈래 마감</div>
-          <p className="mt-1">
-            “결론 / 보류 / 다음 액션” — 끝을 정하면 감정이 덜 남습니다.
-          </p>
-        </div>
-      </div>
-    </Card>
-
-    <Card title="모임 운영을 ‘고급 팀’으로 만드는 3가지 습관">
-      <div className="space-y-3 text-sm leading-7 text-slate-700">
-        <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-          <div className="text-xs font-extrabold text-slate-900">① 역할을 사람에게 고정하지 않기</div>
-          <p className="mt-1">
-            “정리 담당/기록 담당/중재 담당”은 사람 고정이 아니라
-            <b className="text-slate-900"> 라운드제로 돌리면</b> 피로가 줄어요.
-          </p>
-        </div>
-
-        <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-          <div className="text-xs font-extrabold text-slate-900">② 최저점 조합을 ‘구조적으로’ 떨어뜨리기</div>
-          <p className="mt-1">
-            최악 조합이 같은 주제를 계속 맡지 않게 분산하거나,
-            중재/정리 역할을 끼워서 마찰을 줄입니다.
-          </p>
-        </div>
-
-        <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-          <div className="text-xs font-extrabold text-slate-900">③ 회의는 짧게, 마감은 명확하게</div>
-          <p className="mt-1">
-            “결론 1줄 + 액션 3개”만 지켜도 다음 모임 분위기가 달라집니다.
-          </p>
-        </div>
-      </div>
-    </Card>
-
-    <Card title="30초 체크리스트: 우리 모임은 평균 말고 무엇을 먼저 봐야 할까?">
-      <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
-        <ul className="space-y-1.5 text-sm leading-7 text-slate-700">
-          <li>☐ 최악 조합이 중요한 결정에 자주 등장한다</li>
-          <li>☐ 결론이 “사람”에 달려 있고, 구조가 없다</li>
-          <li>☐ 갈등이 나면 수습 방식이 정해져 있지 않다</li>
-          <li>☐ 회의 후 “감정”이 남는 날이 잦다</li>
-          <li>☐ 기록/정리/중재 기능이 자주 비어 있다</li>
-        </ul>
-      </div>
-
-      <p className="mt-4 text-sm leading-7 text-slate-700">
-        2개 이상이면 평균 점수보다 먼저
-        <b className="text-slate-900"> 역할 + 결정 구조 + 수습 루틴</b>을 세팅하는 게 효과가 큽니다.
-      </p>
-    </Card>
-
-    <Card title="자주 묻는 질문 (FAQ)">
-      <div className="space-y-5 text-sm leading-7 text-slate-700">
-        <div>
-          <b className="text-slate-900">Q. 평균이 낮으면 모임이 무조건 힘든가요?</b>
-          <p className="mt-1">
-            아니요. 평균이 낮아도 <b className="text-slate-900">룰/역할/수습</b>이 있으면 훨씬 편해질 수 있어요.
-          </p>
-        </div>
-
-        <div>
-          <b className="text-slate-900">Q. 평균이 높은데도 자꾸 싸워요.</b>
-          <p className="mt-1">
-            보통은 <b className="text-slate-900">최저점 조합이 구조적으로 자주 붙거나</b>,
-            결정/피드백 방식이 사람 중심이라 갈등이 커지는 경우가 많아요.
-          </p>
-        </div>
-
-        <div>
-          <b className="text-slate-900">Q. 그럼 점수는 의미가 없나요?</b>
-          <p className="mt-1">
-            점수는 “날씨”처럼 참고할 가치가 있어요.
-            다만 모임을 굴리는 건 “기후” — 즉 <b className="text-slate-900">운영 구조</b>가 더 중요합니다.
-          </p>
-        </div>
-      </div>
-    </Card>
-
-    <Card title="다음으로 보면 좋은 가이드">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <a
-          href="/guides/no-conclusion"
-          className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-        >
-          <div className="text-xs font-extrabold text-slate-900">
-            왜 우리 모임은 자꾸 결론이 안 날까? (TJ 부족)
-          </div>
-          <p className="mt-1 text-sm leading-6 text-slate-700">
-            결정 구조를 만드는 가장 빠른 방법
-          </p>
-        </a>
-
-        <a
-          href="/guides/cognitive-clash"
-          className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5 transition hover:bg-white/80"
-        >
-          <div className="text-xs font-extrabold text-slate-900">
-            MBTI 인지기능이 모임에서 충돌하는 순간
-          </div>
-          <p className="mt-1 text-sm leading-6 text-slate-700">
-            오해가 생기는 구조를 먼저 이해하기
-          </p>
-        </a>
-      </div>
-    </Card>
-  </>
-),
-
+      "회의에선 조용한데, 뒤에서만 불만이 새는 팀. 피드백을 사람 싸움으로 안 만들고 ‘결과물 싸움’으로 바꾸는 장치들을 정리했어요.",
+    keywords: ["회사", "피드백", "냉전", "팀워크", "커뮤니케이션"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "피드백 냉전 패턴 TOP 3",
+        items: [
+          {
+            title: "1) ‘괜찮아요’가 사실은 괜찮지 않음",
+            when: "표정은 아닌데 말은 괜찮다고 해요.",
+            why: "직접 말하면 관계가 깨질까봐 ‘참는 합의’를 합니다.",
+            tip: "체크 질문 바꾸기: **“0~10점이면 몇 점?”** (구체화)",
+          },
+          {
+            title: "2) 피드백이 곧 ‘평가’로 들림",
+            when: "수정 요청이 인신공격처럼 받아들여져요.",
+            why: "대상(사람/결과물)이 섞이면 방어가 올라갑니다.",
+            tip: "대상 고정: **“결과물 기준으로만”**을 먼저 선언",
+          },
+          {
+            title: "3) DM/뒷말로만 이슈가 돌아다님",
+            when: "회의에선 말 못 하고 개인 채팅에서만 불만이 나와요.",
+            why: "공식 채널이 안전하지 않으면 비공식 채널이 커집니다.",
+            tip: "룰: **회의 끝 5분 ‘익명 리스크’ 수집**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이때부터 냉전이 깊어져요",
+        items: [
+          { title: "‘의도’ 공격이 나오기 시작할 때", detail: "“너 일부러 그러지?” 같은 문장이요." },
+          { title: "피드백이 ‘사람 성향’으로 흐를 때", detail: "결과물 얘기가 아니라 성격 싸움이 됩니다." },
+          { title: "회의 후에만 불만이 폭발할 때", detail: "공식 채널이 비어있다는 신호예요." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["점수/기준으로 구체화", "결과물 대상 고정", "공식 채널에 리스크 수집"],
+          dont: ["의도 공격", "성향 탓", "DM에만 이슈 남기기"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "냉전을 막는 룰 4개",
+        items: [
+          { title: "룰 1) 피드백은 ‘관찰→영향→제안’", how: "감정 없이 말할 수 있어요.", example: "“A를 보니 B가 생겨서, C로 바꾸면 어때요?”" },
+          { title: "룰 2) 0~10 점수로 먼저", how: "모호함이 줄어요.", example: "“이 안, 지금 몇 점이에요?”" },
+          { title: "룰 3) 리스크는 익명 5분", how: "안전한 반대가 가능.", example: "“익명으로 리스크 1개씩만 적자.”" },
+          { title: "룰 4) 합의는 ‘결론 1줄’로", how: "끝을 냅니다.", example: "“오늘 결론: A로 가고, 리스크 B는 C로 보완.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "피드백이 덜 아프게 들리는 문장",
+        items: [
+          { situation: "말 꺼내기 어려울 때", say: "“사람이 아니라 결과물 기준으로만 얘기할게요.”" },
+          { situation: "모호한 ‘괜찮아요’가 나올 때", say: "“0~10점이면 몇 점? 7점 이하라면 한 줄만 개선점.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [
+          { q: "익명 리스크 수집하면 분위기 더 나빠지지 않나요?", a: "오히려 반대가 ‘공식’으로 올라오면 뒷말이 줄어서 팀 온도가 안정되는 경우가 많아요." },
+        ],
+      },
+    ],
+    related: ["work-meeting-stuck", "work-dominating-voices", "work-decision-paralysis", "work-async-misread"],
   },
+
+  {
+    slug: "work-async-misread",
+    groupType: "WORK",
+    title: "메신저/비동기 업무에서 ‘말이 차갑게’ 읽힐 때",
+    description:
+      "의도는 빠르게 처리하려는 건데, 상대는 공격으로 느끼는 상황. 비동기 커뮤니케이션에서 오해를 줄이는 문장/룰을 정리했어요.",
+    keywords: ["회사", "메신저", "비동기", "오해", "커뮤니케이션"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "비동기에서 오해가 나는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 짧은 문장이 ‘명령’으로 읽힘",
+            when: "“이거 수정” “오늘까지” 같은 문장이 차갑게 느껴져요.",
+            why: "텍스트는 표정/톤이 없어서 단문일수록 강해집니다.",
+            tip: "완충 1개만 추가: **맥락 1줄 + 요청 1줄**",
+          },
+          {
+            title: "2) 확인 질문이 ‘검열’처럼 들림",
+            when: "“이거 왜 이렇게 했어요?”가 공격처럼 보여요.",
+            why: "의도(호기심/품질)가 공유되지 않으면 심문이 됩니다.",
+            tip: "의도 먼저: **“품질 체크 차 질문이에요”**",
+          },
+          {
+            title: "3) 답 늦음=무시로 번역",
+            when: "답이 없으면 상대가 나를 무시한다고 느껴요.",
+            why: "비동기에서 ‘기다림 규칙’이 없으면 감정이 커집니다.",
+            tip: "SLA 합의: **“응답은 4시간 내, 급하면 @멘션”**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 커뮤니케이션이 깨지는 중",
+        items: [
+          { title: "‘말투’ 얘기가 나오기 시작할 때", detail: "업무가 아니라 감정 싸움으로 이동 중이에요." },
+          { title: "메신저에서만 공격적으로 보일 때", detail: "오프라인이면 안 생길 오해입니다." },
+          { title: "확인/재확인이 과도할 때", detail: "신뢰가 흔들리면 텍스트는 더 날카로워져요." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["맥락 1줄 붙이기", "의도 먼저 밝히기", "응답 규칙 합의"],
+          dont: ["단문 연속", "왜?만 던지기", "답 늦음을 인격으로 해석"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "비동기 오해 줄이는 룰 4개",
+        items: [
+          { title: "룰 1) 맥락 1줄 + 요청 1줄", how: "단문 공격성을 줄입니다.", example: "“일정 때문에 확인해요. 오늘 5시 전까지 부탁드려요.”" },
+          { title: "룰 2) 질문엔 의도 태그", how: "심문이 아니라 협업으로 들려요.", example: "“(품질 체크) 이 부분 의도가 뭐였을까요?”" },
+          { title: "룰 3) 응답 SLA 합의", how: "기다림을 시스템화.", example: "“4시간 내 답, 급하면 @.”" },
+          { title: "룰 4) 민감한 건 콜로", how: "텍스트로 싸우지 않기.", example: "“이건 오해 생길 수 있으니 5분만 통화할까요?”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "차갑게 안 들리는 대체 문장",
+        items: [
+          { situation: "단문 지시가 필요할 때", say: "“일정 때문에 확인해요. 오늘 5시 전까지 반영 가능할까요?”" },
+          { situation: "왜 이렇게 했는지 묻고 싶을 때", say: "“(의도 확인) 이 선택의 배경이 궁금해요. 품질 체크 차 질문이에요.”" },
+          { situation: "답이 늦을 때 재촉", say: "“급한 건 아니라서 편할 때 답 주세요. 오늘 중 가능할까요?”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [
+          { q: "맥락 붙이면 너무 길어지지 않나요?", a: "딱 1줄만 붙여도 체감 톤이 확 부드러워져요. ‘왜’가 보이면 공격으로 덜 읽힙니다." },
+        ],
+      },
+    ],
+    related: ["work-meeting-stuck", "work-dominating-voices", "work-decision-paralysis", "work-feedback-coldwar"],
+  },
+
+    // =========================
+  // LOCAL (동네모임) (5)
+  // =========================
+  {
+    slug: "local-boundary-manners",
+    groupType: "LOCAL",
+    title: "동네모임이 ‘선 넘는 친절’로 불편해질 때",
+    description:
+      "가까워서 편한데, 가까워서 더 민감해지는 동네 관계. 사소한 말과 행동이 오해로 번지지 않게 ‘거리 조절’ 룰을 정리했어요.",
+    keywords: ["동네모임", "이웃", "관계", "경계", "커뮤니케이션"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "동네모임에서 자주 생기는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 호의가 ‘의무’로 바뀌는 순간",
+            when: "한 번 도와주면 다음부터는 당연한 것처럼 기대가 생겨요.",
+            why: "거리와 생활권이 겹치면 작은 호의가 반복되며 기준이 굳습니다.",
+            tip: "호의는 조건을 붙여요: **“이번엔 가능해. 다음엔 상황 봐야 해.”**",
+          },
+          {
+            title: "2) 사생활 정보가 너무 빨리 공유될 때",
+            when: "의도치 않게 개인 사정이 모임 전체에 퍼져요.",
+            why: "동네는 연결망이 촘촘해서 ‘가벼운 얘기’가 소문이 되기 쉽습니다.",
+            tip: "한 문장 방지선: **“이건 아직 확정이 아니라서 조용히 해줘.”**",
+          },
+          {
+            title: "3) 친해졌는데도 ‘서로 예민한 포인트’가 다를 때",
+            when: "농담이었는데 상처가 되거나, 조언이 간섭처럼 들려요.",
+            why: "가까움이 쌓일수록 말이 짧아지고 해석은 강해집니다.",
+            tip: "대상 고정: **사람 평가가 아니라 상황/행동만** 말하기.",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 거리 조절이 필요해요",
+        items: [
+          {
+            title: "“그 정도는 해줄 수 있잖아”가 나오기 시작할 때",
+            detail: "호의가 거래로 바뀌는 전조입니다.",
+          },
+          {
+            title: "가벼운 부탁이 ‘당일’ 요청으로 바뀔 때",
+            detail: "상대가 내 시간을 ‘공짜’로 인식하기 시작한 상태예요.",
+          },
+          {
+            title: "내가 없는 자리에서 내 얘기가 자주 오갈 때",
+            detail: "개인 정보가 모임의 소재가 된 순간입니다.",
+          },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: [
+            "호의는 **가능 범위**를 먼저 말하기",
+            "민감한 얘기는 **공유 범위**를 지정하기",
+            "불편함은 **초기에 짧게** 정리하기",
+          ],
+          dont: [
+            "참다가 한 번에 폭발하기",
+            "조언을 ‘정답’처럼 밀어붙이기",
+            "상대 사생활을 가십처럼 소비하기",
+          ],
+        },
+      },
+      {
+        type: "RULES",
+        title: "동네모임이 편해지는 운영 룰 4개",
+        items: [
+          {
+            title: "룰 1) 부탁은 ‘선택지’로 제안",
+            how: "요청을 명령이 아니라 선택으로 만들면 부담이 줄어요.",
+            example: "“가능하면 도와주고, 어렵다면 다른 방법 찾자.”",
+          },
+          {
+            title: "룰 2) 사생활은 ‘확정된 것만’ 공유",
+            how: "확정 전 정보는 소문으로 번질 확률이 큽니다.",
+            example: "“확정되면 그때 말할게.”",
+          },
+          {
+            title: "룰 3) 호의는 ‘이번만’ 기본값",
+            how: "반복 기대를 막는 기본 문장입니다.",
+            example: "“이번엔 가능해. 다음엔 일정 봐야 해.”",
+          },
+          {
+            title: "룰 4) 불편함은 ‘행동’으로만 말하기",
+            how: "성격 얘기 대신 행동/상황만 말해야 싸움이 안 납니다.",
+            example: "“그 말이 나에겐 부담으로 들렸어.”",
+          },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "그대로 써도 되는 문장",
+        items: [
+          {
+            situation: "부탁이 과해졌을 때",
+            say: "“지금은 내 일정이 어려워서 이번엔 힘들 것 같아. 다른 방법을 같이 찾아보자.”",
+          },
+          {
+            situation: "사생활 얘기가 퍼질까 걱정될 때",
+            say: "“이건 아직 확정이 아니라서 여기서만 얘기해줬으면 해.”",
+          },
+          {
+            situation: "호의가 반복 기대가 될 때",
+            say: "“도와주고 싶긴 한데, 매번은 어렵고 가끔 가능해.”",
+          },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [
+          {
+            q: "거리 두면 어색해지지 않나요?",
+            a: "오히려 기준이 없을 때 더 빨리 깨져요. 기준을 말로 두면 ‘관계’가 아니라 ‘구조’가 정리됩니다.",
+          },
+        ],
+      },
+    ],
+    related: ["local-committee-decision", "local-fee-fairness", "local-gossip-safety", "local-newcomer-settle"],
+  },
+
+  {
+    slug: "local-committee-decision",
+    groupType: "LOCAL",
+    title: "동네모임이 ‘공지/결정’ 때문에 늘어질 때",
+    description:
+      "모임 얘기는 많은데 결론이 안 나는 이유는 대부분 ‘누가’가 아니라 ‘결정 구조’에 있어요. 부담 없이 빨라지는 합의 루틴을 정리했어요.",
+    keywords: ["동네모임", "결정", "공지", "합의", "운영"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "결정이 늦어지는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 의견 수집이 끝나도 선택을 안 함",
+            when: "불만은 많은데 ‘그럼 뭐로 갈지’는 안 정해요.",
+            why: "선택이 곧 책임처럼 느껴져서 다들 한 발 물러납니다.",
+            tip: "**2안 투표 + 마감시간**을 걸어 결정을 자동화하세요.",
+          },
+          {
+            title: "2) 기준이 숨겨져 있어서 후보가 계속 탈락",
+            when: "장소/시간 후보가 나오면 하나씩 반대만 달려요.",
+            why: "거리, 비용, 소음 등 ‘진짜 기준’이 공개되지 않아서요.",
+            tip: "기준 3개만 먼저: **시간/비용/소음(민원)**",
+          },
+          {
+            title: "3) 공지 문장이 길어서 아무도 안 읽음",
+            when: "중요한 내용인데도 반응이 없어요.",
+            why: "긴 공지는 참여를 줄이고, 질문만 늘립니다.",
+            tip: "공지 템플릿: **한 줄 요약 + 날짜/장소 + 해야 할 것**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이때부터 피로가 올라가요",
+        items: [
+          { title: "같은 질문이 3번 반복될 때", detail: "공지 구조가 길거나 핵심이 안 보이는 상태예요." },
+          { title: "반대만 있고 대안이 없을 때", detail: "의견이 아니라 방해가 됩니다." },
+          { title: "결정 직전에 ‘원점’으로 돌아갈 때", detail: "범위/기준을 다시 고정해야 합니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["2안으로 축소", "마감시간 있는 투표", "공지 3줄로"],
+          dont: ["후보 무한 증식", "반대만 던지기", "공지 장문으로 설득하기"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "결정이 빨라지는 운영 룰 4개",
+        items: [
+          { title: "룰 1) 후보는 A/B 두 개만", how: "선택지가 많을수록 결론은 늦습니다.", example: "“이번 주는 A(주간) vs B(야간)만.”" },
+          { title: "룰 2) 투표는 마감이 있어야 함", how: "마감이 없으면 투표가 대화로 바뀝니다.", example: "“오늘 10시 마감, 미응답은 다수결.”" },
+          { title: "룰 3) 반대는 대안과 세트", how: "불만을 해결로 바꿉니다.", example: "“반대면 대안 1개 같이.”" },
+          { title: "룰 4) 공지는 3줄 템플릿", how: "읽히는 공지가 실행됩니다.", example: "“요약/일시/할 일”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "공지/결정용 복붙 문장",
+        items: [
+          { situation: "의견 수집", say: "“내일 9시까지 의견만 주세요. 그 후 A/B로 줄여 투표 올릴게요.”" },
+          { situation: "투표 마감", say: "“오늘 10시 마감. 미응답은 다수결로 갑니다.”" },
+          { situation: "반대만 나올 때", say: "“반대는 대안이랑 같이 주세요. 그래야 선택이 가능해요.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [
+          { q: "결정하면 불만이 생겨요.", a: "그래서 ‘영구 결정’이 아니라 ‘이번 회차 테스트’로 프레임을 바꾸면 갈등이 줄어요." },
+        ],
+      },
+    ],
+    related: ["local-boundary-manners", "local-fee-fairness", "local-gossip-safety", "local-newcomer-settle"],
+  },
+
+  {
+    slug: "local-fee-fairness",
+    groupType: "LOCAL",
+    title: "동네모임 회비/정산이 ‘은근히’ 불편해질 때",
+    description:
+      "소액이라 더 말 꺼내기 어려운 회비 문제. 사람 탓으로 번지기 전에 규칙으로 정리하는 방법을 정리했어요.",
+    keywords: ["동네모임", "회비", "정산", "규칙", "갈등"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "회비가 미묘해지는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) ‘일단 모았다’가 사용처 불신으로 바뀜",
+            when: "돈은 모였는데 어디에 썼는지 공유가 늦어요.",
+            why: "정보 공백은 의심을 키웁니다.",
+            tip: "월 1회 3줄 공개: **잔액/사용처/다음 계획**",
+          },
+          {
+            title: "2) 참여 빈도가 다른데 동일 회비",
+            when: "자주 나오는 사람과 가끔 나오는 사람이 같은 돈을 내요.",
+            why: "체감 공정성이 깨지면 관계가 차가워집니다.",
+            tip: "이원화: **기본 회비 + 참석자 비용(당일)**",
+          },
+          {
+            title: "3) 누군가가 계속 ‘대납’",
+            when: "항상 한 사람이 대신 결제하고 말이 없어요.",
+            why: "대납이 누적되면 배려가 아니라 부담이 됩니다.",
+            tip: "순번제+마감: **“이번 달 A, 다음 달 B”**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "관계 온도가 떨어지는 신호",
+        items: [
+          { title: "회비 얘기가 농담으로만 나올 때", detail: "농담은 해결이 아니라 미루기라서요." },
+          { title: "영수증/내역 공유가 ‘요청’으로 바뀔 때", detail: "이미 신뢰가 흔들리고 있다는 뜻입니다." },
+          { title: "대납자가 조용히 빠지기 시작할 때", detail: "불만을 말 대신 행동으로 표시하는 단계예요." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["내역은 짧게라도 정기 공유", "기본+당일 비용 분리", "대납 순번제"],
+          dont: ["내역 공유를 ‘눈치’로", "참석 적은 사람을 비난", "대납을 당연하게 받기"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "회비가 깔끔해지는 룰 4개",
+        items: [
+          { title: "룰 1) 내역은 ‘정기’로", how: "요청받기 전에 공개하면 갈등이 줄어요.", example: "“매달 말, 잔액/사용처 3줄 공유.”" },
+          { title: "룰 2) 기본/당일 비용 분리", how: "공정성 체감이 좋아집니다.", example: "“기본은 공용, 당일은 참석자 정산.”" },
+          { title: "룰 3) 대납은 순번제", how: "부담을 시스템으로 분산합니다.", example: "“이번 달 A, 다음 달 B.”" },
+          { title: "룰 4) 미납은 마감으로", how: "미납이 관계 문제로 커지기 전에 끝냅니다.", example: "“내일 점심 전까지 부탁드립니다.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "회비/정산용 문장",
+        items: [
+          { situation: "내역 공유", say: "“이번 달 회비 내역 공유합니다. 잔액/사용처/다음 계획은 이렇게예요.”" },
+          { situation: "참석 빈도 차이", say: "“공정하게 가려고 기본 회비+당일 비용으로 나누면 어떨까요?”" },
+          { situation: "대납 반복", say: "“대납이 누적되면 부담이라서, 다음부터는 순번제로 하자.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "돈 얘기하면 분위기 깨져요.", a: "룰을 만들면 ‘사람’이 아니라 ‘시스템’ 얘기가 돼서 훨씬 덜 불편합니다." }],
+      },
+    ],
+    related: ["local-boundary-manners", "local-committee-decision", "local-gossip-safety", "local-newcomer-settle"],
+  },
+
+  {
+    slug: "local-gossip-safety",
+    groupType: "LOCAL",
+    title: "동네모임 수다가 ‘소문’으로 번지기 직전 멈추는 법",
+    description:
+      "동네는 가까워서 한 번 퍼지면 되돌리기 어렵습니다. 수다를 관계 파괴로 만들지 않는 안전장치를 정리했어요.",
+    keywords: ["동네모임", "소문", "수다", "신뢰", "관계"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "수다가 위험해지는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 사실 확인 없이 단정",
+            when: "한 번 들은 얘기가 ‘사실’처럼 굳어요.",
+            why: "단정은 쉽게 전달되고, 정정은 어렵습니다.",
+            tip: "말머리 붙이기: **“내가 들은 건 여기까지야”**",
+          },
+          {
+            title: "2) 친분 확인 게임",
+            when: "동의하지 않으면 ‘그 편이냐’가 돼요.",
+            why: "수다가 소속감 검열로 바뀐 순간입니다.",
+            tip: "중립 문장: **“나는 판단 보류할게.”**",
+          },
+          {
+            title: "3) 선 넘는 농담",
+            when: "웃기려고 한 말이 누군가에게는 낙인이 돼요.",
+            why: "동네는 ‘평판’이 자산이라 더 민감합니다.",
+            tip: "대상 바꾸기: **사람이 아니라 상황만**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 방향 전환하세요",
+        items: [
+          { title: "이름/가족/직장 같은 구체 정보가 나오기 시작", detail: "그 순간부터 전파 위험이 급상승합니다." },
+          { title: "“너는 어떻게 생각해?”가 압박으로 들림", detail: "중립이 허용되지 않는 분위기예요." },
+          { title: "캡처/전달 얘기가 오갈 때", detail: "이미 신뢰가 흔들리고 있습니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["판단 보류 문장", "사람 대신 상황", "공유 범위 합의"],
+          dont: ["단정/낙인", "동조 강요", "구체 정보 확산"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "수다를 안전하게 만드는 룰 4개",
+        items: [
+          { title: "룰 1) 사실/해석/감정 분리", how: "섞이면 단정이 됩니다.", example: "“사실은 A, 내 해석은 B, 느낌은 C야.”" },
+          { title: "룰 2) 사람 평가는 금지", how: "평판을 건드리지 않기.", example: "“그 행동은 별로”는 가능, “그 사람은 별로”는 금지." },
+          { title: "룰 3) 중립 허용", how: "동조를 요구하지 않기.", example: "“모르면 판단 보류해도 돼.”" },
+          { title: "룰 4) 공유 범위 확인", how: "동네는 전파 속도가 빠릅니다.", example: "“이 얘기는 여기서만 하자.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "분위기 안 깨고 선 긋는 문장",
+        items: [
+          { situation: "단정 흐름", say: "“그건 내가 정확히 몰라서 판단은 보류할게.”" },
+          { situation: "선 넘는 농담", say: "“사람 평가처럼 들릴 수 있으니 상황 얘기만 하자.”" },
+          { situation: "전파 걱정", say: "“이 얘긴 여기서만. 밖으로 나가면 서로 불편해.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "선 긋는 사람이 분위기 깬다고 해요.", a: "“분위기 깨는 게 아니라, 우리 편하자고 안전장치 두는 거야”라고 말하면 갈등이 줄어요." }],
+      },
+    ],
+    related: ["local-boundary-manners", "local-committee-decision", "local-fee-fairness", "local-newcomer-settle"],
+  },
+
+  {
+    slug: "local-newcomer-settle",
+    groupType: "LOCAL",
+    title: "동네모임에 새 사람이 들어왔을 때 ‘어색함’ 줄이는 법",
+    description:
+      "동네는 관계망이 이미 단단해서 새 멤버가 더 조심스러워요. 과한 배려 없이 자연스럽게 섞이는 구조를 정리했어요.",
+    keywords: ["동네모임", "새멤버", "적응", "소개", "분위기"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "새 멤버가 어색해지는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 내부 얘기만 이어짐",
+            when: "아파트/동네 사건, 기존 멤버들끼리만 아는 맥락이 많아요.",
+            why: "설명이 길어지면 새 멤버는 ‘참여’가 아니라 ‘청취’가 됩니다.",
+            tip: "맥락은 30초, 연결 질문 1개: **“너는 이런 상황 겪어봤어?”**",
+          },
+          {
+            title: "2) 과한 상태 체크",
+            when: "“불편하지?”를 반복해서 더 긴장돼요.",
+            why: "배려가 검사처럼 느껴지면 말이 더 줄어듭니다.",
+            tip: "체크 대신 구조로 배려: **자리/턴/주제**를 돌리기.",
+          },
+          {
+            title: "3) 새 멤버가 ‘포지션’이 없음",
+            when: "이미 짝이 정해진 분위기라 끼기 어렵습니다.",
+            why: "관계가 굳은 곳에 들어가면 역할이 비어있지 않아요.",
+            tip: "짧은 페어링: **2:2 대화 10분 → 전체 공유**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 타이밍에 새 멤버가 빠져요",
+        items: [
+          { title: "설명이 수업처럼 길어질 때", detail: "새 멤버는 말할 기회를 잃습니다." },
+          { title: "말 끊김이 잦고 속도가 빠를 때", detail: "끼어들 타이밍을 못 잡아요." },
+          { title: "새 멤버에게만 질문이 몰릴 때", detail: "소개가 면접처럼 됩니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["연결 질문 1개", "2:2 페어링", "내부 얘기 30초 제한"],
+          dont: ["과한 상태 체크", "면접식 질문", "기존 멤버끼리만 웃기"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "새 멤버가 자연스럽게 섞이는 룰 4개",
+        items: [
+          { title: "룰 1) 추억/내부 얘기 30초", how: "길어지면 구경이 됩니다.", example: "“짧게만 말하고, 너 경험도 듣자.”" },
+          { title: "룰 2) 연결 질문 1개", how: "말문을 열어줍니다.", example: "“너는 이런 상황이면 어떻게 해?”" },
+          { title: "룰 3) 페어링 10분", how: "전체 대화보다 부담이 적어요.", example: "“10분만 2:2로 얘기하고 다시 합치자.”" },
+          { title: "룰 4) 소개는 취향 중심", how: "스펙보다 취향이 빨리 친해집니다.", example: "“요즘 뭐에 관심 있어요?”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "소개/적응용 문장",
+        items: [
+          { situation: "내부 얘기 터질 때", say: "“이건 우리끼리 맥락이 있는데, 너도 비슷한 경험 있어?”" },
+          { situation: "새 멤버가 조용할 때", say: "“요즘 제일 재밌는 게 뭐예요?”" },
+          { situation: "질문이 몰릴 때", say: "“오늘은 편하게 취향 얘기만 하자.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "낯가림 심한 분은 더 어렵지 않나요?", a: "그래서 전체 대화보다 1:1이나 2:2 구조가 훨씬 효과적입니다. 구조가 배려가 됩니다." }],
+      },
+    ],
+    related: ["local-boundary-manners", "local-committee-decision", "local-fee-fairness", "local-gossip-safety"],
+  },
+
+  // =========================
+  // SPORTS (운동모임) (5)
+  // =========================
+  {
+    slug: "sports-pace-mismatch",
+    groupType: "SPORTS",
+    title: "운동모임이 ‘강도 차이’ 때문에 자꾸 불편해질 때",
+    description:
+      "열심히 하는 사람과 가볍게 하는 사람이 섞이면, 운동 자체보다 눈치가 더 피곤해져요. 강도를 ‘실력’이 아니라 ‘구조’로 맞추는 방법.",
+    keywords: ["운동모임", "강도", "페이스", "팀워크", "운영"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "강도 불일치 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 목표가 다른데 같은 세션으로 묶임",
+            when: "누군가는 기록, 누군가는 스트레스 해소예요.",
+            why: "목표가 다르면 같은 훈련도 ‘좋음/고통’으로 다르게 해석됩니다.",
+            tip: "세션을 분리: **기본 코스(공통) + 선택 코스(추가)**",
+          },
+          {
+            title: "2) 페이스가 빠른 사람이 기준이 됨",
+            when: "빠른 사람에게 맞추느라 누군가는 탈진해요.",
+            why: "리더가 무심코 기준이 되면 나머지는 침묵으로 따라옵니다.",
+            tip: "기준은 ‘중간’으로: **중간 페이스 + 빠른 그룹은 추가 라운드**",
+          },
+          {
+            title: "3) ‘조언’이 지적으로 들림",
+            when: "도움 주려던 말이 상처가 돼요.",
+            why: "운동은 자존감이 걸려 있어서 표현이 민감합니다.",
+            tip: "허락받고 조언: **“조언해도 될까?”**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 구조를 바꿔야 해요",
+        items: [
+          { title: "운동 후 표정이 계속 안 좋을 때", detail: "운동이 아니라 ‘눈치’로 소진되고 있을 수 있어요." },
+          { title: "빠른 사람만 재밌고 나머지는 조용할 때", detail: "기준이 한쪽으로 기울었습니다." },
+          { title: "조언이 잦아지고 반응이 줄어들 때", detail: "도움이 아니라 평가로 읽히는 단계예요." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["기본+선택 코스", "중간 페이스 기준", "조언은 허락 후"],
+          dont: ["빠른 사람 기준 고정", "조언을 정답처럼", "탈락자를 방치"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "강도 차이를 줄이는 운영 룰 4개",
+        items: [
+          { title: "룰 1) 공통 70% + 선택 30%", how: "같이 하는 시간과 개인 시간을 분리해요.", example: "“워밍업/기본은 같이, 이후는 선택.”" },
+          { title: "룰 2) 그룹을 ‘목표’로 나누기", how: "실력보다 목표가 더 중요합니다.", example: "“기록/건강/친목”으로 선택." },
+          { title: "룰 3) 조언은 허락 후 1개만", how: "과하면 평가로 들립니다.", example: "“조언 하나만 해도 돼?”" },
+          { title: "룰 4) 끝은 함께", how: "모임 느낌을 유지합니다.", example: "“마무리 스트레칭은 전원 같이.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "상황별 대체 문장",
+        items: [
+          { situation: "강도 조정 제안", say: "“오늘은 기본 코스 같이 하고, 더 하고 싶은 사람은 추가로 가자.”" },
+          { situation: "조언하고 싶을 때", say: "“조언 하나 해도 될까? 싫으면 말해줘.”" },
+          { situation: "누군가 힘들어 보일 때", say: "“오늘은 여기까지만 하고, 다음은 페이스 조정해보자.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "그룹 나누면 친목이 깨지지 않나요?", a: "공통 70%를 같이 하면 친목은 유지되고, 갈등만 줄어듭니다." }],
+      },
+    ],
+    related: ["sports-no-show-cancel", "sports-skill-gap-coaching", "sports-competition-tension", "sports-safety-injury"],
+  },
+
+  {
+    slug: "sports-no-show-cancel",
+    groupType: "SPORTS",
+    title: "운동모임이 ‘당일 취소/노쇼’로 무너질 때",
+    description:
+      "가벼운 모임일수록 규칙이 없어서 더 자주 깨집니다. 사람 탓 대신 ‘참여 구조’를 바꾸는 방법을 정리했어요.",
+    keywords: ["운동모임", "노쇼", "취소", "규칙", "운영"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "노쇼/취소 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 참석 확정이 ‘느낌’으로만 남음",
+            when: "“갈게”가 확정인지 의사표현인지 애매해요.",
+            why: "확정 룰이 없으면 부담도 없고 책임도 없습니다.",
+            tip: "확정 문장 통일: **“확정/보류/불가”** 셋 중 하나로만.",
+          },
+          {
+            title: "2) 준비 비용(예약/대관)이 생기는데 룰이 없음",
+            when: "누군가는 돈/시간을 쓰고, 누군가는 가볍게 빠져요.",
+            why: "비용이 생기면 ‘가벼움’이 깨지고 갈등이 납니다.",
+            tip: "마감+패널티(소액) 룰: **“전날 10시 이후 취소는 1/n”**",
+          },
+          {
+            title: "3) 일정이 너무 멀리 잡혀서 동력이 떨어짐",
+            when: "2주 뒤 약속은 심리적으로 아직 ‘가짜’예요.",
+            why: "멀수록 변수도 많고 우선순위가 밀립니다.",
+            tip: "리듬 만들기: **고정 요일/시간**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 구조를 바꿔야 해요",
+        items: [
+          { title: "당일 ‘미안’이 반복될 때", detail: "개인 문제가 아니라 시스템 문제가 됐습니다." },
+          { title: "준비 담당이 지치기 시작할 때", detail: "모임이 유지되지 않습니다." },
+          { title: "소수만 꾸준히 나올 때", detail: "무임승차 구조가 생겼을 수 있어요." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["확정/보류/불가로 단순화", "마감시간", "고정 루틴"],
+          dont: ["느낌으로 확정", "준비 담당에게만 부담", "노쇼를 성향 탓으로"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "노쇼를 줄이는 룰 4개",
+        items: [
+          { title: "룰 1) 참석 상태를 3단계로", how: "말이 아니라 상태로 관리합니다.", example: "“확정/보류/불가”" },
+          { title: "룰 2) 마감시간 필수", how: "마감이 없으면 확정이 아닙니다.", example: "“전날 10시 마감”" },
+          { title: "룰 3) 비용이 있으면 최소 룰", how: "소액이라도 기준이 있어야 합니다.", example: "“마감 이후 취소는 예약비 1/n”" },
+          { title: "룰 4) 고정 요일로 리듬", how: "모임이 습관이 됩니다.", example: "“매주 수요일 8시”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "단톡 복붙 문장",
+        items: [
+          { situation: "참석 체크", say: "“이번 주는 확정/보류/불가로만 답 주세요. 전날 10시 마감입니다.”" },
+          { situation: "마감 이후 취소", say: "“대관/예약이 있어서 마감 이후 취소는 비용 1/n으로 정리할게요.”" },
+          { situation: "고정 루틴 제안", say: "“변수 줄이려고 고정 요일로 가는 게 어때요?”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "패널티가 너무 딱딱해 보여요.", a: "패널티 목적은 처벌이 아니라 준비 담당의 소진을 막는 안전장치입니다." }],
+      },
+    ],
+    related: ["sports-pace-mismatch", "sports-skill-gap-coaching", "sports-competition-tension", "sports-safety-injury"],
+  },
+
+  {
+    slug: "sports-skill-gap-coaching",
+    groupType: "SPORTS",
+    title: "실력 차이가 커서 ‘가르치는 사람’과 ‘배우는 사람’이 불편해질 때",
+    description:
+      "한쪽은 도와주고 싶은데, 다른 쪽은 평가받는 느낌이 들 때가 있어요. 코칭을 관계가 아니라 구조로 정리하는 방법.",
+    keywords: ["운동모임", "실력차", "코칭", "배려", "관계"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "실력 차이로 꼬이는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 조언이 계속 누적됨",
+            when: "한 번 시작한 코칭이 멈추지 않아요.",
+            why: "도움도 반복되면 부담이 됩니다.",
+            tip: "코칭은 시간 제한: **“오늘은 10분만”**",
+          },
+          {
+            title: "2) 칭찬 없이 수정만 나옴",
+            when: "고치라는 말만 들으면 자존감이 꺾여요.",
+            why: "운동은 성취 경험이 핵심입니다.",
+            tip: "비율: **칭찬 1 + 수정 1**",
+          },
+          {
+            title: "3) 배우는 사람이 ‘계속 미안함’",
+            when: "실수할 때마다 분위기 신경을 써요.",
+            why: "실수=민폐로 번역되면 즐거움이 사라집니다.",
+            tip: "실수 프레임 바꾸기: **“연습은 실수하는 시간”**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 코칭 구조를 바꿔야 해요",
+        items: [
+          { title: "배우는 사람이 질문을 안 하게 될 때", detail: "이미 부담이 커진 상태입니다." },
+          { title: "가르치는 사람이 짜증이 늘 때", detail: "코칭이 자원 고갈로 바뀌었습니다." },
+          { title: "실수 후 분위기가 얼어붙을 때", detail: "모임 목표가 운동이 아니라 눈치가 됩니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["코칭 시간 제한", "칭찬 1 + 수정 1", "실수 프레임 합의"],
+          dont: ["조언 과다", "수정만 연속", "실수를 민폐로 몰기"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "코칭이 불편하지 않게 되는 룰 4개",
+        items: [
+          { title: "룰 1) 코칭은 요청받고", how: "허락 없으면 평가로 들립니다.", example: "“원하면 팁 줄게.”" },
+          { title: "룰 2) 10분 타이머", how: "도움이 과해지는 걸 막습니다.", example: "“오늘은 10분만 코칭.”" },
+          { title: "룰 3) 칭찬 1 + 수정 1", how: "동력이 유지됩니다.", example: "“좋았던 점 1개, 바꿀 점 1개.”" },
+          { title: "룰 4) 실수는 정상", how: "연습의 정의를 합의합니다.", example: "“실수는 연습의 일부.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "코칭/배움 문장",
+        items: [
+          { situation: "조언하고 싶을 때", say: "“원하면 팁 하나만 말해도 될까?”" },
+          { situation: "코칭이 길어질 때", say: "“오늘은 10분만 하고, 나머진 즐기자.”" },
+          { situation: "실수했을 때", say: "“괜찮아. 연습은 원래 실수하는 시간이야.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "가르치는 사람만 손해 같아요.", a: "그래서 코칭을 ‘요청 기반 + 시간 제한’으로 만들면 부담이 분산됩니다." }],
+      },
+    ],
+    related: ["sports-pace-mismatch", "sports-no-show-cancel", "sports-competition-tension", "sports-safety-injury"],
+  },
+
+  {
+    slug: "sports-competition-tension",
+    groupType: "SPORTS",
+    title: "운동모임이 ‘승부욕’ 때문에 갈라질 때",
+    description:
+      "이기고 싶은 사람과 즐기고 싶은 사람이 섞이면, 같은 경기라도 서로 다른 경험을 합니다. 승부욕을 악감정으로 안 만드는 룰을 정리했어요.",
+    keywords: ["운동모임", "승부욕", "경쟁", "분위기", "갈등"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "승부욕 갈등 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 지적이 ‘코칭’이 아니라 ‘비난’으로 들림",
+            when: "실수 직후 지적이 나오면 표정이 굳어요.",
+            why: "경기 중엔 감정이 올라가서 문장이 더 세게 들립니다.",
+            tip: "경기 중엔 신호만: **짧은 키워드**, 피드백은 경기 후.",
+          },
+          {
+            title: "2) 특정 사람에게 책임이 몰림",
+            when: "지는 순간 한 사람에게 시선이 꽂혀요.",
+            why: "팀 스포츠는 책임 전가가 쉬운 구조입니다.",
+            tip: "팀 기준으로 말하기: **“다음엔 수비 라인 맞추자.”**",
+          },
+          {
+            title: "3) 분위기가 ‘훈련’으로 굳어짐",
+            when: "친목이었는데 점점 평가장이 돼요.",
+            why: "목표가 합의되지 않으면 진지함이 갈등이 됩니다.",
+            tip: "모드 선언: **친목전 / 진지전** 분리",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 모드를 나눠야 해요",
+        items: [
+          { title: "경기 후 대화가 줄고 표정이 굳을 때", detail: "운동이 아니라 감정이 남는 상태입니다." },
+          { title: "지적이 늘고 웃음이 줄 때", detail: "모임이 평가장으로 가고 있어요." },
+          { title: "일부만 계속 오고 일부는 빠질 때", detail: "목표 불일치가 행동으로 나타납니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["모드 선언", "경기 중 피드백 최소화", "팀 기준으로 말하기"],
+          dont: ["실수 직후 비난", "개인 책임 몰기", "친목 모임을 훈련처럼 운영"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "경쟁이 갈등이 안 되게 하는 룰 4개",
+        items: [
+          { title: "룰 1) 친목전/진지전 분리", how: "모드를 섞지 않기.", example: "“오늘은 친목전, 다음 주는 진지전.”" },
+          { title: "룰 2) 경기 중 피드백은 신호만", how: "감정 폭발을 줄입니다.", example: "“라인/거리/타이밍” 같은 키워드." },
+          { title: "룰 3) 피드백은 경기 후 2개만", how: "과하면 공격으로 들립니다.", example: "“좋았던 점 1, 바꿀 점 1.”" },
+          { title: "룰 4) 책임은 팀으로", how: "개인 낙인을 막아요.", example: "“다음엔 팀 움직임을 맞추자.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "승부욕 조절 문장",
+        items: [
+          { situation: "진지 모드 제안", say: "“오늘은 친목으로 가고, 다음 번에 진지하게 한 번 해보자.”" },
+          { situation: "지적이 세게 나올 때", say: "“경기 중엔 신호만 하자. 피드백은 끝나고 정리하자.”" },
+          { situation: "개인 책임 몰릴 때", say: "“이건 개인 문제가 아니라 팀 움직임 문제야.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "진지하게 하면 재미가 없어요.", a: "그래서 ‘모드 분리’가 핵심입니다. 재미 모드와 훈련 모드를 섞지 않으면 둘 다 살릴 수 있어요." }],
+      },
+    ],
+    related: ["sports-pace-mismatch", "sports-no-show-cancel", "sports-skill-gap-coaching", "sports-safety-injury"],
+  },
+
+  {
+    slug: "sports-safety-injury",
+    groupType: "SPORTS",
+    title: "운동모임에서 ‘부상/안전’ 얘기가 껄끄러울 때",
+    description:
+      "안전 규칙은 분위기를 딱딱하게 만드는 게 아니라, 오래 즐기기 위한 최소 장치입니다. 안전을 ‘잔소리’가 아니라 ‘합의’로 만드는 방법.",
+    keywords: ["운동모임", "부상", "안전", "규칙", "운영"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "안전 문제가 꼬이는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 준비운동/쿨다운이 생략됨",
+            when: "시간이 없다는 이유로 바로 시작해요.",
+            why: "모임이 익숙해질수록 기본이 생략됩니다.",
+            tip: "고정 루틴: **시작 5분/끝 5분**은 무조건.",
+          },
+          {
+            title: "2) 통증을 숨기고 무리",
+            when: "아프다고 말하면 민폐 같아서 참아요.",
+            why: "모임이 ‘강함’ 중심이면 약함을 말하기 어렵습니다.",
+            tip: "합의 문장: **“통증 말하기는 민폐가 아니라 안전”**",
+          },
+          {
+            title: "3) 장비/보호구 얘기가 민감함",
+            when: "누군가에게만 요구하면 지적처럼 들려요.",
+            why: "사람에게 요구하면 방어가 올라갑니다.",
+            tip: "사람이 아니라 규칙: **“모임 규칙으로 정하자.”**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 즉시 룰을 넣어야 해요",
+        items: [
+          { title: "작은 부상이 반복될 때", detail: "우연이 아니라 구조 문제일 가능성이 큽니다." },
+          { title: "무리하는 사람이 ‘미덕’으로 칭찬될 때", detail: "안전 문화가 깨지는 방향입니다." },
+          { title: "준비운동이 점점 줄어들 때", detail: "사고 확률이 올라갑니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["5분 루틴 고정", "통증 공유 문화", "규칙으로 통일"],
+          dont: ["무리 칭찬", "통증을 의지 문제로", "장비 요구를 개인 지적으로"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "안전을 지키는 룰 4개",
+        items: [
+          { title: "룰 1) 시작/끝 5분 고정", how: "최소 루틴이 사고를 줄입니다.", example: "“워밍업 5분, 마무리 5분.”" },
+          { title: "룰 2) 통증 공유는 의무", how: "숨기면 더 크게 다칩니다.", example: "“통증 있으면 바로 말하기.”" },
+          { title: "룰 3) 강도는 단계화", how: "한 번에 올리지 않기.", example: "“오늘은 70%, 다음에 80%.”" },
+          { title: "룰 4) 규칙은 모임 공지로", how: "개인 지적이 되지 않게.", example: "“모임 안전 규칙 4개” 고정 공지." },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "안전 얘기 껄끄럽지 않게 하는 문장",
+        items: [
+          { situation: "준비운동 제안", say: "“오늘도 시작 5분은 같이 준비운동하고 들어가자.”" },
+          { situation: "통증 말해도 되는 분위기", say: "“아픈 거 말하는 건 민폐가 아니라 안전이야. 무리하지 말자.”" },
+          { situation: "장비/규칙 제안", say: "“이건 개인 얘기가 아니라 모임 규칙으로 정하자.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "안전 얘기하면 분위기 처져요.", a: "짧게 룰로만 합의하면 됩니다. 길게 설득할수록 오히려 반감이 생겨요." }],
+      },
+    ],
+    related: ["sports-pace-mismatch", "sports-no-show-cancel", "sports-skill-gap-coaching", "sports-competition-tension"],
+  },
+
+  // =========================
+  // GAMES (게임모임) (5)
+  // =========================
+  {
+    slug: "games-role-conflict",
+    groupType: "GAMES",
+    title: "게임모임이 ‘역할/포지션’ 때문에 감정 상할 때",
+    description:
+      "누구는 이기고 싶고, 누구는 편하게 하고 싶고, 누군가는 늘 같은 역할을 맡습니다. 역할 갈등을 사람 싸움으로 만들지 않는 룰.",
+    keywords: ["게임모임", "역할", "포지션", "팀플", "갈등"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "역할 갈등 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 특정 사람이 늘 같은 역할",
+            when: "항상 탱/서폿/총대 역할이 고정돼요.",
+            why: "고정은 편하지만, 누적되면 희생이 됩니다.",
+            tip: "로테이션: **“오늘 A, 다음 B”**를 공개적으로.",
+          },
+          {
+            title: "2) 역할이 ‘명령’처럼 배정됨",
+            when: "상대의 선택이 아니라 지시로 느껴져요.",
+            why: "게임은 취향이 강해서 강요가 빨리 감정으로 번집니다.",
+            tip: "선택지로 제안: **“A 할래, B 할래?”**",
+          },
+          {
+            title: "3) 실수 책임이 특정 역할에 몰림",
+            when: "패배 원인을 한 사람에게만 붙여요.",
+            why: "팀 게임은 책임 전가가 쉬운 구조입니다.",
+            tip: "리뷰는 팀 기준: **“다음엔 시야/타이밍을 맞추자.”**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 역할 룰이 필요해요",
+        items: [
+          { title: "한 사람이 점점 말이 줄 때", detail: "이미 부담이 쌓인 상태일 수 있어요." },
+          { title: "‘왜 그랬어’가 잦아질 때", detail: "피드백이 아니라 비난으로 이동 중입니다." },
+          { title: "같은 사람만 희생 역할을 맡을 때", detail: "모임 지속성이 떨어집니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["역할 로테이션", "선택지로 배정", "리뷰는 팀 기준"],
+          dont: ["희생 고정", "지시형 배정", "개인 탓 몰아가기"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "역할 갈등 줄이는 룰 4개",
+        items: [
+          { title: "룰 1) 역할은 로테이션", how: "희생이 누적되지 않게.", example: "“오늘 A, 다음 B”" },
+          { title: "룰 2) 배정은 선택지로", how: "강요를 줄입니다.", example: "“A/B 중 뭐 할래?”" },
+          { title: "룰 3) 패배 리뷰는 2개만", how: "과하면 감정이 됩니다.", example: "“좋았던 점 1, 바꿀 점 1.”" },
+          { title: "룰 4) ‘연습 판’ 합의", how: "실수 허용 공간을 만듭니다.", example: "“첫 2판은 적응 판.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "역할 관련 문장",
+        items: [
+          { situation: "희생 고정 끊기", say: "“나도 가끔 다른 역할 해보고 싶어. 다음 판은 로테이션하자.”" },
+          { situation: "배정 제안", say: "“이번 판 A랑 B 중 뭐 할래?”" },
+          { situation: "개인 탓 흐름", say: "“개인 탓보다 팀 움직임을 맞추는 쪽으로 정리하자.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "로테이션하면 승률 떨어져요.", a: "그래서 ‘연습 판/진지 판’ 모드를 나누면 됩니다. 둘 다 살릴 수 있어요." }],
+      },
+    ],
+    related: ["games-tilt-toxic-chat", "games-schedule-queue", "games-loot-credit", "games-newbie-onboarding"],
+  },
+
+  {
+    slug: "games-tilt-toxic-chat",
+    groupType: "GAMES",
+    title: "게임모임에서 말이 거칠어져 ‘틸트’가 퍼질 때",
+    description:
+      "한 사람이 흔들리면 팀 전체 톤이 망가집니다. 화를 없애자는 게 아니라, 퍼지지 않게 막는 최소 룰을 정리했어요.",
+    keywords: ["게임모임", "틸트", "채팅", "분위기", "갈등"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "틸트가 퍼지는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 지적이 ‘즉시’ 튀어나옴",
+            when: "실수 직후 말이 먼저 나가요.",
+            why: "감정이 올라간 상태에선 문장이 공격으로 들립니다.",
+            tip: "경기 중엔 금지: **리뷰는 끝나고 2개만**",
+          },
+          {
+            title: "2) 농담이 비꼼으로 변함",
+            when: "웃기려던 말이 상대에겐 조롱으로 들려요.",
+            why: "텍스트/음성 톤이 날카로워지면 해석이 악화됩니다.",
+            tip: "대상 고정: **사람이 아니라 상황**",
+          },
+          {
+            title: "3) 분위기 회복 없이 연속 큐",
+            when: "망한 판 다음 바로 들어가서 더 망해요.",
+            why: "회복 시간 없이 감정이 누적됩니다.",
+            tip: "리셋 2분: **물 한 잔 + 한 문장 정리**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 잠깐 멈추세요",
+        items: [
+          { title: "말투 얘기가 나오기 시작", detail: "게임이 아니라 감정 싸움으로 넘어가는 중입니다." },
+          { title: "침묵이 길어짐", detail: "이미 불편함이 쌓였을 수 있어요." },
+          { title: "연속 패배 후 바로 다음 판 강행", detail: "틸트 누적 위험이 큽니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["리뷰는 끝나고 2개", "사람 아닌 상황", "리셋 2분"],
+          dont: ["실수 직후 지적", "비꼼/조롱", "연속 큐로 감정 누적"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "틸트 확산 막는 룰 4개",
+        items: [
+          { title: "룰 1) 경기 중 지적 금지", how: "감정 폭발을 막습니다.", example: "“끝나고 정리하자.”" },
+          { title: "룰 2) 리뷰는 2개만", how: "과한 피드백은 비난이 됩니다.", example: "“좋았던 점 1, 바꿀 점 1.”" },
+          { title: "룰 3) 리셋 2분", how: "회복 시간을 주기.", example: "“2분 쉬고 다음.”" },
+          { title: "룰 4) 톤이 흔들리면 콜로", how: "텍스트보다 오해가 줄어요.", example: "“이건 말로 1분만 정리하자.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "분위기 정리 문장",
+        items: [
+          { situation: "실수 직후 말이 나갈 때", say: "“지금은 플레이에 집중하고, 끝나고 짧게 정리하자.”" },
+          { situation: "비꼼으로 들릴 때", say: "“사람 얘기 말고 상황 얘기만 하자.”" },
+          { situation: "연속 큐 멈추기", say: "“2분만 쉬고 가자. 지금은 감정이 올라온 것 같아.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "아예 아무 말도 하면 답답해요.", a: "그래서 ‘경기 중 금지’이고 ‘경기 후 짧게’는 허용하는 구조가 필요합니다." }],
+      },
+    ],
+    related: ["games-role-conflict", "games-schedule-queue", "games-loot-credit", "games-newbie-onboarding"],
+  },
+
+  {
+    slug: "games-schedule-queue",
+    groupType: "GAMES",
+    title: "게임모임이 ‘접속 시간’ 때문에 계속 어긋날 때",
+    description:
+      "말은 ‘언제든 가능’인데 실제로는 아무도 못 맞추는 모임. 시간 합의를 감정이 아니라 구조로 해결하는 방법.",
+    keywords: ["게임모임", "접속", "스케줄", "약속", "운영"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "스케줄이 꼬이는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) ‘가능한 시간’만 모으고 확정을 안 함",
+            when: "다들 시간은 말하는데 결론이 없어요.",
+            why: "수집과 선택이 섞이면 끝이 없습니다.",
+            tip: "**수집 24시간 → 확정 2시간**으로 분리",
+          },
+          {
+            title: "2) 늦는 사람이 기준이 됨",
+            when: "항상 기다리는 사람이 생겨요.",
+            why: "기다림 룰이 없으면 기다리는 사람이 손해를 봅니다.",
+            tip: "SLA 합의: **“10분 대기, 이후엔 시작”**",
+          },
+          {
+            title: "3) 고정 루틴이 없음",
+            when: "매번 새로 잡다가 흐지부지 돼요.",
+            why: "고정이 없으면 우선순위가 밀립니다.",
+            tip: "고정 슬롯 1개: **“주 1회 고정, 추가는 보너스”**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 룰이 필요해요",
+        items: [
+          { title: "대기 시간이 늘어날 때", detail: "기다림이 모임의 기본값이 됐습니다." },
+          { title: "확정 직전에 잠수자가 나올 때", detail: "확정이 구속처럼 느껴지는 상태예요." },
+          { title: "결국 2~3명만 하게 될 때", detail: "구조가 사람을 떨어뜨립니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["수집/확정 분리", "대기 SLA", "고정 슬롯"],
+          dont: ["확정 없는 수다", "무한 대기", "매번 새로 일정 잡기"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "접속이 맞아지는 룰 4개",
+        items: [
+          { title: "룰 1) 수집 24시간", how: "가능 시간을 먼저 모읍니다.", example: "“내일 9시까지 가능 시간만.”" },
+          { title: "룰 2) 확정 2시간", how: "그 다음엔 확정만 합니다.", example: "“A/B 중 투표, 오늘 10시 마감.”" },
+          { title: "룰 3) 대기 10분", how: "기다림을 시스템으로.", example: "“10분 대기 후 시작.”" },
+          { title: "룰 4) 고정 슬롯 1개", how: "모임이 습관이 됩니다.", example: "“매주 금 10시 고정.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "단톡 문장",
+        items: [
+          { situation: "가능 시간 수집", say: "“내일 9시까지 가능 시간만 주세요. 그 후 A/B로 확정 투표 올릴게요.”" },
+          { situation: "대기 룰", say: "“10분까지 대기하고, 이후엔 들어오는 사람끼리 시작하자.”" },
+          { situation: "고정 슬롯 제안", say: "“주 1회 고정 슬롯 만들면 스트레스가 줄 것 같아.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "룰 만들면 딱딱해져요.", a: "룰이 없을 때 더 피곤해집니다. 최소 룰이 오히려 편해져요." }],
+      },
+    ],
+    related: ["games-role-conflict", "games-tilt-toxic-chat", "games-loot-credit", "games-newbie-onboarding"],
+  },
+
+  {
+    slug: "games-loot-credit",
+    groupType: "GAMES",
+    title: "게임모임에서 ‘보상/기여도’ 때문에 미묘해질 때",
+    description:
+      "아이템, 보상, 점수, 기여도는 작은 것 같아도 감정을 건드립니다. 불공평 체감이 쌓이기 전에 룰로 정리하는 방법.",
+    keywords: ["게임모임", "보상", "기여도", "공정", "규칙"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "보상/기여도 갈등 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 기준이 없다가 이긴 뒤에 싸움",
+            when: "좋을 땐 넘어가다가, 한 번 꼬이면 폭발해요.",
+            why: "기준이 없으면 결과가 나쁜 날에만 공정이 문제가 됩니다.",
+            tip: "시작 전에 한 줄 합의: **“보상은 ○○ 기준”**",
+          },
+          {
+            title: "2) 기여도를 말로만 판단",
+            when: "눈에 보이는 플레이만 기여로 인정돼요.",
+            why: "지원/정보/콜 같은 기여는 과소평가되기 쉽습니다.",
+            tip: "기여 범위 선언: **콜/시야/세팅도 기여**",
+          },
+          {
+            title: "3) 보상이 반복적으로 한쪽으로 쏠림",
+            when: "우연이지만 체감은 불공평해요.",
+            why: "체감 불공평은 누적되면 관계를 식힙니다.",
+            tip: "로테이션 또는 우선권: **“이번엔 A, 다음엔 B”**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 룰을 먼저 세워야 해요",
+        items: [
+          { title: "“항상 너만” 같은 문장이 나올 때", detail: "체감 불공평이 이미 쌓였습니다." },
+          { title: "보상 얘기가 자주 ‘끝나고’ 나올 때", detail: "본게임 중엔 말 못 하는 분위기일 수 있어요." },
+          { title: "기여도를 인격처럼 평가할 때", detail: "게임이 아니라 관계 싸움이 됩니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["시작 전 기준 1줄", "보이지 않는 기여 인정", "우선권/로테이션"],
+          dont: ["결과 후에 룰 만들기", "기여도를 사람 평가로", "한쪽으로 반복 쏠림 방치"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "공정 체감 지키는 룰 4개",
+        items: [
+          { title: "룰 1) 시작 전에 기준 1줄", how: "나중 싸움을 줄입니다.", example: "“보상은 랜덤/기여/필요 기반” 중 하나 선택." },
+          { title: "룰 2) 기여 범위 합의", how: "지원 기여를 인정합니다.", example: "“콜/세팅/서포트도 기여.”" },
+          { title: "룰 3) 우선권 로테이션", how: "쏠림을 막아요.", example: "“이번 A, 다음 B.”" },
+          { title: "룰 4) 불만은 다음 판에 반영", how: "오늘을 깨지 않기.", example: "“이번엔 이렇게, 다음에 조정.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "보상/기여도 문장",
+        items: [
+          { situation: "시작 전 합의", say: "“보상 기준을 먼저 정하자. 오늘은 필요 기반으로 가는 게 어때?”" },
+          { situation: "지원 기여 인정", say: "“콜/세팅도 기여야. 그 부분도 같이 보자.”" },
+          { situation: "불만이 나올 때", say: "“오케이. 오늘은 일단 마무리하고, 다음 판부터 룰 조정하자.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "룰이 너무 복잡해져요.", a: "한 줄 기준만 정하면 됩니다. 복잡해질수록 오히려 분쟁이 늘어요." }],
+      },
+    ],
+    related: ["games-role-conflict", "games-tilt-toxic-chat", "games-schedule-queue", "games-newbie-onboarding"],
+  },
+
+  {
+    slug: "games-newbie-onboarding",
+    groupType: "GAMES",
+    title: "게임모임에 초보/복귀 유저가 왔을 때 분위기 안 깨는 법",
+    description:
+      "잘하는 사람은 답답하고, 초보는 위축되고, 결국 둘 다 재미가 줄어듭니다. 실력 차이를 ‘배려’가 아니라 ‘구조’로 해결하는 방법.",
+    keywords: ["게임모임", "초보", "복귀", "온보딩", "분위기"],
+    sections: [
+      {
+        type: "PATTERNS_TOP3",
+        title: "초보가 어색해지는 패턴 TOP 3",
+        items: [
+          {
+            title: "1) 설명이 길어서 수업이 됨",
+            when: "게임 시작 전에 설명만 하다가 피곤해져요.",
+            why: "설명은 참여가 아니라 청취가 됩니다.",
+            tip: "설명은 30초, 나머지는 **하면서 1개씩**",
+          },
+          {
+            title: "2) 실수 후 반응이 세짐",
+            when: "초보가 실수하면 분위기가 얼어요.",
+            why: "초보는 실수 자체보다 표정/톤에 더 위축됩니다.",
+            tip: "합의 문장: **“첫 2판은 적응 판”**",
+          },
+          {
+            title: "3) 목표가 ‘승리’로만 고정",
+            when: "연습인데도 승패로만 평가돼요.",
+            why: "초보가 즐길 공간이 사라집니다.",
+            tip: "목표를 단계화: **V1=적응, V2=승리**",
+          },
+        ],
+      },
+      {
+        type: "TRIGGERS",
+        title: "이 신호가 나오면 온보딩 구조가 필요해요",
+        items: [
+          { title: "초보가 질문을 안 하게 될 때", detail: "이미 위축된 상태일 수 있어요." },
+          { title: "잘하는 사람이 말이 거칠어질 때", detail: "답답함이 공격으로 번질 위험이 있습니다." },
+          { title: "초보가 다음 약속을 피할 때", detail: "즐거움이 아니라 부담이 됐습니다." },
+        ],
+      },
+      {
+        type: "CAUTION",
+        title: "DO / DON’T",
+        items: {
+          do: ["적응 판 합의", "설명은 짧게", "목표 단계화"],
+          dont: ["수업식 장문 설명", "실수 직후 지적", "승패로만 평가"],
+        },
+      },
+      {
+        type: "RULES",
+        title: "초보가 자연스럽게 섞이는 룰 4개",
+        items: [
+          { title: "룰 1) 첫 2판은 적응", how: "승패보다 익숙함을 우선합니다.", example: "“첫 2판은 적응 판.”" },
+          { title: "룰 2) 설명은 30초", how: "나머지는 플레이 중 1개씩.", example: "“핵심 1개만 말하고 시작.”" },
+          { title: "룰 3) 실수는 ‘정상’", how: "실수 프레임 합의.", example: "“실수는 연습의 일부.”" },
+          { title: "룰 4) 역할은 쉬운 것부터", how: "초보 부담을 줄입니다.", example: "“처음엔 쉬운 역할로 시작.”" },
+        ],
+      },
+      {
+        type: "SCRIPTS",
+        title: "온보딩 문장",
+        items: [
+          { situation: "시작 전 합의", say: "“오늘 첫 2판은 적응 판으로 하자. 승패는 신경 덜 쓰고.”" },
+          { situation: "설명 길어질 때", say: "“일단 시작하고, 필요한 건 한 개씩 말해줄게.”" },
+          { situation: "실수했을 때", say: "“괜찮아. 적응 판이니까 편하게 해.”" },
+        ],
+      },
+      {
+        type: "FAQ",
+        title: "FAQ",
+        items: [{ q: "그러면 고수는 재미없어요.", a: "모드를 분리하면 됩니다. 적응 판 이후에 ‘진지 판’을 짧게 넣으면 둘 다 만족도가 올라가요." }],
+      },
+    ],
+    related: ["games-role-conflict", "games-tilt-toxic-chat", "games-schedule-queue", "games-loot-credit"],
+  },
+
 ];
 
 const norm = (s: string) => decodeURIComponent(s).trim().toLowerCase();
@@ -1822,4 +2068,8 @@ const norm = (s: string) => decodeURIComponent(s).trim().toLowerCase();
 export function getGuide(slug: string) {
   const key = norm(slug);
   return GUIDES.find((g) => norm(g.slug) === key) ?? null;
+}
+
+export function listGuidesByGroup(groupType: GroupType) {
+  return GUIDES.filter((g) => g.groupType === groupType);
 }

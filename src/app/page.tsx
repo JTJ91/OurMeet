@@ -3,8 +3,10 @@
 import EgoGraphCanvasResponsive, { EgoNode } from "@/components/EgoGraphCanvasResponsive";
 import { calcCompatLevel, calcCompatScore } from "@/lib/mbtiCompat";
 import BottomCTA from "@/components/BottomCTA";
+import ClientOverlays from "@/components/ClientOverlays";
 import { useMemo, useState } from "react";
 import Link from "next/link";
+
 
 export default function Home() {
   const members = [
@@ -62,25 +64,9 @@ export default function Home() {
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-10">
       {/* Centered "mobile-like" container */}
       <div className="mx-auto flex min-h-screen max-w-[760px] flex-col px-5 pt-8">
-        {/* Header */}
-        <header className="text-center">
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
-            모임<span className="text-[#1E88E5]">랭킹</span>
-          </h1>
-          <p className="mt-3 text-sm text-slate-600">
-            모임 안에서 <b className="text-[#1E88E5]">MBTI 인지기능</b>을 활용해 <br/>서로의 관계 케미를 재미로 살펴봐요
-          </p>
-
-          <br/>
-          <p>
-            <Link href="/cognitive-functions" className="text-sm text-slate-500 underline underline-offset-4 hover:text-slate-700">
-              MBTI 인지기능이란?
-            </Link>
-          </p>
-        </header>
 
         {/* Hero */}
-        <section className="mt-10">
+        <section className="">
           <div className="rounded-3xl bg-white/70 p-6 shadow-sm ring-1 ring-black/5">
             <h1 className="text-3xl font-extrabold leading-tight">
               우리 모임<br />
@@ -160,7 +146,8 @@ export default function Home() {
       </div>
 
       <BottomCTA />
-
+      
     </main>
   );
 }
+
