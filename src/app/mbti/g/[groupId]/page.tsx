@@ -11,7 +11,7 @@ import ChemReportSection from "@/app/mbti/g/[groupId]/components/ChemReportSecti
 import TouchSavedGroupClient from "@/app/components/TouchSavedGroupClient";
 import SaveGroupClient from "@/app/components/SaveGroupClient";
 import ChemTopWorst from "./components/ChemTopWorst";
-
+import ExportGroupImageButton from "@/app/components/ExportGroupImageButton";
 
 import Link from "next/link";
 import { Suspense } from "react";
@@ -886,6 +886,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
 
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-10">
+    <div id="capture-root">
       <div className="mx-auto max-w-[760px] px-5 pt-6">
         {/* Top left back */}
         <div className="flex items-center justify-between">
@@ -1263,7 +1264,8 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
         </section>
       </div>
 
-    
+    </div>
+    <ExportGroupImageButton targetId="capture-root" fileTitle={group.name} />
     </main>
   );
 }
