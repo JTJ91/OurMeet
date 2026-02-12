@@ -197,7 +197,7 @@ export default function BottomCTA() {
                                 {/* (선택) 내 정보 표시 */}
                                 {(g.myNickname || g.myMbti) && (
                                   <div className="mt-1 truncate text-[11px] font-bold text-slate-500">
-                                    내 정보: {g.myNickname ?? "?"}
+                                    {g.myNickname ?? "?"}
                                     {g.myMbti ? ` · ${g.myMbti.toUpperCase()}` : ""}
                                   </div>
                                 )}

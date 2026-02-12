@@ -28,6 +28,9 @@ const TREE: TreeGroup[] = [
     children: [
       { type: "link", label: "MBTI 홈", desc: "메인으로 이동", href: "/mbti" },
 
+      // ✅ 여기 추가
+      { type: "link", label: "MBTI 검사", desc: "60문항 정식 검사", href: "/mbti-test" },
+
       { type: "heading", label: "가이드" },
       { type: "link", label: "인지기능", desc: "개념을 3분만에", href: "/mbti/cognitive-functions" },
       { type: "link", label: "모임 속 MBTI", desc: "친구/회사/동네/운동/게임", href: "/guides/mbti" },
@@ -342,31 +345,31 @@ export default function AppHeader() {
                                     );
                                   }
 
-  return (
-    <li key={it.href}>
-      <Link
-        href={it.href}
-        onClick={() => setOpen(false)}
-        className={[
-          "group relative flex items-center px-6 py-2",
-          "text-sm font-semibold transition",
-          active
-            ? "text-[#1E88E5] bg-[#1E88E5]/5"
-            : "text-slate-700 hover:bg-slate-900/5",
-        ].join(" ")}
-      >
-        <span
-          aria-hidden
-          className={[
-            "absolute left-4 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-full transition",
-            active ? "bg-[#1E88E5]" : "bg-transparent group-hover:bg-[#1E88E5]",
-          ].join(" ")}
-        />
-        <span className="truncate">{it.label}</span>
-      </Link>
-    </li>
-  );
-}
+                                  return (
+                                    <li key={it.href}>
+                                      <Link
+                                        href={it.href}
+                                        onClick={() => setOpen(false)}
+                                        className={[
+                                          "group relative flex items-center px-8 py-2",
+                                          "text-sm font-semibold transition",
+                                          active
+                                            ? "text-[#1E88E5] bg-[#1E88E5]/5"
+                                            : "text-slate-700 hover:bg-slate-900/5",
+                                        ].join(" ")}
+                                      >
+                                        <span
+                                          aria-hidden
+                                          className={[
+                                            "absolute left-6 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-full transition",
+                                            active ? "bg-[#1E88E5]" : "bg-transparent group-hover:bg-[#1E88E5]",
+                                          ].join(" ")}
+                                        />
+                                        <span className="truncate">{it.label}</span>
+                                      </Link>
+                                    </li>
+                                  );
+                                }
 
 
                                 // (B) 최근 모임 토글
@@ -379,7 +382,7 @@ export default function AppHeader() {
                                         setRecentOpen((v) => !v);
                                       }}
                                       className={[
-                                        "group relative flex w-full items-center px-6 py-2 text-left",
+                                        "group relative flex w-full items-center px-8 py-2 text-left",
                                         "text-sm font-semibold transition",
                                         recentOpen
                                           ? "text-[#1E88E5] bg-[#1E88E5]/5"
@@ -425,7 +428,7 @@ export default function AppHeader() {
                                     <div className="overflow-hidden">
                                         <div className="px-4 pb-3">
                                         {/* ✅ panel */}
-                                        <div className="mt-2 rounded-3xl bg-[#F5F9FF] p-3 ring-1 ring-black/5">
+                                        <div className="mt-2 rounded-3xl p-3 ring-1 ring-black/5">
                                             {!groups.length ? (
                                             <div className="rounded-2xl bg-white/70 p-3 text-xs font-semibold text-slate-600 ring-1 ring-black/5">
                                                 모임을 만들거나 참여하면 여기에 기록돼요
@@ -443,7 +446,7 @@ export default function AppHeader() {
                                                         href={href}
                                                         onClick={() => setOpen(false)}
                                                         className="
-                                                        group flex-1 rounded-2xl bg-white/80 px-3 py-2
+                                                        group flex-1 rounded-2xl bg-[#F5F9FF] px-3 py-2 
                                                         ring-1 ring-black/5
                                                         hover:bg-white hover:ring-black/10
                                                         transition
@@ -457,7 +460,7 @@ export default function AppHeader() {
 
                                                             {(gr.myNickname || gr.myMbti) && (
                                                             <div className="mt-0.5 truncate text-[11px] font-bold text-slate-500">
-                                                                내 정보: {gr.myNickname ?? "?"}
+                                                                {gr.myNickname ?? "?"}
                                                                 {gr.myMbti ? ` · ${gr.myMbti.toUpperCase()}` : ""}
                                                             </div>
                                                             )}
@@ -492,11 +495,6 @@ export default function AppHeader() {
                                                 })}
                                             </ul>
                                             )}
-
-                                            {/* ✅ footnote */}
-                                            <div className="mt-3 rounded-2xl bg-white/60 p-3 text-[11px] font-semibold text-slate-500 ring-1 ring-black/5">
-                                            ※ 이 목록은 이 기기(브라우저)에만 저장돼요.
-                                            </div>
                                         </div>
                                         </div>
                                     </div>

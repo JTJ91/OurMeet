@@ -9,15 +9,15 @@ export const metadata = {
 export default function CognitiveFunctionsGuidePage() {
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
-      <div className="mx-auto w-full max-w-3xl px-4 pb-10 pt-10">
+      <div className="mx-auto w-full max-w-3xl px-4 pb-10 pt-8">
         {/* Top left back */}
         <div className="flex items-center justify-between mb-4">
           <Link
-            href="/"
+            href="/mbti"
             className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 backdrop-blur hover:bg-white"
           >
             <span aria-hidden>←</span>
-            <span>메인으로</span>
+            <span>MBTI 홈</span>
           </Link>
         </div>
         

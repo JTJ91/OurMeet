@@ -10,7 +10,7 @@ export default function MbtiGuidesPage() {
 
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
-      <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-10">
+      <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-8">
         <div id="top" />
 
         {/* 뒤로가기 */}

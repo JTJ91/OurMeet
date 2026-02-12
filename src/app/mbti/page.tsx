@@ -91,6 +91,14 @@ export default function Home() {
               서로의 <b className="text-slate-800">생각 방식과 대화 리듬</b>을 비교해
               관계 케미를 확인해요.
             </p>
+
+            <Link
+              href="/mbti/cognitive-functions"
+              className="mt-3 inline-block text-xs font-bold text-slate-500 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-700"
+            >
+              MBTI 인지기능이란?
+            </Link>
+
           </div>
         </section>
 
@@ -108,6 +116,54 @@ export default function Home() {
             />
           </div>
         </section>
+
+        {/* MBTI Quick Actions */}
+        <section className="mt-6">
+          <div className="rounded-3xl bg-white/80 p-4 ring-1 ring-black/5 shadow-sm">
+            <div className="mb-3 text-sm font-bold text-slate-800">
+              MBTI가 아직 없다면?
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+
+              {/* 정식 검사 */}
+              <Link href="/mbti-test" className="block">
+                <div className="
+                  flex h-14 flex-col items-start justify-center
+                  rounded-2xl bg-[#1E88E5] px-4 text-white
+                  transition hover:brightness-110 active:scale-[0.98]
+                ">
+                  <div className="text-sm font-extrabold">
+                    MBTI 검사
+                  </div>
+                  <div className="text-[11px] font-semibold text-white/80">
+                    60문항 정식 테스트
+                  </div>
+                </div>
+              </Link>
+
+              {/* 가이드 */}
+              <Link href="/guides/mbti" className="block">
+                <div className="
+                  flex h-14 flex-col items-start justify-center
+                  rounded-2xl bg-[#F5F9FF] px-4
+                  text-[#1E88E5] ring-1 ring-[#1E88E5]/20
+                  transition hover:bg-[#E9F2FF] active:scale-[0.98]
+                ">
+                  <div className="text-sm font-extrabold">
+                    모임 속 MBTI
+                  </div>
+                  <div className="text-[11px] font-semibold text-[#1E88E5]/70">
+                    인지기능 & 케미 설명
+                  </div>
+                </div>
+              </Link>
+
+            </div>
+          </div>
+        </section>
+
+
 
         {/* Steps */}
         <section className="mt-6">

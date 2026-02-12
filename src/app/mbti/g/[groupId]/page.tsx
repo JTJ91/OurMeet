@@ -960,7 +960,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
               <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/5">
                 <div className="flex items-center justify-between">
                       <div className="text-sm font-extrabold">🧭 관계도 로딩 중</div>
-                  <div className="text-[11px] text-slate-500">잠깐만요</div>
+                  <div className="text-[11px] text-slate-500">잠시만요</div>
                 </div>
 
                 <div className="mt-3 h-[360px] w-full rounded-2xl bg-white/60 ring-1 ring-black/5 animate-pulse" />

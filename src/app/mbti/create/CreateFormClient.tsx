@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createGroupAction } from "@/app/mbti/actions/group";
 import { upsertSavedGroup } from "@/app/lib/mbti/groupHistory";
 import { useRouter } from "next/navigation";
 import MbtiTestModal from "@/app/components/mbtiTest/MbtiTestModal8";
+import { useSearchParams } from "next/navigation";
 
 
 function isValidMbti(mbti: string) {
@@ -21,12 +22,34 @@ export default function CreateFormClient() {
   const [testOpen, setTestOpen] = useState(false);
   const mbtiInputRef = useRef<HTMLInputElement | null>(null);
 
+  const sp = useSearchParams();
+  
+  // ✅ /mbti/create?mbti=ENFP 로 들어오면 자동 입력
+  useEffect(() => {
+    const raw = (sp.get("mbti") || "")
+      .replace(/\s/g, "")
+      .toUpperCase()
+      .replace(/[^EINSFTJP]/g, "")
+      .slice(0, 4);
+
+    if (!raw) return;
+
+    if (mbtiInputRef.current) {
+      mbtiInputRef.current.value = raw;
+      // UX: 들어오자마자 포커스 줄 필요 없으면 지워도 됨
+      // mbtiInputRef.current.focus();
+    }
+
+    setMbtiError(raw.length === 4 && !isValidMbti(raw) ? "MBTI 형식이 올바르지 않아요. 예) ENFP" : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sp]);
+
   return (
     <form
       action={async (fd: FormData) => {
         try {
           const result = await createGroupAction(fd);
-
+          
           upsertSavedGroup({
             id: result.groupId,
             name: result.groupName,
@@ -111,13 +134,24 @@ export default function CreateFormClient() {
           <div className="text-sm font-bold text-slate-800">MBTI</div>
 
           <button
-            type="button"
-            disabled={isSubmitting}
-            onClick={() => setTestOpen(true)}
-            className="rounded-full bg-white/70 px-3 py-1.5 text-[11px] font-extrabold text-slate-700 ring-1 ring-black/10 hover:bg-white disabled:opacity-60"
-          >
-            🧪 MBTI 검사하기
-          </button>
+          type="button"
+          onClick={() => setTestOpen(true)}
+          className="
+            inline-flex items-center justify-center
+            rounded-full
+            bg-[#1E88E5]
+            px-4 py-2
+            text-[12px] font-black text-white
+            shadow-sm ring-1 ring-[#1E88E5]/30
+            transition-all duration-200
+            hover:brightness-110 hover:shadow-md
+            active:scale-[0.97]
+            disabled:opacity-50 disabled:cursor-not-allowed
+          "
+        >
+          MBTI 간단 검사
+        </button>
+
         </div>
 
         <input

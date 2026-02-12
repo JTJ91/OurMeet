@@ -23,7 +23,7 @@ export default function Footer() {
             <span className="text-slate-300">·</span>
             <Link href="/guides/mbti" className="hover:text-slate-700 transition">모임 속 MBTI</Link>
             <span className="text-slate-300">·</span>
-            <Link href="/systems/mbti/cognitive-functions" className="hover:text-slate-700 transition">인지기능</Link>
+            <Link href="/mbti/cognitive-functions" className="hover:text-slate-700 transition">인지기능</Link>
             <span className="text-slate-300">·</span>
             <Link href="/faq" className="hover:text-slate-700 transition">자주 묻는 질문</Link>
           </>
