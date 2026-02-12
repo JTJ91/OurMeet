@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     url: "https://www.moimrank.com/",
     images: [
       {
-        url: "https://www.moimrank.com/og_20260210.png",
+        url: "https://www.moimrank.com/og.png",
         width: 1200,
         height: 630,
       },
