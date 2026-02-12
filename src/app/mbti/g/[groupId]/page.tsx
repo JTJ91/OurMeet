@@ -11,7 +11,7 @@ import ChemReportSection from "@/app/mbti/g/[groupId]/components/ChemReportSecti
 import TouchSavedGroupClient from "@/app/components/TouchSavedGroupClient";
 import SaveGroupClient from "@/app/components/SaveGroupClient";
 import ChemTopWorst from "./components/ChemTopWorst";
-import ExportGroupImageButton from "@/app/components/ExportGroupImageButton";
+
 
 import Link from "next/link";
 import { Suspense } from "react";
@@ -936,7 +936,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
 
           </div>
         </section>
-        <div id="capture-root">
+
         <Suspense
           fallback={
             <section className="mt-6">
@@ -956,8 +956,6 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
         >
           <GraphServer groupId={groupId} centerId={centerId} />
         </Suspense>
-
-        <div id="graph-portal-root" />
 
         {/* ✅ 최고 / 최악 */}
         <SectionCard2
@@ -1256,7 +1254,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
               </>
           )}
         </SectionCard2>
-        </div>
+
         <section className="mt-6">
           <div className="rounded-3xl bg-white/70 p-5 ring-1 ring-black/5">
             <p className="text-xs leading-relaxed text-slate-500">
@@ -1267,7 +1265,6 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
       </div>
 
 
-    <ExportGroupImageButton targetId="capture-root" fileTitle={group.name} />
     </main>
   );
 }
