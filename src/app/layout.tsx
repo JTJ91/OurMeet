@@ -21,6 +21,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "moimrank",
   description: "관계 랭킹 바로 확인!",
+  icons: {
+    icon: "/favicon.png",
+  },
   openGraph: {
     type: "website",
     title: "moimrank - 모임 랭킹",
@@ -35,6 +38,8 @@ export const metadata: Metadata = {
     ],
   },
 };
+
+
 
 export default function RootLayout({
   children,
