@@ -87,28 +87,30 @@ function formatRelativeTime(ts: number) {
 
 function MenuIcon({ open }: { open: boolean }) {
   return (
-    <div className="relative h-5 w-6">
+    <div className="relative h-4 w-4.5">
       <span
         className={[
-          "absolute left-0 top-0 h-[2px] w-6 rounded bg-slate-900 transition-all duration-300",
-          open ? "top-[9px] rotate-45" : "",
+          "absolute left-0 top-0 h-[1.5px] w-4.5 rounded bg-slate-900 transition-all duration-300",
+          open ? "top-[6px] rotate-45" : "",
         ].join(" ")}
       />
       <span
         className={[
-          "absolute left-0 top-[9px] h-[2px] w-6 rounded bg-slate-900 transition-all duration-300",
+          "absolute left-0 top-[6px] h-[1.5px] w-4.5 rounded bg-slate-900 transition-all duration-300",
           open ? "opacity-0" : "opacity-100",
         ].join(" ")}
       />
       <span
         className={[
-          "absolute left-0 top-[18px] h-[2px] w-6 rounded bg-slate-900 transition-all duration-300",
-          open ? "top-[9px] -rotate-45" : "",
+          "absolute left-0 top-[12px] h-[1.5px] w-4.5 rounded bg-slate-900 transition-all duration-300",
+          open ? "top-[6px] -rotate-45" : "",
         ].join(" ")}
       />
     </div>
   );
 }
+
+
 
 export default function AppHeader() {
   const pathname = usePathname();
@@ -432,8 +434,8 @@ export default function AppHeader() {
                                             <ul className="space-y-2">
                                                 {groups.map((gr) => {
                                                 const href = gr.myMemberId
-                                                    ? `/g/${gr.id}?center=${gr.myMemberId}`
-                                                    : `/g/${gr.id}`;
+                                                    ? `/mbti/g/${gr.id}?center=${gr.myMemberId}`
+                                                    : `/mbti/g/${gr.id}`;
 
                                                 return (
                                                     <li key={gr.id} className="flex items-center gap-2">
