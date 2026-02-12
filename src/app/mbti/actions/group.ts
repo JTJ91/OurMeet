@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/app/lib/mbti/prisma";
+import { revalidatePath } from "next/cache"; // ✅ 추가
 
 type JudgeStyle = "LOGIC" | "PEOPLE";
 type InfoStyle = "IDEA" | "FACT";
@@ -83,6 +84,10 @@ export async function createGroupAction(formData: FormData) {
 
   const memberId = group.members[0]?.id;
   if (!memberId) throw new Error("멤버 생성에 실패했어요.");
+
+  // ✅ 새 방 생성 후: 목록/해당 방 페이지 캐시 무효화
+  revalidatePath("/mbti");                 // 홈/랭킹/최근 모임 등
+  revalidatePath(`/mbti/g/${group.id}`);   // 방 상세(바로 들어갈 거라면)
 
   return {
     groupId: group.id,

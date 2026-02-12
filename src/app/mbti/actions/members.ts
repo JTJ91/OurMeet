@@ -54,7 +54,9 @@ export async function joinGroupAction(formData: FormData) {
     select: { id: true },
   });
 
-  revalidatePath(`/g/${groupId}`);
+  // ✅ 새 방 생성 후: 목록/해당 방 페이지 캐시 무효화
+  revalidatePath("/mbti");                 // 홈/랭킹/최근 모임 등
+  revalidatePath(`/mbti/g/${group.id}`);   // 방 상세(바로 들어갈 거라면)
 
   return {
     groupId: group.id,
