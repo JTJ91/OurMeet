@@ -957,6 +957,8 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
           <GraphServer groupId={groupId} centerId={centerId} />
         </Suspense>
 
+        <div id="graph-portal-root" />
+
         {/* ✅ 최고 / 최악 */}
         <SectionCard2
           icon="🏆"
