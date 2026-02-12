@@ -571,60 +571,77 @@ function pickRolesForGroup(
 
 /** ✅ 3) 케미 타입 분류 (점수 기반 + 약간의 위트) */
 
+//** ✅ cached rankings (groupId 별 캐시 분리 + best/worst 안정 계산) */
+const getRankings = (groupId: string) =>
+  unstable_cache(
+    async () => {
+      const group = await prisma.group.findUnique({
+        where: { id: groupId },
+        include: { members: true },
+      });
+      if (!group) return null;
 
+      const membersForRank = group.members
+        .filter((m) => isValidMbti(m.mbti))
+        .map((m) => ({
+          id: m.id,
+          nickname: m.nickname,
+          mbti: (m.mbti ?? "").trim().toUpperCase(),
+          judgeStyle: (m.judgeStyle ?? "LOGIC") as JudgeStyle,
+          infoStyle: (m.infoStyle ?? "IDEA") as InfoStyle,
+        }));
 
-/** ✅ cached rankings (원본 유지 + pairs도 같이 반환해 3번에 재사용) */
-const getRankings = unstable_cache(
-  async (groupId: string) => {
-    const group = await prisma.group.findUnique({
-      where: { id: groupId },
-      include: { members: true },
-    });
-    if (!group) return null;
+      const pairs: PairRow[] = [];
 
-    const membersForRank = group.members
-      .filter((m) => isValidMbti(m.mbti))
-      .map((m) => ({
-        id: m.id,
-        nickname: m.nickname,
-        mbti: (m.mbti ?? "").trim().toUpperCase(),
-        judgeStyle: (m.judgeStyle ?? "LOGIC") as JudgeStyle, // ✅
-        infoStyle: (m.infoStyle ?? "IDEA") as InfoStyle,     // ✅
-      }));
+      for (let i = 0; i < membersForRank.length; i++) {
+        for (let j = i + 1; j < membersForRank.length; j++) {
+          const a = membersForRank[i];
+          const b = membersForRank[j];
 
-    const pairs: PairRow[] = [];
-    for (let i = 0; i < membersForRank.length; i++) {
-      for (let j = i + 1; j < membersForRank.length; j++) {
-        const a = membersForRank[i];
-        const b = membersForRank[j];
+          const base = calcCompatScore(a.mbti, b.mbti);
+          const score = adjustChemScoreByStyles(
+            base,
+            { judge: a.judgeStyle, info: a.infoStyle },
+            { judge: b.judgeStyle, info: b.infoStyle }
+          );
 
-        const base = calcCompatScore(a.mbti, b.mbti);
-        const score = adjustChemScoreByStyles(
-          base,
-          { judge: a.judgeStyle, info: a.infoStyle },
-          { judge: b.judgeStyle, info: b.infoStyle }
-        );
-
-        pairs.push({
-          aId: a.id,
-          aName: a.nickname,
-          aMbti: a.mbti,
-          bId: b.id,
-          bName: b.nickname,
-          bMbti: b.mbti,
-          score: score,
-        });
+          pairs.push({
+            aId: a.id,
+            aName: a.nickname,
+            aMbti: a.mbti,
+            bId: b.id,
+            bName: b.nickname,
+            bMbti: b.mbti,
+            score,
+          });
+        }
       }
-    }
 
-    const best3 = [...pairs].sort((x, y) => y.score - x.score).slice(0, 3);
-    const worst3 = [...pairs].sort((x, y) => x.score - y.score).slice(0, 3);
+      // ✅ 안정 정렬(점수 동률일 때 aId/bId로 고정)
+      const sortedDesc = [...pairs].sort((x, y) => {
+        if (y.score !== x.score) return y.score - x.score;
+        const ax = `${x.aId}:${x.bId}`;
+        const ay = `${y.aId}:${y.bId}`;
+        return ax.localeCompare(ay);
+      });
 
-    return { group, best3, worst3, pairs };
-  },
-  ["group-rankings"],
-  { revalidate: 60 }
-);
+      const sortedAsc = [...pairs].sort((x, y) => {
+        if (x.score !== y.score) return x.score - y.score;
+        const ax = `${x.aId}:${x.bId}`;
+        const ay = `${y.aId}:${y.bId}`;
+        return ax.localeCompare(ay);
+      });
+
+      const best3 = sortedDesc.slice(0, 3);
+      const worst3 = sortedAsc.slice(0, 3);
+
+      return { group, best3, worst3, pairs };
+    },
+    // ✅ groupId를 캐시 키에 포함 (그룹별 캐시 완전 분리)
+    ["group-rankings", groupId],
+    { revalidate: 60 }
+  )();
+
 
 type Level = 1 | 2 | 3 | 4 | 5;
 

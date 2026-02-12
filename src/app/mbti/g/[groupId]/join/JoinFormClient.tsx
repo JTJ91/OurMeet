@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { joinGroupAction } from "@/app/mbti/actions/members";
 import { upsertSavedGroup } from "@/app/lib/mbti/groupHistory";
-import MbtiTestModal from "@/app/components/mbtiTest/MbtiTestModal";
+import MbtiTestModal from "@/app/components/mbtiTest/MbtiTestModal8";
 
 import { useRouter } from "next/navigation";
 

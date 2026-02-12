@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { createGroupAction } from "@/app/mbti/actions/group";
 import { upsertSavedGroup } from "@/app/lib/mbti/groupHistory";
 import { useRouter } from "next/navigation";
-import MbtiTestModal from "@/app/components/mbtiTest/MbtiTestModal";
+import MbtiTestModal from "@/app/components/mbtiTest/MbtiTestModal8";
 
 
 function isValidMbti(mbti: string) {
