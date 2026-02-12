@@ -30,6 +30,50 @@ export default function ExportGroupImageButton({
   const onDownload = async () => {
     if (isExporting) return;
 
+    // ✅ 캡처 전에 canvas -> img 치환
+    const replaceCanvasWithImages = (root: HTMLElement) => {
+    const replaces: { canvas: HTMLCanvasElement; img: HTMLImageElement }[] = [];
+    const canvases = Array.from(root.querySelectorAll("canvas"));
+
+    for (const canvas of canvases) {
+        try {
+        const dataUrl = canvas.toDataURL("image/png");
+
+        const img = new Image();
+        img.src = dataUrl;
+
+        // 크기/레이아웃 유지
+        const rect = canvas.getBoundingClientRect();
+        img.width = canvas.width || Math.round(rect.width);
+        img.height = canvas.height || Math.round(rect.height);
+
+        img.style.width = `${rect.width}px`;
+        img.style.height = `${rect.height}px`;
+        img.style.display = getComputedStyle(canvas).display === "block" ? "block" : "inline-block";
+        img.style.borderRadius = getComputedStyle(canvas).borderRadius;
+
+        // canvas 숨기고 img 삽입
+        canvas.style.visibility = "hidden";
+        canvas.parentElement?.insertBefore(img, canvas);
+
+        replaces.push({ canvas, img });
+        } catch (e) {
+        // WebGL이거나 tainted canvas면 여기로 올 수 있음
+        // 이 경우는 그래프 렌더쪽에서 CORS/폰트/이미지 사용 여부 확인 필요
+        console.warn("canvas toDataURL failed:", e);
+        }
+    }
+
+    // 원복 함수 반환
+    return () => {
+        for (const r of replaces) {
+        r.img.remove();
+        r.canvas.style.visibility = "";
+        }
+    };
+    };
+
+
     const el = document.getElementById(targetId);
     if (!el) {
       alert("저장할 영역을 찾지 못했어요.");
@@ -38,12 +82,16 @@ export default function ExportGroupImageButton({
 
     try {
       setIsExporting(true);
+      el.classList.add("capture-mode");
+      const restoreCanvas = replaceCanvasWithImages(el);
 
       const dataUrl = await toPng(el, {
         cacheBust: true,
         pixelRatio: Math.min(2, window.devicePixelRatio || 2),
         backgroundColor: "#F5F9FF",
       });
+      restoreCanvas();
+      el.classList.remove("capture-mode");
 
       const a = document.createElement("a");
       a.href = dataUrl;

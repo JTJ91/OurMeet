@@ -29,3 +29,19 @@ body {
 summary::-webkit-details-marker { display: none; }
 summary { list-style: none; }
 
+/* ✅ 캡처 순간 테두리 깨짐 방지 모드 */
+#capture-root.capture-mode * {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+#capture-root.capture-mode .ring-1 {
+  /* ring이 이상하게 보이면 border로 고정 */
+  box-shadow: none !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important; /* slate-900 약하게 */
+}
+
+#capture-root.capture-mode [class*="bg-white/"] {
+  /* 반투명 배경을 흰색으로 고정 */
+  background-color: rgba(255, 255, 255, 0.98) !important;
+}

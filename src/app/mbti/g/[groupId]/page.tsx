@@ -886,7 +886,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
 
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-10">
-    <div id="capture-root">
+    
       <div className="mx-auto max-w-[760px] px-5 pt-6">
         {/* Top left back */}
         <div className="flex items-center justify-between">
@@ -936,7 +936,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
 
           </div>
         </section>
-
+        <div id="capture-root">
         <Suspense
           fallback={
             <section className="mt-6">
@@ -1254,7 +1254,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
               </>
           )}
         </SectionCard2>
-
+        </div>
         <section className="mt-6">
           <div className="rounded-3xl bg-white/70 p-5 ring-1 ring-black/5">
             <p className="text-xs leading-relaxed text-slate-500">
@@ -1264,7 +1264,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
         </section>
       </div>
 
-    </div>
+
     <ExportGroupImageButton targetId="capture-root" fileTitle={group.name} />
     </main>
   );
