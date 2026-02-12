@@ -3,9 +3,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import Script from "next/script";
-import FloatingToTop from "@/components/FloatingToTop";
-import ClientOverlays from "@/components/ClientOverlays";
-import AppHeader from "@/components/AppHeader";
+import FloatingToTop from "@/app/components/FloatingToTop";
+import ClientOverlays from "@/app/components/ClientOverlays";
+import AppHeader from "@/app/components/AppHeader";
+import Footer from "./components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,40 +67,7 @@ export default function RootLayout({
           {children}
         </div>
 
-        {/* 공통 Footer */}
-        <footer className="py-10 text-center text-xs text-slate-500 bg-[#F5F9FF] backdrop-blur pb-30">
-          
-          {/* 1줄: 콘텐츠 */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href="/cognitive-functions" className="hover:text-slate-700 transition">
-              MBTI 인지기능
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link href="/guides" className="hover:text-slate-700 transition">
-              모임 속 MBTI
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link href="/faq" className="hover:text-slate-700 transition">
-              자주 묻는 질문
-            </Link>
-          </div>
-
-          {/* 2줄: 정책 */}
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/terms" className="hover:text-slate-700 transition">
-              이용 약관
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link href="/privacy" className="hover:text-slate-700 transition">
-              개인정보처리방침
-            </Link>
-          </div>
-
-          <div className="mt-4 text-[11px] text-slate-400">
-            © 2026 모임랭크. All rights reserved.
-          </div>
-        </footer>
-
+        <Footer />   {/* 기본(홈/공통) */}
 
         <ClientOverlays />
       </body>

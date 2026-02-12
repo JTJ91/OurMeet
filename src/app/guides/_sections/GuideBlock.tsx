@@ -1,6 +1,6 @@
 // app/guides/_sections/GuideBlock.tsx
-import type { GuideSection } from "../_data/types";
-import { SECTION_ID } from "../_data/types";
+import type { GuideSection } from "../_data/mbti/types";
+import { SECTION_ID } from "../_data/mbti/types";
 
 export default function GuideBlock({
   sections,

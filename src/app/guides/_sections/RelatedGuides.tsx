@@ -1,8 +1,13 @@
 import Link from "next/link";
-import type { Guide } from "../_data/types";
-import { getGuide } from "../_data/guides";
+import type { Guide } from "../_data/mbti/types";
+import { getGuide } from "../_data/mbti/guides";
 
-export default function RelatedGuides({ guide }: { guide: Guide }) {
+type Props = {
+  guide: Guide;
+  system: string; // "mbti" | "saju" ...
+};
+
+export default function RelatedGuides({ guide, system }: Props) {
   const list =
     guide.related
       ?.map((slug) => getGuide(slug))
@@ -21,7 +26,7 @@ export default function RelatedGuides({ guide }: { guide: Guide }) {
         {list.map((g) => (
           <Link
             key={g.slug}
-            href={`/guides/${g.slug}`}
+            href={`/guides/${system}/${g.slug}`}   // ✅ 여기 수정
             className="rounded-2xl border border-black/5 bg-white/80 p-4 shadow-sm transition hover:bg-white"
           >
             <div className="text-sm font-black">{g.title}</div>

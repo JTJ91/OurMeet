@@ -1,7 +1,7 @@
 // src/app/sitemap.ts
 import { MetadataRoute } from "next";
-import { prisma } from "@/lib/prisma";
-import { GUIDES } from "@/app/guides/_data/guides";
+import { prisma } from "@/app/lib/mbti/prisma";
+import { GUIDES } from "@/app/guides/_data/mbti/guides";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") || "https://www.moimrank.com";

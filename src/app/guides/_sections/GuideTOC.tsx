@@ -1,6 +1,6 @@
 // app/guides/_sections/GuideTOC.tsx
-import type { GuideSection } from "../_data/types";
-import { SECTION_ID, SECTION_META } from "../_data/types";
+import type { GuideSection } from "../_data/mbti/types";
+import { SECTION_ID, SECTION_META } from "../_data/mbti/types";
 
 export default function GuideTOC({ sections }: { sections: GuideSection[] }) {
   return (
