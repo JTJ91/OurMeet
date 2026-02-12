@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import { createGroupAction } from "@/app/mbti/actions/group";
 import { upsertSavedGroup } from "@/app/lib/mbti/groupHistory";
 import { useRouter } from "next/navigation";
+import MbtiTestModal from "@/app/components/mbtiTest/MbtiTestModal";
+
 
 function isValidMbti(mbti: string) {
   return /^[EI][NS][TF][JP]$/.test(mbti);
@@ -15,6 +17,9 @@ export default function CreateFormClient() {
 
   const lockedRef = useRef(false);
   const router = useRouter();
+
+  const [testOpen, setTestOpen] = useState(false);
+  const mbtiInputRef = useRef<HTMLInputElement | null>(null);
 
   return (
     <form
@@ -102,8 +107,21 @@ export default function CreateFormClient() {
 
       {/* MBTI */}
       <label className="block">
-        <div className="text-sm font-bold text-slate-800">MBTI</div>
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-bold text-slate-800">MBTI</div>
+
+          <button
+            type="button"
+            disabled={isSubmitting}
+            onClick={() => setTestOpen(true)}
+            className="rounded-full bg-white/70 px-3 py-1.5 text-[11px] font-extrabold text-slate-700 ring-1 ring-black/10 hover:bg-white disabled:opacity-60"
+          >
+            🧪 MBTI 검사하기
+          </button>
+        </div>
+
         <input
+          ref={mbtiInputRef}
           name="mbti"
           required
           maxLength={4}
@@ -114,13 +132,39 @@ export default function CreateFormClient() {
             "mt-2 h-12 w-full rounded-2xl border bg-white px-4 text-[16px] uppercase outline-none disabled:opacity-60",
             mbtiError ? "border-red-400 focus:border-red-400" : "border-black/10 focus:border-[#1E88E5]/50",
           ].join(" ")}
+          onKeyDown={(e) => {
+            if (e.key === " ") e.preventDefault();
+          }}
+          onChange={(e) => {
+            const v = e.currentTarget.value
+              .replace(/\s/g, "")
+              .toUpperCase()
+              .replace(/[^EINSFTJP]/g, "")
+              .slice(0, 4);
+
+            e.currentTarget.value = v;
+
+            if (v.length === 4) {
+              setMbtiError(isValidMbti(v) ? null : "MBTI 형식이 올바르지 않아요. 예) ENFP");
+            } else {
+              setMbtiError(null);
+            }
+          }}
+          onBlur={(e) => {
+            const v = (e.currentTarget.value || "").replace(/\s/g, "").toUpperCase();
+            if (v.length === 4 && !isValidMbti(v)) {
+              setMbtiError("MBTI 형식이 올바르지 않아요. 예) ENFP");
+            }
+          }}
         />
+
         {mbtiError ? (
           <p className="mt-1 text-[11px] font-semibold text-red-500">{mbtiError}</p>
         ) : (
           <p className="mt-1 text-[11px] text-slate-500">ENFP 형식, 공백 없이 4글자</p>
         )}
       </label>
+
 
       {/* 결정 스타일 */}
       <fieldset className="block">
@@ -217,6 +261,20 @@ export default function CreateFormClient() {
       >
         {isSubmitting ? "생성중…" : "모임 만들기"}
       </button>
+
+      <MbtiTestModal
+        open={testOpen}
+        onClose={() => setTestOpen(false)}
+        onComplete={(r) => {
+          const v = (r.type || "").toUpperCase();
+          if (mbtiInputRef.current) {
+            mbtiInputRef.current.value = v;
+            mbtiInputRef.current.focus();
+          }
+          setMbtiError(isValidMbti(v) ? null : "MBTI 형식이 올바르지 않아요. 예) ENFP");
+          setTestOpen(false);
+        }}
+      />
     </form>
   );
 }

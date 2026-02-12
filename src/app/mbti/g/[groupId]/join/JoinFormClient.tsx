@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { joinGroupAction } from "@/app/mbti/actions/members";
 import { upsertSavedGroup } from "@/app/lib/mbti/groupHistory";
+import MbtiTestModal from "@/app/components/mbtiTest/MbtiTestModal";
 
 import { useRouter } from "next/navigation";
 
@@ -19,6 +20,9 @@ export default function JoinFormClient({
 }) {
   const [mbtiError, setMbtiError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [testOpen, setTestOpen] = useState(false); // ✅ 추가
+  const mbtiInputRef = useRef<HTMLInputElement | null>(null); // ✅ 추가
 
   // ✅ 렌더 틈까지 커버하는 “진짜 잠금”
   const lockedRef = useRef(false);
@@ -117,51 +121,66 @@ export default function JoinFormClient({
       </label>
 
       {/* MBTI */}
-      <label className="block">
-        <div className="text-sm font-bold text-slate-800">MBTI</div>
-        <input
-          name="mbti"
-          required
-          maxLength={4}
-          placeholder="예) ENFP"
-          disabled={isFull || isSubmitting}
-          aria-invalid={!!mbtiError}
-          className={[
-            "mt-2 h-12 w-full rounded-2xl border bg-white px-4 text-[16px] uppercase outline-none disabled:opacity-60",
-            mbtiError ? "border-red-400 focus:border-red-400" : "border-black/10 focus:border-[#1E88E5]/50",
-          ].join(" ")}
-          onKeyDown={(e) => {
-            if (e.key === " ") e.preventDefault();
-          }}
-          onChange={(e) => {
-            const v = e.currentTarget.value
-              .replace(/\s/g, "")
-              .toUpperCase()
-              .replace(/[^EINSFTJP]/g, "")
-              .slice(0, 4);
+        <label className="block">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-bold text-slate-800">MBTI</div>
 
-            e.currentTarget.value = v;
+            {/* ✅ 검사 버튼 */}
+            <button
+              type="button"
+              disabled={isFull || isSubmitting}
+              onClick={() => setTestOpen(true)}
+              className="rounded-full bg-white/70 px-3 py-1.5 text-[11px] font-extrabold text-slate-700 ring-1 ring-black/10 hover:bg-white disabled:opacity-60"
+            >
+              🧪 MBTI 검사하기
+            </button>
+          </div>
 
-            if (v.length === 4) {
-              setMbtiError(isValidMbti(v) ? null : "MBTI 형식이 올바르지 않아요. 예) ENFP");
-            } else {
-              setMbtiError(null);
-            }
-          }}
-          onBlur={(e) => {
-            const v = (e.currentTarget.value || "").replace(/\s/g, "").toUpperCase();
-            if (v.length === 4 && !isValidMbti(v)) {
-              setMbtiError("MBTI 형식이 올바르지 않아요. 예) ENFP");
-            }
-          }}
-        />
+          <input
+            ref={mbtiInputRef} // ✅ 추가
+            name="mbti"
+            required
+            maxLength={4}
+            placeholder="예) ENFP"
+            disabled={isFull || isSubmitting}
+            aria-invalid={!!mbtiError}
+            className={[
+              "mt-2 h-12 w-full rounded-2xl border bg-white px-4 text-[16px] uppercase outline-none disabled:opacity-60",
+              mbtiError ? "border-red-400 focus:border-red-400" : "border-black/10 focus:border-[#1E88E5]/50",
+            ].join(" ")}
+            onKeyDown={(e) => {
+              if (e.key === " ") e.preventDefault();
+            }}
+            onChange={(e) => {
+              const v = e.currentTarget.value
+                .replace(/\s/g, "")
+                .toUpperCase()
+                .replace(/[^EINSFTJP]/g, "")
+                .slice(0, 4);
 
-        {mbtiError ? (
-          <p className="mt-1 text-[11px] font-semibold text-red-500">{mbtiError}</p>
-        ) : (
-          <p className="mt-1 text-[11px] text-slate-500">ENFP 형식, 공백 없이 4글자</p>
-        )}
-      </label>
+              e.currentTarget.value = v;
+
+              if (v.length === 4) {
+                setMbtiError(isValidMbti(v) ? null : "MBTI 형식이 올바르지 않아요. 예) ENFP");
+              } else {
+                setMbtiError(null);
+              }
+            }}
+            onBlur={(e) => {
+              const v = (e.currentTarget.value || "").replace(/\s/g, "").toUpperCase();
+              if (v.length === 4 && !isValidMbti(v)) {
+                setMbtiError("MBTI 형식이 올바르지 않아요. 예) ENFP");
+              }
+            }}
+          />
+
+          {mbtiError ? (
+            <p className="mt-1 text-[11px] font-semibold text-red-500">{mbtiError}</p>
+          ) : (
+            <p className="mt-1 text-[11px] text-slate-500">ENFP 형식, 공백 없이 4글자</p>
+          )}
+        </label>
+
 
       
 
@@ -259,6 +278,22 @@ export default function JoinFormClient({
       >
         {isFull ? "정원이 가득 찼어요" : isSubmitting ? "참여중…" : "🫶 모임에 참가하기"}
       </button>
+
+      <MbtiTestModal
+        open={testOpen}
+        onClose={() => setTestOpen(false)}
+        onComplete={(r) => {
+          const v = (r.type || "").toUpperCase();
+          if (mbtiInputRef.current) {
+            mbtiInputRef.current.value = v;   // ✅ 자동 입력
+            mbtiInputRef.current.focus();     // 선택: 입력칸 포커스
+          }
+          setMbtiError(isValidMbti(v) ? null : "MBTI 형식이 올바르지 않아요. 예) ENFP"); // ✅ 에러도 동기화
+          setTestOpen(false);
+        }}
+      />
     </form>
+
   );
+
 }
