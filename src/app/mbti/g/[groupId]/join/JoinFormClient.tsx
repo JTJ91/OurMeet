@@ -39,7 +39,7 @@ export default function JoinFormClient({
             });
 
             // ✅ 성공 시 이동
-            router.replace(`/g/${result.groupId}?center=${result.memberId}`);
+            router.replace(`/mbti/g/${result.groupId}?center=${result.memberId}`);
             router.refresh();
           } catch (err: any) {
             // ✅ 에러 처리

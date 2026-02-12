@@ -10,7 +10,7 @@ export default function InviteActions({ groupId }: { groupId: string }) {
     if (typeof window === "undefined") return "";
     const ver = process.env.NEXT_PUBLIC_SHARE_VER ?? "1";
 
-    const u = new URL(`/g/${groupId}`, window.location.origin);
+    const u = new URL(`mbti/g/${groupId}`, window.location.origin);
     u.searchParams.set("v", Date.now().toString());
 
     return u.toString();

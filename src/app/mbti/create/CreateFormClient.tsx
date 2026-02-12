@@ -30,7 +30,8 @@ export default function CreateFormClient() {
             myMbti: String(fd.get("mbti") || "").toUpperCase(),
           });
 
-          router.replace(`/g/${result.groupId}?center=${result.memberId}`);
+          const base = "/mbti";
+          router.replace(`${base}/g/${result.groupId}?center=${result.memberId}`);
         } catch (err: any) {
           alert(err?.message ?? "모임 생성 중 문제가 발생했어요.");
           lockedRef.current = false;

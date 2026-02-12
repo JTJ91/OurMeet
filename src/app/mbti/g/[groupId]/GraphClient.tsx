@@ -64,7 +64,7 @@ export default function GraphClient({
         {/* ✅ 버튼: 작게/컴팩트 */}
         <div className="grid grid-cols-2 gap-2">
           <Link
-            href={`/g/${groupId}/join`}
+            href={`/mbti/g/${groupId}/join`}
             className="
               flex h-10 w-full items-center justify-center gap-2
               rounded-2xl bg-[#1E88E5]
