@@ -37,7 +37,6 @@ export default function Footer() {
           </>
         ) : (
           <>
-            <Link href="/" className="hover:text-slate-700 transition">홈</Link>
           </>
         )}
       </div>
