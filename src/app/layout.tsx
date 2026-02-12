@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     url: "https://www.moimrank.com/",
     images: [
       {
-        url: "https://www.moimrank.com/og.png?v=3",
+        url: "https://www.moimrank.com/og.png?v=4",
         width: 1200,
         height: 630,
       },
