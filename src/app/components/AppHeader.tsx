@@ -163,10 +163,12 @@ export default function AppHeader() {
   }, [open]);
 
   const isActiveHref = (href: string) => {
-    if (href === "/mbti") return pathname === "/mbti" || pathname.startsWith("/mbti/");
-    if (href === "/saju") return pathname === "/saju" || pathname.startsWith("/saju/");
-    return pathname === href || pathname.startsWith(href + "/");
-  };
+  // ✅ 홈 링크는 "정확히 일치"만
+  if (href === "/mbti") return pathname === "/mbti";
+  if (href === "/saju") return pathname === "/saju";
+
+  return pathname === href || pathname.startsWith(href + "/");
+};
 
 
   return (
