@@ -13,6 +13,21 @@ const SCALE = [
   { v: 5, label: "매우 그렇다" },
 ];
 
+const TRAIT_COLOR: Record<string, string> = {
+    E: "#FF6B6B", // coral
+    I: "#4D96FF", // blue
+    N: "#9B59B6", // purple
+    S: "#2ECC71", // green
+    T: "#F39C12", // orange
+    F: "#E84393", // pink
+    J: "#2D3436", // dark
+    P: "#16A085", // teal
+    };
+
+function traitColor(k: string) {
+return TRAIT_COLOR[k] ?? "#1E88E5";
+}
+
 export default function MbtiTestModal({
   open,
   onClose,
@@ -83,8 +98,6 @@ export default function MbtiTestModal({
     });
     }
 
-
-
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-3">
       <div className="w-full max-w-[520px] rounded-3xl bg-white shadow-xl ring-1 ring-black/10">
@@ -115,7 +128,9 @@ export default function MbtiTestModal({
         <div className="px-5 pb-4 pt-5">
           {!done ? (
             <>
-              <div className="text-base font-extrabold leading-6 text-slate-900">{q.text}</div>
+              <div className="min-h-[72px] text-base font-extrabold leading-6 text-slate-900">
+                {q.text}
+                </div>
 
               <div className="mt-4 grid gap-2">
                 {SCALE.map((s) => (
@@ -178,7 +193,17 @@ function ResultView({
   return (
     <div>
       <div className="text-sm font-extrabold text-slate-500">결과</div>
-      <div className="mt-1 text-3xl font-black tracking-tight text-slate-900">{type}</div>
+      <div className="mt-1 flex items-end gap-1">
+        {type.split("").map((ch, i) => (
+            <span
+            key={i}
+            className="text-3xl font-black tracking-tight"
+            style={{ color: traitColor(ch) }}
+            >
+            {ch}
+            </span>
+        ))}
+        </div>
 
       <div className="mt-3 rounded-2xl bg-white/70 p-4 ring-1 ring-black/10">
         <div className="flex items-center justify-between text-xs font-extrabold text-slate-700">
@@ -231,19 +256,70 @@ function AxisRow({
   rightPct: number;
   conf: number;
 }) {
-  const majorLeft = leftPct >= rightPct;
+  const delta = leftPct - 50;                // -50..+50
+  const leanLeft = delta >= 0;               // true면 left쪽 우세
+  const diff = Math.round(Math.abs(delta));  // 0..50
+  const halfFill = Math.min(100, diff * 2);  // 0..100 (반쪽 기준 채움)
+
+  const winner = leanLeft ? left : right;
+  const color = traitColor(winner);
+
+  const leftFill = leanLeft ? halfFill : 0;
+  const rightFill = leanLeft ? 0 : halfFill;
+
   return (
     <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/10">
-      <div className="flex items-center justify-between text-xs font-extrabold text-slate-700">
-        <span>
-          {left} {leftPct}% · {right} {rightPct}%
-        </span>
-        <span className="text-[11px] font-black text-slate-900">축명확도 {conf}%</span>
-      </div>
+      {/* ✅ 상단: 좌/중/우 고정폭 그리드 */}
+        <div className="grid grid-cols-[84px_1fr_84px] items-center text-xs font-extrabold text-slate-700">
+        {/* left */}
+        <div className="text-left">
+            <span style={{ color: traitColor(left) }} className="inline-flex items-baseline gap-1">
+            <span className="font-black">{left}</span>
+            <span className="tabular-nums text-slate-900">{leftPct}%</span>
+            </span>
+        </div>
 
-      <div className="mt-2 h-2 w-full rounded-full bg-slate-200">
-        <div className="h-2 rounded-full bg-[#1E88E5]" style={{ width: `${majorLeft ? leftPct : rightPct}%` }} />
+        {/* center (항상 중앙 고정) */}
+        <div className="text-center">
+            <span className="inline-flex items-center justify-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-black text-slate-900 ring-1 ring-black/5 tabular-nums">
+            축명확도 {conf}%
+            </span>
+        </div>
+
+        {/* right */}
+        <div className="text-right">
+            <span style={{ color: traitColor(right) }} className="inline-flex items-baseline gap-1">
+            <span className="tabular-nums text-slate-900">{rightPct}%</span>
+            <span className="font-black">{right}</span>
+            </span>
+        </div>
+        </div>
+
+      {/* ✅ 중앙 기준 바 (좌/우 50% 분리, overflow로 뚫림 방지) */}
+      <div className="relative mt-2 h-3 w-full overflow-hidden rounded-full bg-slate-200">
+        <div className="absolute inset-0 flex">
+          {/* left half */}
+          <div className="relative h-3 w-1/2 overflow-hidden">
+            <div
+              className="absolute right-0 top-0 h-3 rounded-l-full"
+              style={{ width: `${leftFill}%`, backgroundColor: color }}
+            />
+          </div>
+          {/* right half */}
+          <div className="relative h-3 w-1/2 overflow-hidden">
+            <div
+              className="absolute left-0 top-0 h-3 rounded-r-full"
+              style={{ width: `${rightFill}%`, backgroundColor: color }}
+            />
+          </div>
+        </div>
+
+        {/* 중앙 라인 */}
+        <div className="absolute left-1/2 top-0 h-3 w-[2px] -translate-x-1/2 rounded-full bg-slate-400/70" />
       </div>
     </div>
   );
 }
+
+
+
