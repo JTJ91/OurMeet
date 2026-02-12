@@ -26,7 +26,7 @@ export default async function GroupJoinPage({
         {/* 상단 */}
         <div className="mb-4 flex items-center justify-between">
           <Link
-            href={`/g/${groupId}`}
+            href={`/mbti/g/${groupId}`}
             className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 hover:bg-white"
           >
             ← 뒤로
