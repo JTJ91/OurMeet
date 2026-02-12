@@ -68,11 +68,11 @@ export default function Home() {
         {/* Top left back */}
         <div className="flex items-center justify-between">
           <Link
-            href="/mbti"
+            href="/"
             className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 backdrop-blur hover:bg-white"
           >
             <span aria-hidden>←</span>
-            <span>뒤로가기</span>
+            <span>메인으로</span>
           </Link>
         </div>
 
