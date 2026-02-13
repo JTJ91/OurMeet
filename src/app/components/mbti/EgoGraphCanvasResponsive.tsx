@@ -15,7 +15,7 @@ type Props = {
   groupName?: string;
   memberCount?: number;
   centerName: string;
-  centerSub?: string; // ??지금�? ?�기(?�터 MBTI�??�는 �?
+  centerSub?: string;
   nodes: EgoNode[];
   pairAverageScore?: number | null;
   ringCount?: 2 | 3;
@@ -61,7 +61,7 @@ function animalOf(mbti?: string) {
 function animalIconSrc(mbti?: string) {
   const key = (mbti || "").trim().toUpperCase();
   if (!/^[EI][NS][TF][JP]$/.test(key)) return null;
-  return `/mbti-animals/${key.toLowerCase()}.svg`;
+  return `/mbti-animals/${key}.png`;
 }
 
 function hexToRgba(hex: string, a: number) {
@@ -71,26 +71,6 @@ function hexToRgba(hex: string, a: number) {
   const g = (v >> 8) & 255;
   const b = v & 255;
   return `rgba(${r},${g},${b},${a})`;
-}
-
-function parseHex(hex: string) {
-  const h = hex.replace("#", "");
-  const v = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
-  return {
-    r: (v >> 16) & 255,
-    g: (v >> 8) & 255,
-    b: v & 255,
-  };
-}
-
-function mixHex(base: string, target: string, ratio: number) {
-  const t = Math.max(0, Math.min(1, ratio));
-  const a = parseHex(base);
-  const b = parseHex(target);
-  const r = Math.round(a.r + (b.r - a.r) * t);
-  const g = Math.round(a.g + (b.g - a.g) * t);
-  const bl = Math.round(a.b + (b.b - a.b) * t);
-  return `rgb(${r},${g},${bl})`;
 }
 
 function drawSoftShadowCircle(
@@ -125,59 +105,39 @@ function drawPremiumNodeCircle(
   isHover: boolean,
   dim: boolean
 ) {
-  // No inner fill: keep the node clean and icon-focused.
-  const shadowBlur = isActive ? 8 : isHover ? 7 : dim ? 3 : 5;
-  const shadowColor = dim ? "rgba(15,23,42,0.03)" : "rgba(15,23,42,0.08)";
-  const shadowOffsetY = isActive ? 2 : 1;
+  // Soft tinted fill that matches compatibility color.
+  ctx.save();
+  ctx.fillStyle = dim ? hexToRgba(baseColor, 0.08) : hexToRgba(baseColor, isActive ? 0.2 : 0.14);
+  ctx.beginPath();
+  ctx.arc(x, y, Math.max(0, r - Math.max(1.2, r * 0.12)), 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  const shadowBlur = isActive ? 10 : isHover ? 8 : dim ? 3 : 6;
+  const shadowColor = dim ? "rgba(15,23,42,0.05)" : "rgba(15,23,42,0.1)";
+  const shadowOffsetY = isActive ? 2.5 : 1.5;
   drawSoftShadowCircle(ctx, x, y, r, "rgba(255,255,255,0.001)", shadowColor, shadowBlur, shadowOffsetY);
 
-  // Clean colored outer ring.
+  // Strong, clean compatibility-colored ring.
   ctx.save();
-  const ringW = Math.max(1.4, r * (isActive ? 0.14 : isHover ? 0.12 : 0.1));
+  const ringW = Math.max(2.4, r * (isActive ? 0.18 : isHover ? 0.16 : 0.145));
   const ringR = Math.max(0, r - ringW / 2);
-  ctx.strokeStyle = dim ? hexToRgba(baseColor, 0.26) : hexToRgba(baseColor, isActive ? 0.82 : 0.7);
+  ctx.strokeStyle = dim ? hexToRgba(baseColor, 0.5) : hexToRgba(baseColor, isActive ? 0.98 : 0.92);
   ctx.lineWidth = ringW;
   ctx.beginPath();
   ctx.arc(x, y, ringR, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
-}
 
-function drawPremiumCenterCircle(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  r: number
-) {
-  const fillGrad = ctx.createRadialGradient(
-    x - r * 0.16,
-    y - r * 0.24,
-    r * 0.08,
-    x,
-    y,
-    r * 1.02
-  );
-  fillGrad.addColorStop(0, "rgba(255,255,255,1)");
-  fillGrad.addColorStop(0.72, "rgba(248,250,252,1)");
-  fillGrad.addColorStop(1, "rgba(241,245,249,1)");
-
-  drawSoftShadowCircle(ctx, x, y, r, fillGrad, "rgba(15,23,42,0.11)", 10, 3);
-
-  ctx.save();
-  ctx.strokeStyle = "rgba(255,255,255,0.72)";
-  ctx.lineWidth = Math.max(1, r * 0.05);
-  ctx.beginPath();
-  ctx.arc(x, y, r * 0.86, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
-
-  ctx.save();
-  ctx.strokeStyle = "rgba(15,23,42,0.1)";
-  ctx.lineWidth = Math.max(1.2, r * 0.06);
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
+  if (!dim) {
+    ctx.save();
+    ctx.strokeStyle = hexToRgba(baseColor, isActive ? 0.32 : 0.25);
+    ctx.lineWidth = Math.max(1, ringW * 0.48);
+    ctx.beginPath();
+    ctx.arc(x, y, r + ringW * 0.28, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
 }
 
 function drawCurvedLine(
@@ -208,105 +168,6 @@ function clampNodes(nodes: EgoNode[], max = 20) {
   return nodes.length <= max ? nodes : nodes.slice(0, max);
 }
 
-function groupByLevel(nodes: EgoNode[]) {
-  const g: Record<Level, EgoNode[]> = { 1: [], 2: [], 3: [], 4: [], 5: [] };
-  nodes.forEach((n) => g[n.level].push(n));
-  return g;
-}
-
-function mapToRings(nodes: EgoNode[], ringCount: 2 | 3) {
-  const by = groupByLevel(nodes);
-  if (ringCount === 3) return [[...by[5], ...by[4]], [...by[3]], [...by[2], ...by[1]]];
-  return [[...by[5], ...by[4], ...by[3]], [...by[2], ...by[1]]];
-}
-
-function layoutOnRing(items: EgoNode[], radius: number, startAngle: number) {
-  if (!items.length) return [];
-
-  const sorted = [...items].sort((a, b) =>
-    b.level !== a.level ? b.level - a.level : a.name.localeCompare(b.name)
-  );
-
-  const N = sorted.length;
-  const twoPi = Math.PI * 2;
-
-  const avoidTop = 0.45;
-  const baseRot = startAngle + avoidTop;
-
-  const presetAngles = (n: number) => {
-    if (n === 1) return [Math.PI / 4];
-    if (n === 2) return [0, Math.PI];
-    if (n === 3) return [0, (twoPi / 3) * 1, (twoPi / 3) * 2];
-    if (n === 4) return [0, Math.PI / 2, Math.PI, (Math.PI / 2) * 3];
-    return null;
-  };
-
-  const preset = presetAngles(N);
-  const out: Array<EgoNode & { x: number; y: number; angle: number }> = [];
-
-  if (preset) {
-    for (let i = 0; i < N; i++) {
-      const ang = baseRot + preset[i];
-      out.push({ ...sorted[i], angle: ang, x: Math.cos(ang) * radius, y: Math.sin(ang) * radius });
-    }
-    return out;
-  }
-
-  const step = twoPi / N;
-  const halfStep = step / 2;
-
-  for (let i = 0; i < N; i++) {
-    const ang = baseRot + halfStep + i * step;
-    out.push({ ...sorted[i], angle: ang, x: Math.cos(ang) * radius, y: Math.sin(ang) * radius });
-  }
-
-  return out;
-}
-
-function layoutAcrossRings(
-  rings: EgoNode[][],
-  radii: number[],
-  startAngle: number
-) {
-  const sortedRings = rings.map((items) =>
-    [...items].sort((a, b) =>
-      b.level !== a.level ? b.level - a.level : a.name.localeCompare(b.name)
-    )
-  );
-
-  const maxLen = Math.max(0, ...sortedRings.map((r) => r.length));
-  const ordered: Array<{ node: EgoNode; ringIndex: number }> = [];
-
-  // Interleave rings so all rings share global angular slots.
-  for (let i = 0; i < maxLen; i++) {
-    for (let ringIndex = 0; ringIndex < sortedRings.length; ringIndex++) {
-      const node = sortedRings[ringIndex][i];
-      if (node) ordered.push({ node, ringIndex });
-    }
-  }
-
-  const N = ordered.length;
-  if (!N) return [] as Array<EgoNode & { x: number; y: number; angle: number; ringIndex: number; r: number }>;
-
-  const twoPi = Math.PI * 2;
-  const step = twoPi / N;
-  const baseRot = startAngle + 0.45;
-  const halfStep = step / 2;
-
-  return ordered.map(({ node, ringIndex }, i) => {
-    const angle = baseRot + halfStep + i * step;
-    const r = radii[ringIndex];
-    return {
-      ...node,
-      angle,
-      x: Math.cos(angle) * r,
-      y: Math.sin(angle) * r,
-      ringIndex,
-      r,
-    };
-  });
-}
-
 function layoutSunflower(nodes: EgoNode[], size: number) {
   if (!nodes.length) return [] as Array<EgoNode & { x: number; y: number; angle: number; ringIndex: number; r: number }>;
 
@@ -322,11 +183,17 @@ function layoutSunflower(nodes: EgoNode[], size: number) {
   const golden = Math.PI * (3 - Math.sqrt(5)); // ~2.399963
   const start = -Math.PI / 2 + 0.35;
 
-  const minR = size * 0.23;
-  const maxR = size * 0.56;
+  const minR = size * 0.32;
+  const maxR = size * 0.78;
   const span = Math.max(1, n - 1);
 
-  return sorted.map((node, i) => {
+  const denseT = Math.max(0, Math.min(1, (n - 10) / 10));
+  const nodeScale = 1 - 0.18 * denseT;
+  const estNodeR = size * 0.089 * nodeScale;
+  const estLabelGap = Math.max(10, estNodeR * 0.55);
+  const estLineGap = Math.max(10, estNodeR * 0.5);
+
+  const out = sorted.map((node, i) => {
     const t = i / span;
     const levelBias = (5 - node.level) * 0.045; // lower compatibility sits slightly farther out
     const rRaw = minR + (maxR - minR) * Math.sqrt(t);
@@ -343,6 +210,90 @@ function layoutSunflower(nodes: EgoNode[], size: number) {
       r,
     };
   });
+
+  const nodeLabel = (name: string) => (name.length > 5 ? `${name.slice(0, 4)}...` : name);
+  const estLabelWidth = (node: { name: string; mbti: string }) => {
+    const name = nodeLabel(node.name);
+    const mbti = (node.mbti || "").trim().toUpperCase();
+    const nameFont = Math.max(11, estNodeR * 0.42);
+    const mbtiFont = Math.max(9, estNodeR * 0.3);
+    const nameW = Math.max(16, name.length * nameFont * 0.62);
+    const mbtiW = Math.max(12, mbti.length * mbtiFont * 0.62);
+    return Math.max(nameW, mbtiW) + estNodeR * 0.5;
+  };
+
+  const boxOf = (p: { x: number; y: number; name: string; mbti: string }) => {
+    const w = estLabelWidth(p);
+    const top = p.y - estNodeR;
+    const bottom = p.y + estNodeR + estLabelGap + estLineGap + estNodeR * 0.16;
+    return {
+      left: p.x - w / 2,
+      right: p.x + w / 2,
+      top,
+      bottom,
+    };
+  };
+
+  const overlapAabb = (
+    a: { left: number; right: number; top: number; bottom: number },
+    b: { left: number; right: number; top: number; bottom: number }
+  ) => {
+    const ox = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+    const oy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+    if (ox <= 0 || oy <= 0) return null;
+    return { ox, oy };
+  };
+
+  for (let iter = 0; iter < 180; iter++) {
+    let moved = false;
+
+    for (let i = 0; i < out.length; i++) {
+      for (let j = i + 1; j < out.length; j++) {
+        const a = out[i];
+        const b = out[j];
+        const ov = overlapAabb(boxOf(a), boxOf(b));
+        if (!ov) continue;
+
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const len = Math.hypot(dx, dy) || 1;
+        let ux = dx / len;
+        let uy = dy / len;
+        if (Math.abs(ux) < 0.08 && Math.abs(uy) < 0.08) {
+          ux = Math.cos((i + j) * 1.7);
+          uy = Math.sin((i + j) * 1.7);
+        }
+
+        // Push by overlap amount + a small margin.
+        const push = (Math.max(ov.ox, ov.oy) + 4) * 0.18;
+        a.x -= ux * push;
+        a.y -= uy * push;
+        b.x += ux * push;
+        b.y += uy * push;
+        moved = true;
+      }
+    }
+
+    for (let i = 0; i < out.length; i++) {
+      const p = out[i];
+      const d = Math.hypot(p.x, p.y) || 1;
+      const t = i / span;
+      const targetRaw = minR + (maxR - minR) * Math.sqrt(t);
+      const target = Math.min(maxR, Math.max(minR, targetRaw * (1 + (5 - p.level) * 0.045)));
+      const clamped = Math.min(maxR, Math.max(minR, d));
+      const ndx = p.x / d;
+      const ndy = p.y / d;
+      const relaxed = clamped * 0.88 + target * 0.12;
+      p.x = ndx * relaxed;
+      p.y = ndy * relaxed;
+      p.r = relaxed;
+      p.angle = Math.atan2(p.y, p.x);
+    }
+
+    if (!moved) break;
+  }
+
+  return out;
 }
 
 type Placed = EgoNode & { x: number; y: number; ringIndex: number; r: number };
@@ -714,8 +665,13 @@ function EgoGraphCanvasResponsiveInner({
   const rafRef = useRef<number | null>(null);
   const drawQueuedRef = useRef(false);
   const iconCacheRef = useRef<Record<string, HTMLImageElement>>({});
+  const frozenDemoAvgRef = useRef<number | null>(null);
 
   const safeNodes = useMemo(() => clampNodes(nodes, 20), [nodes]);
+  const memberSignature = useMemo(
+    () => safeNodes.map((n) => n.id).sort().join("|"),
+    [safeNodes]
+  );
   const demoAvgScore = useMemo(() => {
     const scores = safeNodes
       .map((n) => Number(n.score))
@@ -723,7 +679,12 @@ function EgoGraphCanvasResponsiveInner({
     if (!scores.length) return null;
     return scores.reduce((sum, s) => sum + s, 0) / scores.length;
   }, [safeNodes]);
-  const avgScore = pairAverageScore ?? demoAvgScore;
+  useEffect(() => {
+    if (pairAverageScore != null) return;
+    frozenDemoAvgRef.current = demoAvgScore;
+  }, [memberSignature, pairAverageScore, demoAvgScore]);
+
+  const avgScore = pairAverageScore ?? frozenDemoAvgRef.current ?? demoAvgScore;
   const avgLevel = avgScore == null ? null : scoreToLevel(avgScore);
   const avgColor = avgLevel ? LEVEL_META[avgLevel].color : "#94A3B8";
   const avgPercent = avgScore == null ? 0 : Math.max(0, Math.min(100, avgScore));
@@ -749,29 +710,29 @@ function EgoGraphCanvasResponsiveInner({
     [placed]
   );
 
-  // ??placed 기�? fitScale 계산 (placed 변?�시?�만)
-  const contentFitRef = useRef({ nodeR_world: 0, margin_world: 0, contentR_world: 1 });
-  useEffect(() => {
+  // Fit content size in world coordinates (includes labels), derived from current member layout.
+  const contentFit = useMemo(() => {
     const n = placed.length;
     const denseT = Math.max(0, Math.min(1, (n - 10) / 10));
-    const nodeScale = 1 - 0.04 * denseT;
-    const nodeR_world = size * 0.062 * nodeScale;
+    const nodeScale = 1 - 0.03 * denseT;
+    const nodeR_world = size * 0.082 * nodeScale;
+    const labelWorld = Math.max(size * 0.08, nodeR_world * 1.2);
     const margin_world = size * 0.06;
     let maxDist = 0;
     for (const n of placed) {
       const d = Math.hypot(n.x, n.y);
       if (d > maxDist) maxDist = d;
     }
-    contentFitRef.current = {
+    return {
       nodeR_world,
       margin_world,
-      contentR_world: maxDist + nodeR_world + margin_world,
+      contentR_world: maxDist + nodeR_world + labelWorld + margin_world,
     };
   }, [placed, size]);
 
   const computeFitScale = (canvasWpx: number, canvasHpx: number, dpr: number) => {
     const availR_px = Math.min(canvasWpx, canvasHpx) / 2 / dpr;
-    const s = availR_px / Math.max(1, contentFitRef.current.contentR_world);
+    const s = availR_px / Math.max(1, contentFit.contentR_world);
     return Math.min(1, Math.max(0.5, s));
   };
 
@@ -814,13 +775,17 @@ function EgoGraphCanvasResponsiveInner({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const { dpr, fitScale, cx, cy } = geomRef.current;
+    const { dpr, cx, cy } = geomRef.current;
+    const fitScale = computeFitScale(canvas.width, canvas.height, dpr);
+    geomRef.current.fitScale = fitScale;
 
     const w = canvas.width;
     const h = canvas.height;
 
     // ??clear
     ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     ctx.clearRect(0, 0, w, h);
 
     // ??배경(?�이??
@@ -839,15 +804,40 @@ function EgoGraphCanvasResponsiveInner({
 
     const toScreen = (wx: number, wy: number) => ({
       x: cx + wx * fitScale * dpr,
-      y: cy + wy * fitScale * dpr,
+      y: graphCy + wy * fitScale * dpr,
     });
 
     const denseT = Math.max(0, Math.min(1, (placed.length - 10) / 10));
-    const nodeScale = 1 - 0.12 * denseT;
-    const centerScale = 1 - 0.08 * denseT;
+    const nodeScale = 1 - 0.18 * denseT;
+    const nodeR = size * 0.089 * nodeScale * fitScale * dpr;
+    const centerR = nodeR * 1.04;
+    let graphCy = cy;
 
-    const centerR = size * 0.075 * centerScale * fitScale * dpr;
-    const nodeR = size * 0.068 * nodeScale * fitScale * dpr;
+    // Keep node + label bounds inside canvas vertically.
+    const fitVertically = () => {
+      const pad = Math.max(8 * dpr, nodeR * 0.35);
+      let minTop = Infinity;
+      let maxBottom = -Infinity;
+
+      for (const n of placed) {
+        const sy = graphCy + n.y * fitScale * dpr;
+        const r = nodeR;
+        const nameY = sy + r + Math.max(10 * dpr, r * 0.55);
+        const mbtiY = nameY + Math.max(10 * dpr, r * 0.5);
+        const top = sy - r;
+        const bottom = mbtiY + Math.max(8 * dpr, r * 0.2);
+        if (top < minTop) minTop = top;
+        if (bottom > maxBottom) maxBottom = bottom;
+      }
+
+      if (minTop !== Infinity) {
+        if (minTop < pad) graphCy += pad - minTop;
+        if (maxBottom > h - pad) graphCy -= maxBottom - (h - pad);
+      }
+    };
+
+    fitVertically();
+    fitVertically();
 
     // ??hover??ref?�서 ?�기
     const hoverId = hoverIdRef.current;
@@ -864,7 +854,7 @@ function EgoGraphCanvasResponsiveInner({
       ctx.setLineDash([6 * dpr, 10 * dpr]);
       ctx.lineDashOffset = idx * 2 * dpr;
       ctx.beginPath();
-      ctx.arc(cx, cy, rpx, 0, Math.PI * 2);
+      ctx.arc(cx, graphCy, rpx, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
     });
@@ -887,14 +877,14 @@ function EgoGraphCanvasResponsiveInner({
       const col = LEVEL_META[n.level].color;
       const focused = isFocused(n.level);
 
-      const alpha = isActive ? 1 : hasFocus ? (focused ? 0.92 : 0.05) : 0.3;
-      const baseLW = isActive ? 5.8 : isHover ? 5.0 : hasFocus ? (focused ? 4.2 : 2.0) : 3.0;
+      const alpha = hasFocus ? (focused ? 0.94 : 0.12) : 0.48;
+      const baseLW = isHover ? 5.0 : hasFocus ? (focused ? 4.4 : 2.4) : 3.6;
 
       // ??gradient???��??�되, alpha ??�� ?�는 ?�색?�로 가볍게(?��? 최적??
-      const useGrad = alpha > 0.25;
+      const useGrad = alpha > 0.18;
       const stroke: string | CanvasGradient = useGrad
         ? (() => {
-            const g = ctx.createLinearGradient(cx, cy, p.x, p.y);
+            const g = ctx.createLinearGradient(cx, graphCy, p.x, p.y);
             g.addColorStop(0, hexToRgba(col, Math.min(0.55, alpha)));
             g.addColorStop(1, hexToRgba(col, Math.min(0.95, alpha)));
             return g;
@@ -911,30 +901,30 @@ function EgoGraphCanvasResponsiveInner({
       else ctx.setLineDash([]);
 
       const dx = p.x - cx;
-      const dy = p.y - cy;
+      const dy = p.y - graphCy;
       const len = Math.hypot(dx, dy) || 1;
       const ux = dx / len;
       const uy = dy / len;
-      const endScale = isActive ? 1.35 : isHover ? 1.08 : 1.0;
+      const endScale = 1.0;
       const endR = nodeR * endScale;
       const pad = 2.5 * dpr;
       const x1 = cx + ux * (centerR + pad);
-      const y1 = cy + uy * (centerR + pad);
+      const y1 = graphCy + uy * (centerR + pad);
       const x2 = p.x - ux * (endR + pad);
       const y2 = p.y - uy * (endR + pad);
 
-      const bend = isActive ? 0.18 : 0.12;
+      const bend = 0.12;
       drawCurvedLine(ctx, x1, y1, x2, y2, bend);
       ctx.restore();
     });
 
-    // ??중앙(미니멀 ?�리미엄)
-    drawPremiumCenterCircle(ctx, cx, cy, centerR);
+    // Center node: draw in the same visual language as surrounding nodes.
+    drawPremiumNodeCircle(ctx, cx, graphCy, centerR, "#94A3B8", false, false, false);
 
     const centerMbtiKey = (centerSub || "").trim().toUpperCase();
     const centerIcon = iconCacheRef.current[centerMbtiKey];
-    const centerIconR = centerR * 0.78;
-    const centerIconY = cy - centerR * 0.08;
+    const centerIconR = centerR * 0.9;
+    const centerIconY = graphCy;
 
     if (centerIcon && centerIcon.complete && centerIcon.naturalWidth > 0) {
       ctx.save();
@@ -943,6 +933,10 @@ function EgoGraphCanvasResponsiveInner({
       ctx.closePath();
       ctx.clip();
       ctx.drawImage(centerIcon, cx - centerIconR, centerIconY - centerIconR, centerIconR * 2, centerIconR * 2);
+      ctx.fillStyle = hexToRgba("#94A3B8", 0.08);
+      ctx.beginPath();
+      ctx.arc(cx, centerIconY, centerIconR, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
     } else {
       ctx.fillStyle = "#0F172A";
@@ -952,17 +946,20 @@ function EgoGraphCanvasResponsiveInner({
       ctx.fillText(animalOf(centerSub), cx, centerIconY);
     }
 
+    ctx.save();
+    const centerNameY = graphCy + centerR + Math.max(10 * dpr, centerR * 0.55);
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#0F172A";
-    ctx.font = `700 ${Math.round(size * 0.031 * fitScale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
-    ctx.fillText(centerName, cx, cy + centerR * 0.85);
+    ctx.font = `700 ${Math.max(11, Math.round(centerR * 0.42))}px ui-sans-serif, system-ui, -apple-system`;
+    ctx.fillText(centerName, cx, centerNameY);
 
     if (centerSub) {
-      ctx.fillStyle = "rgba(15,23,42,0.55)";
-      ctx.font = `700 ${Math.round(size * 0.023 * fitScale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
-      ctx.fillText(centerSub.toUpperCase(), cx, cy + centerR * 1.25);
+      ctx.fillStyle = "rgba(15,23,42,0.62)";
+      ctx.font = `700 ${Math.max(9, Math.round(centerR * 0.3))}px ui-sans-serif, system-ui, -apple-system`;
+      ctx.fillText(centerSub.toUpperCase(), cx, centerNameY + Math.max(10 * dpr, centerR * 0.5));
     }
+    ctx.restore();
 
     const pts: Array<{ id: string; x: number; y: number }> = [];
 
@@ -973,21 +970,14 @@ function EgoGraphCanvasResponsiveInner({
       const isActive = activeId === n.id;
       const isHover = hoverId === n.id;
       const meta = LEVEL_META[n.level];
+      const focused = isFocused(n.level);
 
       const dim = (focusLevel && !isFocused(n.level)) || (activeId && !isActive);
-      const scale = isActive ? 1.35 : isHover ? 1.08 : 1.0;
+      const scale = 1.0;
       const r = nodeR * scale;
 
-      if (isActive) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r * 1.25, 0, Math.PI * 2);
-        ctx.fillStyle = hexToRgba(meta.color, 0.12);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      ctx.globalAlpha = activeId ? (isActive ? 1 : 0.35) : 1;
+      const nodeAlpha = activeId ? (isActive ? 1 : 0.6) : hasFocus ? (focused ? 1 : 0.22) : 1;
+      ctx.globalAlpha = nodeAlpha;
 
       drawPremiumNodeCircle(
         ctx,
@@ -995,7 +985,7 @@ function EgoGraphCanvasResponsiveInner({
         p.y,
         r,
         meta.color,
-        isActive,
+        false,
         isHover,
         !!dim
       );
@@ -1003,7 +993,7 @@ function EgoGraphCanvasResponsiveInner({
       const label = n.name.length > 5 ? `${n.name.slice(0, 4)}...` : n.name;
       const mbtiKey = (n.mbti || "").trim().toUpperCase();
       const iconImg = iconCacheRef.current[mbtiKey];
-      const iconR = r * 0.98;
+      const iconR = r * 0.9;
 
       if (iconImg && iconImg.complete && iconImg.naturalWidth > 0) {
         ctx.save();
@@ -1012,6 +1002,10 @@ function EgoGraphCanvasResponsiveInner({
         ctx.closePath();
         ctx.clip();
         ctx.drawImage(iconImg, p.x - iconR, p.y - iconR, iconR * 2, iconR * 2);
+        ctx.fillStyle = dim ? hexToRgba(meta.color, 0.08) : hexToRgba(meta.color, isActive ? 0.14 : 0.11);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, iconR, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
       } else {
         const emoji = animalOf(n.mbti);
@@ -1025,10 +1019,15 @@ function EgoGraphCanvasResponsiveInner({
       // Name + MBTI under node
       ctx.save();
       const nameY = p.y + r + Math.max(10 * dpr, r * 0.55);
+
       ctx.fillStyle = activeId
         ? isActive
           ? "#0F172A"
           : "rgba(15,23,42,0.38)"
+        : hasFocus
+        ? focused
+          ? "#0F172A"
+          : "rgba(15,23,42,0.28)"
         : dim
         ? "rgba(15,23,42,0.45)"
         : "#0F172A";
@@ -1037,8 +1036,11 @@ function EgoGraphCanvasResponsiveInner({
       ctx.textBaseline = "middle";
       ctx.fillText(label, p.x, nameY);
       ctx.fillStyle = dim ? "rgba(15,23,42,0.42)" : "rgba(15,23,42,0.62)";
+      if (!activeId && hasFocus && !focused) {
+        ctx.fillStyle = "rgba(15,23,42,0.3)";
+      }
       ctx.font = `700 ${Math.max(9, Math.round(r * 0.3))}px ui-sans-serif, system-ui, -apple-system`;
-      ctx.fillText(mbtiKey, p.x, nameY + Math.max(9 * dpr, r * 0.42));
+      ctx.fillText(mbtiKey, p.x, nameY + Math.max(10 * dpr, r * 0.5));
       ctx.restore();
     });
 
@@ -1057,7 +1059,7 @@ function EgoGraphCanvasResponsiveInner({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
 
     // CSS ?�기
     canvas.style.width = "100%";
@@ -1265,7 +1267,7 @@ function EgoGraphCanvasResponsiveInner({
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="font-semibold text-slate-900 truncate">{activeNode.name}</span>
-                  <span className="text-slate-300">?</span>
+                  <span className="text-slate-300">|</span>
                   <span className="font-semibold text-slate-600">{activeNode.mbti}</span>
                 </div>
 
@@ -1374,8 +1376,3 @@ const areEqual = (prev: Props, next: Props) => {
 };
 
 export default memo(EgoGraphCanvasResponsiveInner, areEqual);
-
-
-
-
-
