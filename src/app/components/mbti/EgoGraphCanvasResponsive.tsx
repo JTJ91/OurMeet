@@ -814,6 +814,7 @@ function EgoGraphCanvasResponsiveInner({
     const centerR = nodeR * 1.04;
     let graphCy = cy;
     const mobileTextBoost = size <= 430 ? 1.24 : 1;
+    const graphTextScale = 1.5;
 
     // Keep node + label bounds inside canvas vertically.
     const fitVertically = () => {
@@ -954,12 +955,12 @@ function EgoGraphCanvasResponsiveInner({
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#0F172A";
-    ctx.font = `700 ${Math.max(12, Math.round(centerR * 0.42 * mobileTextBoost))}px ui-sans-serif, system-ui, -apple-system`;
+    ctx.font = `700 ${Math.max(12, Math.round(centerR * 0.42 * mobileTextBoost * graphTextScale))}px ui-sans-serif, system-ui, -apple-system`;
     ctx.fillText(centerName, cx, centerNameY);
 
     if (centerSub) {
       ctx.fillStyle = "rgba(15,23,42,0.62)";
-      ctx.font = `700 ${Math.max(10, Math.round(centerR * 0.3 * mobileTextBoost))}px ui-sans-serif, system-ui, -apple-system`;
+      ctx.font = `700 ${Math.max(10, Math.round(centerR * 0.3 * mobileTextBoost * graphTextScale))}px ui-sans-serif, system-ui, -apple-system`;
       ctx.fillText(centerSub.toUpperCase(), cx, centerNameY + Math.max(10 * dpr, centerR * 0.5));
     }
     ctx.restore();
@@ -1034,7 +1035,10 @@ function EgoGraphCanvasResponsiveInner({
         : dim
         ? "rgba(15,23,42,0.45)"
         : "#0F172A";
-      const nameFontPx = Math.max(12, Math.round(r * 0.42 * mobileTextBoost * (isActive ? 1.14 : 1)));
+      const nameFontPx = Math.max(
+        12,
+        Math.round(r * 0.42 * mobileTextBoost * graphTextScale * (isActive ? 1.14 : 1))
+      );
       ctx.font = `${isActive ? 700 : 650} ${nameFontPx}px ui-sans-serif, system-ui, -apple-system`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -1043,7 +1047,10 @@ function EgoGraphCanvasResponsiveInner({
       if (!activeId && hasFocus && !focused) {
         ctx.fillStyle = "rgba(15,23,42,0.3)";
       }
-      const mbtiFontPx = Math.max(10, Math.round(r * 0.3 * mobileTextBoost * (isActive ? 1.14 : 1)));
+      const mbtiFontPx = Math.max(
+        10,
+        Math.round(r * 0.3 * mobileTextBoost * graphTextScale * (isActive ? 1.14 : 1))
+      );
       ctx.font = `700 ${mbtiFontPx}px ui-sans-serif, system-ui, -apple-system`;
       ctx.fillText(mbtiKey, p.x, nameY + Math.max(10 * dpr, r * 0.5));
       ctx.restore();
