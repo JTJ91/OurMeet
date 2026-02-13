@@ -109,7 +109,7 @@ export default function GraphClient({
         onCenterChange={(id) => {
           const next = new URLSearchParams(sp?.toString());
           next.set("center", id);
-          router.replace(`/g/${groupId}?${next.toString()}`);
+          router.replace(`/mbti/g/${groupId}?${next.toString()}`);
         }}
       />
     </>
