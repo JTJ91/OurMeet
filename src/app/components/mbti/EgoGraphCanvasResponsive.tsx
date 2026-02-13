@@ -813,7 +813,7 @@ function EgoGraphCanvasResponsiveInner({
     const nodeR = size * 0.089 * nodeScale * fitScale * dpr;
     const centerR = nodeR * 1.04;
     let graphCy = cy;
-    const mobileTextBoost = size <= 430 ? 1.16 : 1;
+    const mobileTextBoost = size <= 430 ? 1.24 : 1;
 
     // Keep node + label bounds inside canvas vertically.
     const fitVertically = () => {
@@ -975,7 +975,7 @@ function EgoGraphCanvasResponsiveInner({
       const focused = isFocused(n.level);
 
       const dim = (focusLevel && !isFocused(n.level)) || (activeId && !isActive);
-      const scale = 1.0;
+      const scale = isActive ? 1.24 : 1.0;
       const r = nodeR * scale;
 
       const nodeAlpha = activeId ? (isActive ? 1 : 0.6) : hasFocus ? (focused ? 1 : 0.22) : 1;
@@ -987,7 +987,7 @@ function EgoGraphCanvasResponsiveInner({
         p.y,
         r,
         meta.color,
-        false,
+        isActive,
         isHover,
         !!dim
       );
@@ -1033,7 +1033,7 @@ function EgoGraphCanvasResponsiveInner({
         : dim
         ? "rgba(15,23,42,0.45)"
         : "#0F172A";
-      const nameFontPx = Math.max(12, Math.round(r * 0.42 * mobileTextBoost));
+      const nameFontPx = Math.max(12, Math.round(r * 0.42 * mobileTextBoost * (isActive ? 1.14 : 1)));
       ctx.font = `${isActive ? 700 : 650} ${nameFontPx}px ui-sans-serif, system-ui, -apple-system`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -1042,7 +1042,7 @@ function EgoGraphCanvasResponsiveInner({
       if (!activeId && hasFocus && !focused) {
         ctx.fillStyle = "rgba(15,23,42,0.3)";
       }
-      const mbtiFontPx = Math.max(10, Math.round(r * 0.3 * mobileTextBoost));
+      const mbtiFontPx = Math.max(10, Math.round(r * 0.3 * mobileTextBoost * (isActive ? 1.14 : 1)));
       ctx.font = `700 ${mbtiFontPx}px ui-sans-serif, system-ui, -apple-system`;
       ctx.fillText(mbtiKey, p.x, nameY + Math.max(10 * dpr, r * 0.5));
       ctx.restore();
