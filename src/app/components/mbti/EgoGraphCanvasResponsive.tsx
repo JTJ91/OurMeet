@@ -899,7 +899,8 @@ function EgoGraphCanvasResponsiveInner({
       ctx.lineWidth = baseLW * dpr;
       ctx.lineCap = "round";
 
-      if (n.level <= 2) ctx.setLineDash([7 * dpr, 10 * dpr]);
+      const isDashed = n.level <= 2;
+      if (isDashed) ctx.setLineDash([7 * dpr, 10 * dpr]);
       else ctx.setLineDash([]);
 
       const dx = p.x - cx;
@@ -909,7 +910,7 @@ function EgoGraphCanvasResponsiveInner({
       const uy = dy / len;
       const endScale = 1.0;
       const endR = nodeR * endScale;
-      const pad = 2.5 * dpr;
+      const pad = isDashed ? 0.25 * dpr : 2.5 * dpr;
       const x1 = cx + ux * (centerR + pad);
       const y1 = graphCy + uy * (centerR + pad);
       const x2 = p.x - ux * (endR + pad);
