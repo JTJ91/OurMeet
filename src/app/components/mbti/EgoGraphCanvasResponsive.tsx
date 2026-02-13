@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, memo } from "react";
 import { getCompatScore } from "@/app/lib/mbti/mbtiCompat";
 
 type Level = 1 | 2 | 3 | 4 | 5;
@@ -462,7 +462,7 @@ function ScoreBar({
   );
 }
 
-export default function EgoGraphCanvasResponsive({
+function EgoGraphCanvasResponsiveInner({
   groupName,
   memberCount,
   centerName,
@@ -1022,3 +1022,21 @@ export default function EgoGraphCanvasResponsive({
     </div>
   );
 }
+
+const areEqual = (prev: Props, next: Props) => {
+  return (
+    prev.groupName === next.groupName &&
+    prev.memberCount === next.memberCount &&
+    prev.centerName === next.centerName &&
+    prev.centerSub === next.centerSub &&
+    prev.nodes === next.nodes && // ✅ 핵심: nodes 참조가 같으면 캔버스 리렌더 스킵
+    prev.ringCount === next.ringCount &&
+    prev.maxSize === next.maxSize &&
+    prev.minSize === next.minSize &&
+    prev.aspect === next.aspect &&
+    prev.showLegend === next.showLegend &&
+    prev.onCenterChange === next.onCenterChange
+  );
+};
+
+export default memo(EgoGraphCanvasResponsiveInner, areEqual);
