@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState, memo } from "react";
+import { flushSync } from "react-dom";
 import { getCompatScore } from "@/app/lib/mbti/mbtiCompat";
 
 type Level = 1 | 2 | 3 | 4 | 5;
@@ -777,8 +778,8 @@ function EgoGraphCanvasResponsiveInner({
     // ✅ hitTest 캐시 갱신
     geomRef.current.pts = pts;
 
-    // ✅ hit radius 캐시 (hitTest에서 재계산 제거)
-    const hitR = size * 0.048 * fitScale * dpr * 1.3;
+    // ✅ hit radius 캐시: 실제 노드 반지름 기반으로 (빈공간 클릭 오판 줄이기)
+    const hitR = nodeR * 1.08; // 1.05~1.15 사이 취향(작을수록 빈공간 잘 잡힘)
     geomRef.current.hitR2 = hitR * hitR;
 
     ctx.globalAlpha = 1;
@@ -865,13 +866,50 @@ function EgoGraphCanvasResponsiveInner({
   const onClick = (e: React.MouseEvent) => {
     refreshRect();
     const id = hitTest(e.clientX, e.clientY);
-    setActiveId((prev) => (prev === id ? null : id));
-    requestDraw();
+
+    // ✅ 빈공간 클릭 = 즉시 해제
+    if (!id) {
+      flushSync(() => {
+        setActiveId(null);
+        setFocusLevel(null);
+      });
+
+      hoverIdRef.current = null;
+      const canvas = canvasRef.current;
+      if (canvas) canvas.style.cursor = "default";
+
+      draw(); // ✅ 이제 최신 state로 즉시 draw 됨
+      return;
+    }
+
+    // ✅ 노드 클릭: 토글(next를 먼저 계산해서 동기 반영)
+    const next = (activeId === id) ? null : id;
+
+    flushSync(() => {
+      setActiveId(next);
+    });
+
+    if (next === null) {
+      hoverIdRef.current = null;
+      const canvas = canvasRef.current;
+      if (canvas) canvas.style.cursor = "default";
+    }
+
+    draw();        // ✅ 클릭 즉시 커짐/작아짐 반영
+    requestDraw(); // ✅ 혹시 잔여 RAF가 있으면 안전하게 한 번 더
   };
+
+
+
 
   const onMouseMove = (e: React.MouseEvent) => {
     refreshRect();
     const id = hitTest(e.clientX, e.clientY);
+
+    // activeId가 null이고, hover만 커지는 게 싫으면:
+    if (activeId === null && id !== null) {
+      // hover를 유지할지 말지는 취향
+    }
 
     if (hoverIdRef.current !== id) {
       hoverIdRef.current = id;
