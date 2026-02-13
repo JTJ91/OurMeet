@@ -1,5 +1,5 @@
 import React from "react";
-import { getCompatScore, levelFromScore } from "@/app/lib/mbti/mbtiCompat";
+import { levelFromScore } from "@/app/lib/mbti/mbtiCompat";
 
 type Level = 1 | 2 | 3 | 4 | 5;
 
@@ -18,18 +18,17 @@ function scoreColor(score: number) {
 type PairRow = {
   aId: string; aName: string; aMbti: string;
   bId: string; bName: string; bMbti: string;
-  score: number;
+  score: number; // ✅ 서버에서 정렬에 사용한 점수(표시도 이걸로)
 };
 
 type Props = {
   best3: PairRow[];
   worst3: PairRow[];
-  // ✅ 있으면 더 정확한 문구 가능 (없으면 자동 처리)
   memberCount?: number;
 };
 
 export default function ChemTopWorst({ best3, worst3, memberCount }: Props) {
-  const pairCount = best3.length + worst3.length; // 보통 둘 다 0이면 페어 0
+  const pairCount = best3.length + worst3.length;
   const isNoPairs = pairCount === 0;
 
   if (isNoPairs) {
@@ -67,7 +66,8 @@ export default function ChemTopWorst({ best3, worst3, memberCount }: Props) {
 
         <ul className="space-y-2">
           {best3.map((p, idx) => {
-            const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti);
+            const s = Number.isFinite(Number(p.score)) ? Number(p.score) : 0;
+
             return (
               <li
                 key={`best-${p.aId}-${p.bId}`}
@@ -81,8 +81,8 @@ export default function ChemTopWorst({ best3, worst3, memberCount }: Props) {
                 </div>
 
                 <div className="mt-0.5 pl-5 text-[12px] font-extrabold">
-                  <span style={{ color: scoreColor(r.score) }}>
-                    {r.score.toFixed(2)}점
+                  <span style={{ color: scoreColor(s) }}>
+                    {s.toFixed(2)}점
                   </span>
                 </div>
               </li>
@@ -100,7 +100,8 @@ export default function ChemTopWorst({ best3, worst3, memberCount }: Props) {
 
         <ul className="space-y-2">
           {worst3.map((p, idx) => {
-            const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti);
+            const s = Number.isFinite(Number(p.score)) ? Number(p.score) : 0;
+
             return (
               <li
                 key={`worst-${p.aId}-${p.bId}`}
@@ -114,8 +115,8 @@ export default function ChemTopWorst({ best3, worst3, memberCount }: Props) {
                 </div>
 
                 <div className="mt-0.5 pl-5 text-[12px] font-extrabold">
-                  <span style={{ color: scoreColor(r.score) }}>
-                    {r.score.toFixed(2)}점
+                  <span style={{ color: scoreColor(s) }}>
+                    {s.toFixed(2)}점
                   </span>
                 </div>
               </li>

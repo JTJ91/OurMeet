@@ -165,9 +165,27 @@ function scorePair(a: Stack, b: Stack): number {
   return Math.max(0, Math.min(100, s));
 }
 
+function internalCompat(
+  leftId: string,
+  leftMbti: string,
+  rightId: string,
+  rightMbti: string
+): CompatScore {
+  const scoreInt = calcCompatScore(leftMbti, rightMbti); // ✅ 이제 pairTiebreak가 대칭이면 안정
+  const score = microFromBase(leftId, leftMbti, rightId, rightMbti, scoreInt);
+
+  const level = levelFromScore(score);
+  const type = classifyChemType(leftMbti, rightMbti, score);
+
+  return { scoreInt, score, level, type };
+}
+
+
 // ✅ 기존 타이브레이커(정수 점수용)
 function pairTiebreak(a: string, b: string) {
-  const s = `${norm(a)}-${norm(b)}`;
+  const A = norm(a);
+  const B = norm(b);
+  const s = A < B ? `${A}-${B}` : `${B}-${A}`; // ✅ 순서 고정
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
   return (h % 20) / 10; // 0.0~1.9
@@ -270,19 +288,17 @@ export function calcCompatLevel(aMbti: string, bMbti: string): Level {
 }
 
 // ✅ 캔버스/리포트가 "똑같은 점수" 쓰게 하는 단일 함수
-  export function getCompatScore(
+export function getCompatScore(
   aId: string,
   aMbti: string,
   bId: string,
   bMbti: string
 ): CompatScore {
-  const scoreInt = calcCompatScore(aMbti, bMbti);                 // 정수
-  const score = microFromBase(aId, aMbti, bId, bMbti, scoreInt);  // 소수점(표시용)
+  const A = `${aId}|${norm(aMbti)}`;
+  const B = `${bId}|${norm(bMbti)}`;
 
-  const level = levelFromScore(score);               // ✅ micro 기준 (색=표시점수와 동기화)
-  const type  = classifyChemType(aMbti, bMbti, score); // ✅ micro 기준(원하면)
-
-  return { scoreInt, score, level, type };
+  if (A < B) return internalCompat(aId, aMbti, bId, bMbti);
+  return internalCompat(bId, bMbti, aId, aMbti);
 }
 
 

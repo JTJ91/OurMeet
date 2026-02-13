@@ -5,7 +5,7 @@ import RememberGroupClient from "@/app/components/RememberGroupClient";
 import ChemMoreList from "@/app/mbti/g/[groupId]/components/ChemMoreList";
 import RoleMoreList from "@/app/mbti/g/[groupId]/components/RoleMoreList";
 import GraphServer from "./GraphServer";
-import { calcCompatScore } from "@/app/lib/mbti/mbtiCompat";
+import { getCompatScore } from "@/app/lib/mbti/mbtiCompat";
 import { unstable_cache } from "next/cache";
 import ChemReportSection from "@/app/mbti/g/[groupId]/components/ChemReportSection";
 import TouchSavedGroupClient from "@/app/components/TouchSavedGroupClient";
@@ -598,12 +598,7 @@ const getRankings = (groupId: string) =>
           const a = membersForRank[i];
           const b = membersForRank[j];
 
-          const base = calcCompatScore(a.mbti, b.mbti);
-          const score = adjustChemScoreByStyles(
-            base,
-            { judge: a.judgeStyle, info: a.infoStyle },
-            { judge: b.judgeStyle, info: b.infoStyle }
-          );
+          const score = getCompatScore(a.id, a.mbti, b.id, b.mbti).score;
 
           pairs.push({
             aId: a.id,
