@@ -61,7 +61,7 @@ export default function FloatingToTop() {
       type="button"
       aria-label="맨위로"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed right-4 z-[55] rounded-full bg-white/90 px-4 py-3 text-xs font-extrabold text-slate-800 shadow-lg ring-1 ring-black/10 backdrop-blur hover:bg-white active:scale-[0.98]"
+      className="fixed right-4 z-[55] rounded-full border border-slate-200/70 bg-white/92 px-4 py-3 text-xs font-extrabold text-slate-800 shadow-[0_10px_24px_rgba(15,23,42,0.14)] backdrop-blur-sm hover:bg-white active:scale-[0.98]"
       style={{
         bottom:
           "calc(var(--bottom-cta-h, 0px) + 16px + env(safe-area-inset-bottom))",

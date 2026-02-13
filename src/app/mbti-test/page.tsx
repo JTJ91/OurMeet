@@ -9,13 +9,13 @@ export const metadata = {
 
 export default function MbtiTestPage() {
   return (
-    <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
-      <div className="mx-auto w-full max-w-[760px] px-4 pb-16 pt-10">
+    <main className="mbti-page-bg">
+      <div className="mbti-shell w-full max-w-[820px] pb-16 pt-10">
         {/* Top bar */}
         <div className="mb-4 flex items-center justify-between">
         <Link
             href="/mbti"
-            className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 text-xs font-extrabold text-slate-700 ring-1 ring-black/5 backdrop-blur hover:bg-white"
+            className="mbti-back-btn"
         >
             <span aria-hidden>←</span>
             <span>MBTI 홈</span>
@@ -24,7 +24,7 @@ export default function MbtiTestPage() {
 
 
         {/* Header */}
-        <header className="rounded-3xl bg-white/70 p-6 shadow-sm ring-1 ring-black/5">
+        <header className="mbti-card p-6">
         <h1 className="text-3xl font-extrabold leading-tight text-slate-900">
             MBTI 정식 검사
             <br />
@@ -51,7 +51,7 @@ export default function MbtiTestPage() {
 
 
         {/* Test Card */}
-        <section className="mt-5 rounded-3xl bg-white/80 p-5 shadow-sm ring-1 ring-black/5">
+        <section className="mbti-card mt-5 p-5">
           <MbtiTestClient />
         </section>
 

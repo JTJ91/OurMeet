@@ -34,9 +34,9 @@ export default function GraphClient({
     const centerLabel = `${center.nickname} · ${center.mbti}`;
 
     return (
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {/* ✅ 현재 센터: 깔끔한 인포 바 */}
-        <div className="flex items-center justify-between rounded-2xl bg-white/70 px-3 py-2 ring-1 ring-black/5">
+        <div className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/85 px-3.5 py-2.5 shadow-[0_6px_16px_rgba(15,23,42,0.05)]">
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-[11px] font-extrabold text-slate-500 shrink-0">
               내 정보
@@ -62,15 +62,16 @@ export default function GraphClient({
         </p>
 
         {/* ✅ 버튼: 작게/컴팩트 */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2.5">
           <Link
             href={`/mbti/g/${groupId}/join`}
             className="
               flex h-10 w-full items-center justify-center gap-2
-              rounded-2xl bg-[#1E88E5]
+              rounded-2xl bg-gradient-to-r from-[#1E88E5] to-[#2f9dff]
               text-[13px] font-extrabold text-white
+              shadow-[0_8px_18px_rgba(30,136,229,0.26)]
               transition-all duration-200
-              hover:bg-[#1E88E5]/90
+              hover:brightness-95
               active:scale-[0.98]
             "
           >

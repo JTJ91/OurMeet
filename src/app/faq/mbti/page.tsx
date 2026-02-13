@@ -8,13 +8,13 @@ export const metadata = {
 
 export default function FAQPage() {
   return (
-    <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
-      <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-10">
+    <main className="mbti-page-bg">
+      <div className="mbti-shell w-full max-w-3xl pb-16 pt-10">
         {/* Top left back */}
         <div className="mb-4 flex items-center justify-between">
           <Link
             href="/mbti"
-            className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 backdrop-blur hover:bg-white"
+            className="mbti-back-btn"
           >
             <span aria-hidden>←</span>
             <span>MBTI홈</span>
@@ -22,7 +22,7 @@ export default function FAQPage() {
         </div>
 
         {/* 헤더 */}
-        <header className="rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
+        <header className="mbti-card p-6">
           <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
             자주 묻는 질문(FAQ)
           </h1>
@@ -74,7 +74,7 @@ export default function FAQPage() {
             <div className="mt-5">
               <a
                 href="/guide/cognitive-functions"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 hover:bg-slate-50"
+                className="mbti-back-btn inline-flex items-center gap-2 px-4"
               >
                 인지기능 설명 페이지 보기 →
               </a>
@@ -216,7 +216,7 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-3xl border border-black/5 bg-white/80 p-5 shadow-sm backdrop-blur">
+    <div className="mbti-card p-5">
       <h2 className="text-base font-extrabold text-slate-900">{title}</h2>
       <div className="mt-3">{children}</div>
     </div>

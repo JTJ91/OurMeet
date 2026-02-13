@@ -17,14 +17,14 @@ export default function GuideLayout({
   hideCTA?: boolean;
 }) {
   return (
-    <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
-      <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-8">
+    <main className="mbti-page-bg">
+      <div className="mbti-shell w-full max-w-3xl pb-16">
         {/* Back */}
         {!hideTopBack && (
           <div className="mb-4 flex items-center justify-between">
             <Link
               href="/guides"
-              className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 backdrop-blur hover:bg-white"
+              className="mbti-back-btn whitespace-nowrap"
             >
               <span aria-hidden>←</span>
               <span>가이드 목록</span>
@@ -36,7 +36,7 @@ export default function GuideLayout({
 
         {/* Header */}
         {!hideHeader && (
-          <header className="rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
+          <header className="mbti-card p-6">
             <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
               {title}
             </h1>
@@ -55,13 +55,13 @@ export default function GuideLayout({
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/guides"
-              className="flex-1 rounded-full border border-slate-300 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              className="mbti-back-btn flex-1 justify-center whitespace-nowrap px-6 py-3 text-sm font-semibold"
             >
               가이드 목록
             </Link>
             <Link
               href="/"
-              className="flex-1 rounded-full bg-[#1E88E5] px-6 py-3 text-center text-sm font-semibold text-white shadow-md transition hover:bg-[#1E88E5]/90"
+              className="mbti-primary-btn flex-1 justify-center whitespace-nowrap px-6 py-3 text-sm font-semibold text-white"
             >
               모임 케미 보러가기 →
             </Link>
@@ -81,7 +81,7 @@ export function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-3xl border border-black/5 bg-white/80 p-5 shadow-sm backdrop-blur">
+    <div className="mbti-card p-5">
       <h2 className="text-base font-extrabold text-slate-900">{title}</h2>
       <div className="mt-3">{children}</div>
     </div>

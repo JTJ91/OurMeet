@@ -188,8 +188,8 @@ export default function MbtiTestClient() {
             type="button"
             onClick={() => router.push(`/mbti/create?mbti=${encodeURIComponent(type)}`)}
             className="
-              rounded-full bg-[#1E88E5] px-5 py-2 text-xs font-extrabold text-white
-              shadow-sm transition-all duration-200 hover:brightness-110 active:scale-[0.97]
+              mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white
+              transition-all duration-200 active:scale-[0.97]
             "
           >
             이 결과로 모임 만들기
@@ -201,8 +201,8 @@ export default function MbtiTestClient() {
             type="button"
             onClick={() => goBackWithMbti(type)}
             className="
-              rounded-full bg-[#1E88E5] px-5 py-2 text-xs font-extrabold text-white
-              shadow-sm transition-all duration-200 hover:brightness-110 active:scale-[0.97]
+              mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white
+              transition-all duration-200 active:scale-[0.97]
             "
           >
             이 결과로 참여하기
@@ -214,8 +214,8 @@ export default function MbtiTestClient() {
             type="button"
             onClick={() => router.push(`/mbti/create?mbti=${encodeURIComponent(type)}`)}
             className="
-              rounded-full bg-[#1E88E5] px-5 py-2 text-xs font-extrabold text-white
-              shadow-sm transition-all duration-200 hover:brightness-110 active:scale-[0.97]
+              mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white
+              transition-all duration-200 active:scale-[0.97]
             "
           >
             이 결과로 모임 만들기
@@ -256,9 +256,9 @@ export default function MbtiTestClient() {
         </div>
 
       {/* 진행 바 */}
-      <div className="mt-3 h-2.5 w-full rounded-full bg-slate-200/80 ring-1 ring-black/5 overflow-hidden">
+      <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-slate-200/80 ring-1 ring-black/5">
         <div
-            className="h-full rounded-full bg-[#1E88E5] transition-[width] duration-300"
+            className="h-full rounded-full bg-gradient-to-r from-[#1E88E5] to-[#3ba6ff] transition-[width] duration-300"
             style={{ width: `${progressPct}%` }}
         />
         </div>
@@ -327,7 +327,7 @@ function AxisRow({
   const rightFill = leanLeft ? 0 : halfFill;
 
   return (
-    <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/10 shadow-sm">
+    <div className="mbti-card-soft rounded-3xl p-4 ring-1 ring-black/10">
       {/* 상단 라벨 */}
       <div className="grid grid-cols-[96px_1fr_96px] items-center">
         {/* left */}

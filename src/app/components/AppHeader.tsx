@@ -63,7 +63,7 @@ const TREE: TreeGroup[] = [
 
 
 function formatRelativeTime(ts: number) {
-  const diff = Date.now() - ts;
+  const diff = ts;
   const sec = Math.floor(diff / 1000);
 
   if (sec < 10) return "방금";
@@ -119,6 +119,7 @@ export default function AppHeader() {
   const pathname = usePathname();
 
   const [open, setOpen] = useState(false);
+  const [nowTs, setNowTs] = useState(() => Date.now());
   const [openKey, setOpenKey] = useState<"mbti" | "saju" | null>("mbti");
 
   const [recentOpen, setRecentOpen] = useState(false);
@@ -137,7 +138,10 @@ export default function AppHeader() {
     document.body.style.overflow = "hidden";
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      setRecentOpen(false);
+      setOpenKey(null);
     };
     window.addEventListener("keydown", onKey);
 
@@ -148,10 +152,6 @@ export default function AppHeader() {
   }, [open]);
 
   // ✅ drawer 열릴 때마다 최근 목록 로드
-  useEffect(() => {
-    if (open) setGroups(readSavedGroups());
-  }, [open]);
-
   // ✅ 다른 탭에서 바뀐 경우도 반영
   useEffect(() => {
     const onStorage = () => setGroups(readSavedGroups());
@@ -161,11 +161,29 @@ export default function AppHeader() {
 
   // ✅ drawer 닫히면 하위 트리 정리
   useEffect(() => {
-    if (!open) {
-      setRecentOpen(false);
-      setOpenKey(null);
-    }
-  }, [open]);
+    const timer = window.setInterval(() => setNowTs(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const closeDrawer = () => {
+    setOpen(false);
+    setRecentOpen(false);
+    setOpenKey(null);
+  };
+
+  const toggleDrawer = () => {
+    setOpen((v) => {
+      const next = !v;
+      if (next) {
+        setGroups(readSavedGroups());
+        setOpenKey((k) => k ?? "mbti");
+      } else {
+        setRecentOpen(false);
+        setOpenKey(null);
+      }
+      return next;
+    });
+  };
 
   const isActiveHref = (href: string) => {
   // ✅ 홈 링크는 "정확히 일치"만
@@ -178,8 +196,8 @@ export default function AppHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-black/5 bg-white/70 backdrop-blur">
-        <div className="mx-auto flex h-12 max-w-[760px] items-center justify-between px-5">
+      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 backdrop-blur-sm">
+        <div className="mx-auto flex h-12 max-w-[820px] items-center justify-between px-5">
           {/* Brand */}
           <Link href="/" className="flex items-center gap-2">
             <span className="text-sm font-extrabold tracking-tight text-slate-900">
@@ -187,7 +205,7 @@ export default function AppHeader() {
             </span>
 
             {/* ✅ beta 배지 */}
-            <span className="rounded-full bg-[#1E88E5]/10 px-2 py-0.5 text-[11px] font-extrabold text-[#1E88E5]">
+            <span className="rounded-full bg-[#1E88E5]/12 px-2 py-0.5 text-[11px] font-extrabold text-[#1E88E5] ring-1 ring-[#1E88E5]/20">
               beta
             </span>
           </Link>
@@ -195,8 +213,8 @@ export default function AppHeader() {
 
           <button
             type="button"
-            onClick={() => setOpen((v) => !v)}
-            className="group inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/70 ring-1 ring-black/5 backdrop-blur transition hover:bg-white"
+            onClick={toggleDrawer}
+            className="group inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white/85 shadow-[0_4px_12px_rgba(15,23,42,0.05)] backdrop-blur-sm transition hover:bg-white"
             aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
             aria-expanded={open}
           >
@@ -216,7 +234,7 @@ export default function AppHeader() {
         <button
           type="button"
           aria-label="닫기"
-          onClick={() => setOpen(false)}
+          onClick={closeDrawer}
           className={[
             "absolute inset-0 transition-opacity duration-300",
             open ? "opacity-100 bg-black/35" : "opacity-0 bg-black/0",
@@ -226,7 +244,8 @@ export default function AppHeader() {
         <aside
           className={[
             "absolute right-0 top-0 h-full w-[320px] max-w-[85vw]",
-            "bg-white/85 backdrop-blur-xl shadow-2xl ring-1 ring-black/5",
+            "bg-white/90 backdrop-blur-xl shadow-[0_20px_48px_rgba(15,23,42,0.18)] ring-1 ring-slate-200/70",
+            "overflow-hidden",
             "transition-transform duration-300 ease-out",
             open ? "translate-x-0" : "translate-x-full",
           ].join(" ")}
@@ -246,7 +265,7 @@ export default function AppHeader() {
               </div>
 
               <button
-                onClick={() => setOpen(false)}
+                onClick={closeDrawer}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white ring-1 ring-black/10 hover:bg-slate-50"
                 aria-label="닫기"
               >
@@ -255,8 +274,8 @@ export default function AppHeader() {
             </div>
 
             {/* ✅ Tree Nav */}
-            <nav className="mt-5">
-              <div className="rounded-3xl bg-white/70 ring-1 ring-black/5 backdrop-blur">
+            <nav className="mt-5 min-h-0 flex-1 overflow-y-auto pr-1 overscroll-contain">
+              <div className="rounded-3xl border border-slate-200/70 bg-white/85 shadow-[0_8px_20px_rgba(15,23,42,0.05)] backdrop-blur-sm">
                 <ul className="divide-y divide-black/5">
                   {TREE.map((g) => {
                     const expanded = openKey === g.key;
@@ -349,7 +368,7 @@ export default function AppHeader() {
                                     <li key={it.href}>
                                       <Link
                                         href={it.href}
-                                        onClick={() => setOpen(false)}
+                                        onClick={closeDrawer}
                                         className={[
                                           "group relative flex items-center px-8 py-2",
                                           "text-sm font-semibold transition",
@@ -428,9 +447,9 @@ export default function AppHeader() {
                                     <div className="overflow-hidden">
                                         <div className="px-4 pb-3">
                                         {/* ✅ panel */}
-                                        <div className="mt-2 rounded-3xl p-3 ring-1 ring-black/5">
+                                        <div className="mt-2 rounded-3xl border border-slate-200/70 bg-white/88 p-3">
                                             {!groups.length ? (
-                                            <div className="rounded-2xl bg-white/70 p-3 text-xs font-semibold text-slate-600 ring-1 ring-black/5">
+                                            <div className="rounded-2xl border border-slate-200/70 bg-white/85 p-3 text-xs font-semibold text-slate-600">
                                                 모임을 만들거나 참여하면 여기에 기록돼요
                                             </div>
                                             ) : (
@@ -444,11 +463,10 @@ export default function AppHeader() {
                                                     <li key={gr.id} className="flex items-center gap-2">
                                                     <Link
                                                         href={href}
-                                                        onClick={() => setOpen(false)}
+                                                        onClick={closeDrawer}
                                                         className="
-                                                        group flex-1 rounded-2xl bg-[#F5F9FF] px-3 py-2 
-                                                        ring-1 ring-black/5
-                                                        hover:bg-white hover:ring-black/10
+                                                        group flex-1 rounded-2xl border border-slate-200/70 bg-white/85 px-3 py-2 
+                                                        hover:bg-white
                                                         transition
                                                         "
                                                     >
@@ -467,7 +485,7 @@ export default function AppHeader() {
                                                         </div>
 
                                                         <span className="shrink-0 text-[11px] font-bold text-slate-400">
-                                                        {formatRelativeTime(gr.lastSeenAt)}
+                                                        {formatRelativeTime(nowTs - gr.lastSeenAt)}
                                                         </span>
                                                         </div>
                                                     </Link>
@@ -479,9 +497,8 @@ export default function AppHeader() {
                                                         setGroups(readSavedGroups());
                                                         }}
                                                         className="
-                                                        shrink-0 rounded-2xl bg-white/70 px-3 py-2
+                                                        shrink-0 rounded-2xl border border-slate-200/70 bg-white/85 px-3 py-2
                                                         text-[11px] font-extrabold text-slate-500
-                                                        ring-1 ring-black/10
                                                         hover:bg-white hover:text-slate-700
                                                         transition
                                                         "
@@ -516,7 +533,7 @@ export default function AppHeader() {
 
             {/* Bottom hint */}
             <div className="mt-auto pt-6">
-              <div className="rounded-2xl bg-[#F5F9FF] p-4 text-xs leading-relaxed text-slate-600 ring-1 ring-black/5">
+              <div className="rounded-2xl border border-slate-200/70 bg-white/85 p-4 text-xs leading-relaxed text-slate-600">
                 <b className="text-slate-800">팁</b>· “모임 속 MBTI”에서 모임 유형별 케미 가이드를 한눈에 확인해보세요.
               </div>
 

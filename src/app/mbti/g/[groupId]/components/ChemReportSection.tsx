@@ -345,8 +345,8 @@ export default function ChemReportSection({ pairs }: Props) {
                 <div
                     key={t}
                     className={[
-                    "relative overflow-hidden rounded-2xl bg-white/70 p-3",
-                    "ring-1 ring-black/5",
+                    "relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white/88 p-3",
+                    "shadow-[0_6px_16px_rgba(15,23,42,0.05)]",
                     ].join(" ")}
                 >
                     <div className={`absolute left-0 top-0 h-full w-1 ${th.leftBar}`} />
@@ -382,7 +382,7 @@ export default function ChemReportSection({ pairs }: Props) {
 
                     <div className="mt-3 pl-2">
                     {rankSlots.length > 0 ? (
-                        <ul className="divide-y divide-black/5 overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/5">
+                        <ul className="divide-y divide-black/5 overflow-hidden rounded-xl border border-slate-200/70 bg-white/88">
                         {rankSlots.map((slot, rankIdx) => {
                             const badge = chemRankBadge(t, rankIdx);
 
@@ -441,7 +441,7 @@ export default function ChemReportSection({ pairs }: Props) {
                         })}
                         </ul>
                     ) : (
-                        <div className="rounded-xl bg-white/60 px-3 py-3 ring-1 ring-black/5">
+                        <div className="rounded-xl border border-slate-200/70 bg-white/88 px-3 py-3">
                         <div className="text-[11px] text-slate-500">
                             아직 이 타입으로 분류되는 조합이 없어요.
                         </div>
@@ -457,7 +457,7 @@ export default function ChemReportSection({ pairs }: Props) {
             {/* ✅ 상단 요약(가독성 개선) */}
             <div className="mt-3 space-y-2">
               {/* 모임 프로필 */}
-              <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
+              <div className="rounded-2xl border border-slate-200/70 bg-white/88 p-3 shadow-[0_6px_16px_rgba(15,23,42,0.05)]">
                 <div className="text-[11px] font-extrabold text-slate-500">모임 성격</div>
                 <div className="mt-1 text-xs font-extrabold text-slate-800 leading-5">
                   {chem.profile}

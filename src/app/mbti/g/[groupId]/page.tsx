@@ -719,34 +719,34 @@ function SectionCard2({
   const toneMap = {
     blue: {
       top: "bg-[#1E88E5]",
-      chip: "bg-[#1E88E5]/10 text-[#1E88E5]",
-      headerBg: "bg-[#1E88E5]/[0.06]",
+      chip: "bg-[#1E88E5]/12 text-[#1E88E5]",
+      headerBg: "bg-[#1E88E5]/[0.05]",
     },
     indigo: {
       top: "bg-indigo-500",
       chip: "bg-indigo-500/10 text-indigo-700",
-      headerBg: "bg-indigo-500/[0.06]",
+      headerBg: "bg-indigo-500/[0.05]",
     },
     violet: {
       top: "bg-violet-500",
       chip: "bg-violet-500/10 text-violet-700",
-      headerBg: "bg-violet-500/[0.06]",
+      headerBg: "bg-violet-500/[0.05]",
     },
     emerald: {
       top: "bg-emerald-500",
       chip: "bg-emerald-500/10 text-emerald-700",
-      headerBg: "bg-emerald-500/[0.06]",
+      headerBg: "bg-emerald-500/[0.05]",
     },
   }[tone];
 
   return (
     <section className="mt-6">
-      <div className="overflow-hidden rounded-3xl bg-white/75 shadow-sm ring-1 ring-black/5">
+      <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white/85 shadow-[0_10px_28px_rgba(15,23,42,0.06)] backdrop-blur-sm">
         {/* ✅ 상단 얇은 라인(구분감 핵심) */}
 
 
         {/* ✅ 헤더 스트립(아주 약한 배경톤) */}
-        <div className={`px-4 py-3 ${toneMap.headerBg}`}>
+        <div className={`px-4 py-3 ${toneMap.headerBg} border-b border-slate-200/60`}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
@@ -764,7 +764,7 @@ function SectionCard2({
         </div>
 
         {/* ✅ 본문 */}
-        <div className="px-4 pb-4">{children}</div>
+        <div className="px-4 pb-4 pt-1">{children}</div>
       </div>
     </section>
   );
@@ -897,14 +897,14 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
 
 
   return (
-    <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-10">
+    <main className="mbti-page-bg pb-12">
     
-      <div className="mx-auto max-w-[760px] px-5 pt-6">
+      <div className="mbti-shell">
         {/* Top left back */}
         <div className="flex items-center justify-between">
           <Link
             href="/mbti"
-            className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 backdrop-blur hover:bg-white"
+            className="mbti-back-btn"
           >
             <span aria-hidden>←</span>
             <span>뒤로가기</span>
@@ -915,7 +915,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
 
         {/* Unified top card */}
         <section className="mt-4">
-          <div className="rounded-3xl bg-white/70 p-5 shadow-sm ring-1 ring-black/5">
+          <div className="rounded-3xl border border-slate-200/70 bg-white/85 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] backdrop-blur-sm">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="text-xs font-bold text-slate-500">모임</div>
@@ -934,9 +934,9 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
 
             {/* progress */}
             <div className="mt-4">
-              <div className="h-2 w-full rounded-full bg-slate-200/70">
+              <div className="h-2 w-full rounded-full bg-slate-200/80">
                 <div
-                  className="h-2 rounded-full bg-[#1E88E5]"
+                  className="h-2 rounded-full bg-gradient-to-r from-[#1E88E5] to-[#3ba6ff]"
                   style={{ width: `${ratio}%` }}
                 />
               </div>
@@ -952,13 +952,13 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
         <Suspense
           fallback={
             <section className="mt-6">
-              <div className="rounded-3xl bg-white/70 p-4 ring-1 ring-black/5">
+              <div className="rounded-3xl border border-slate-200/70 bg-white/85 p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
                 <div className="flex items-center justify-between">
                       <div className="text-sm font-extrabold">🧭 관계도 로딩 중</div>
                   <div className="text-[11px] text-slate-500">잠시만요</div>
                 </div>
 
-                <div className="mt-3 h-[360px] w-full rounded-2xl bg-white/60 ring-1 ring-black/5 animate-pulse" />
+                <div className="mt-3 h-[360px] w-full rounded-2xl border border-slate-200/70 bg-white/88 animate-pulse" />
                 <p className="mt-2 text-xs text-slate-500">
                   그래프 먼저 준비하고 있어요. 위 콘텐츠는 이미 볼 수 있어요.
                 </p>
@@ -1032,7 +1032,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
 
 
                     return (
-                      <div key={row.title} className="rounded-2xl bg-white/60 p-3 ring-1 ring-black/5">
+                      <div key={row.title} className="rounded-2xl border border-slate-200/70 bg-white/88 p-3">
                         <div className="text-[11px] font-extrabold text-slate-500">{row.title}</div>
 
                         {/* ✅ first (다수파) */}
@@ -1078,7 +1078,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                 </div>
 
                 
-                <div className="mt-3 rounded-2xl bg-white/60 p-3 ring-1 ring-black/5">
+                <div className="mt-3 rounded-2xl border border-slate-200/70 bg-white/88 p-3">
                   <div className="text-xs font-extrabold text-slate-800">모임 분위기 요약</div>
 
                   {/* ✅ 핵심 3칩 */}
@@ -1086,7 +1086,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                     {dist.vibe.core.map((c, i) => (
                       <span
                         key={i}
-                        className="rounded-full bg-white/70 px-2 py-1 text-[11px] font-extrabold ring-1 ring-black/5"
+                        className="rounded-full border border-slate-200/70 bg-white/88 px-2 py-1 text-[11px] font-extrabold"
                         style={{ color: axisColor(c.k) }}
                       >
                         {c.label}
@@ -1102,7 +1102,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                   </div>
 
                   {/* ✅ 주의 포인트 */}
-                  <div className="mt-2 rounded-xl bg-white/70 p-2 ring-1 ring-black/5">
+                  <div className="mt-2 rounded-xl border border-slate-200/70 bg-white/88 p-2">
                     <div className="text-[11px] font-extrabold text-slate-700">
                       <span className="font-extrabold" style={{ color: axisColor(dist.vibe.caution.k) }}>
                         주의 포인트
@@ -1144,7 +1144,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
           ) : (
             <>
                 {/* ✅ Summary card */}
-                <div className="mt-3 rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
+                <div className="mt-3 rounded-2xl border border-slate-200/70 bg-white/88 p-3">
                   <div className="text-xs font-extrabold text-slate-900">{roles.headline}</div>
                   <p className="mt-1 text-xs leading-relaxed text-slate-600">{roles.tip}</p>
                 </div>
@@ -1166,8 +1166,8 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                       <div
                         key={k}
                         className={[
-                          "relative overflow-hidden rounded-2xl bg-white/70 p-3",
-                          "ring-1 ring-black/5",
+                          "relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white/88 p-3",
+                          "shadow-[0_6px_16px_rgba(15,23,42,0.05)]",
                         ].join(" ")}
                       >
                         {/* left accent bar */}
@@ -1193,7 +1193,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                         {sorted.length > 0 && (
                           
                           <div className="mt-3 pl-2">
-                            <ul className="divide-y divide-black/5 overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/5">
+                            <ul className="divide-y divide-black/5 overflow-hidden rounded-xl border border-slate-200/70 bg-white/88">
                               {sorted.slice(0, 5).map((m, idx) => {
                                 const rank = fitRankMap.get(m.fit) ?? 999; // 1,2,3...
                                 const badge = roleRankBadge(k, rank - 1); // roleRankBadge는 0=1등 규칙
@@ -1247,7 +1247,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                         )}
                         {sorted.length === 0 && (
                           <div className="mt-3 pl-2">
-                            <div className="rounded-xl bg-white/60 px-3 py-3 ring-1 ring-black/5">
+                            <div className="rounded-xl border border-slate-200/70 bg-white/88 px-3 py-3">
                               <div className="text-[11px] font-extrabold text-slate-500">
                                 해당 성향 없음
                               </div>
@@ -1268,7 +1268,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
         </SectionCard2>
 
         <section className="mt-6">
-          <div className="rounded-3xl bg-white/70 p-5 ring-1 ring-black/5">
+          <div className="rounded-3xl border border-slate-200/70 bg-white/88 p-5 shadow-[0_8px_20px_rgba(15,23,42,0.05)]">
             <p className="text-xs leading-relaxed text-slate-500">
               ※ 결과는 재미를 위한 참고용이에요. 관계 판단/결정의 근거로 사용하지 마세요.
             </p>

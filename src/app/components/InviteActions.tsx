@@ -1,17 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Share } from "lucide-react";
 
 export default function InviteActions({ groupId }: { groupId: string }) {
   const [copied, setCopied] = useState(false);
 
   const fullUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
-    const ver = process.env.NEXT_PUBLIC_SHARE_VER ?? "1";
+    const shareVer = process.env.NEXT_PUBLIC_SHARE_VER ?? "1";
 
     const u = new URL(`mbti/g/${groupId}`, window.location.origin);
-    u.searchParams.set("v", Date.now().toString());
+    u.searchParams.set("v", shareVer);
 
     return u.toString();
   }, [groupId]);
@@ -43,12 +42,12 @@ export default function InviteActions({ groupId }: { groupId: string }) {
         className="
             absolute right-0 top-0
             flex items-center gap-1.5
-            rounded-full bg-white/90 px-2.5 py-1.5
+            rounded-full border border-slate-200/70 bg-white/90 px-2.5 py-1.5
             text-xs font-semibold text-[#1E88E5]
-            ring-1 ring-[#1E88E5]/20
+            shadow-[0_4px_12px_rgba(15,23,42,0.06)]
             backdrop-blur-sm
             transition-all duration-200
-            hover:bg-[#1E88E5]/10 active:scale-95
+            hover:bg-white active:scale-95
         "
         >
         <svg

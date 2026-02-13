@@ -9,22 +9,22 @@ export default function MbtiGuidesPage() {
   const system = "mbti";
 
   return (
-    <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
-      <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-8">
+    <main className="mbti-page-bg">
+      <div className="mbti-shell w-full max-w-3xl pb-16">
         <div id="top" />
 
         {/* 뒤로가기 */}
         <div className="mb-4">
           <Link
             href="/mbti"
-            className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-2 text-xs font-extrabold text-slate-700 ring-1 ring-black/5"
+            className="mbti-back-btn"
           >
             ← 뒤로가기
           </Link>
         </div>
 
         {/* 헤더 */}
-        <header className="rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
+        <header className="mbti-card p-6">
           <h1 className="mt-2 text-2xl font-black leading-tight">
             모임에서 <span className="text-slate-600">자주 터지는 순간</span>을
             <br />
@@ -45,7 +45,7 @@ export default function MbtiGuidesPage() {
                 <a
                   key={k}
                   href={`#${m.anchor}`}
-                  className="group rounded-3xl border border-black/5 bg-white/80 p-5 shadow-sm transition hover:bg-white"
+                  className="mbti-card group rounded-3xl p-5 transition hover:bg-white"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -55,7 +55,7 @@ export default function MbtiGuidesPage() {
                       </div>
                       <div className="mt-1 text-sm text-slate-600">{m.desc}</div>
                     </div>
-                    <div className="shrink-0 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-extrabold text-slate-700">
+                    <div className="mbti-back-btn shrink-0 px-3 py-1 text-xs font-extrabold">
                       바로보기 →
                     </div>
                   </div>
@@ -90,7 +90,7 @@ export default function MbtiGuidesPage() {
 
                     <a
                       href="#top"
-                      className="rounded-full bg-white/80 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5"
+                      className="mbti-back-btn"
                     >
                       위로
                     </a>
@@ -103,7 +103,7 @@ export default function MbtiGuidesPage() {
                       key={g.slug}
                       id={g.slug}                 // ✅ 앵커 타겟을 Link(=a)에 직접
                       href={`/guides/${system}/${g.slug}`}
-                      className="scroll-mt-24 rounded-3xl border border-black/5 bg-white/80 p-5 shadow-sm transition hover:bg-white"
+                      className="mbti-card scroll-mt-24 rounded-3xl p-5 transition hover:bg-white"
                     >
                       <div className="flex items-start justify-between gap-3">  {/* ✅ items-start */}
                         <div>
@@ -111,7 +111,7 @@ export default function MbtiGuidesPage() {
                           <p className="mt-2 text-sm text-slate-700">{g.description}</p>
                         </div>
 
-                        <div className="shrink-0 self-start rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-extrabold text-slate-700">
+                        <div className="mbti-back-btn shrink-0 self-start px-3 py-1 text-xs font-extrabold">
                           읽기 →
                         </div>
                       </div>

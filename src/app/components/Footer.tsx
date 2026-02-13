@@ -25,7 +25,7 @@ export default function Footer() {
             <span className="text-slate-300">·</span>
             <Link href="/mbti/cognitive-functions" className="hover:text-slate-700 transition">인지기능</Link>
             <span className="text-slate-300">·</span>
-            <Link href="/faq" className="hover:text-slate-700 transition">자주 묻는 질문</Link>
+            <Link href="/faq/mbti" className="hover:text-slate-700 transition">자주 묻는 질문</Link>
           </>
         ) : system === "saju" ? (
           <>
@@ -33,7 +33,7 @@ export default function Footer() {
             <span className="text-slate-300">·</span>
             <Link href="/guides/saju" className="hover:text-slate-700 transition">사주 가이드</Link>
             <span className="text-slate-300">·</span>
-            <Link href="/faq" className="hover:text-slate-700 transition">자주 묻는 질문</Link>
+            <Link href="/faq/mbti" className="hover:text-slate-700 transition">자주 묻는 질문</Link>
           </>
         ) : (
           <>

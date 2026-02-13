@@ -1,4 +1,4 @@
-import Link from "next/link";
+import BackNavButton from "@/app/components/BackNavButton";
 
 export const metadata = {
   title: "개인정보처리방침 | 모임랭크",
@@ -12,13 +12,11 @@ export default function PrivacyPolicyPage() {
       <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-10">
         {/* Top left back */}
         <div className="mb-4 flex items-center justify-between">
-          <Link
-            href="/"
+          <BackNavButton
+            label="뒤로가기"
+            icon="←"
             className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 backdrop-blur hover:bg-white"
-          >
-            <span aria-hidden>←</span>
-            <span>메인으로</span>
-          </Link>
+          />
         </div>
 
         {/* 헤더 */}
@@ -191,12 +189,10 @@ export default function PrivacyPolicyPage() {
 
           {/* CTA */}
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <a
-              href="/"
+            <BackNavButton
+              label="뒤로가기"
               className="flex-1 rounded-full border border-slate-300 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              메인으로
-            </a>
+            />
             <a
               href="/create"
               className="flex-1 rounded-full bg-[#1E88E5] px-6 py-3 text-center text-sm font-semibold text-white shadow-md transition hover:bg-[#1E88E5]/90"

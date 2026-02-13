@@ -21,24 +21,24 @@ export default function GuideHero({ guide, system }: Props) {
     system === "mbti" ? "MBTI 홈" : system === "saju" ? "사주 홈" : "메인";
 
   return (
-    <header className="rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
+    <header className="mbti-card p-6">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="inline-flex items-center gap-2 text-xs font-extrabold text-slate-600">
+        <div className="inline-flex items-center gap-2 whitespace-nowrap text-xs font-extrabold text-slate-600">
           <span className="text-base">{meta.badge}</span>
           <span>{meta.label}</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <Link
             href={systemPath}
-            className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:border-black/20"
+            className="mbti-back-btn px-3 py-2 text-xs font-bold whitespace-nowrap"
           >
             ← {systemLabel}
           </Link>
 
           <Link
             href={`/guides/${system}#${guide.slug}`}   // ✅ mbti면 /guides/mbti#friends-xxx
-            className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:border-black/20"
+            className="mbti-back-btn px-3 py-2 text-xs font-bold whitespace-nowrap"
           >
             ← 가이드 목록
           </Link>

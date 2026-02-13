@@ -8,13 +8,13 @@ export const metadata = {
 
 export default function CognitiveFunctionsGuidePage() {
   return (
-    <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
-      <div className="mx-auto w-full max-w-3xl px-4 pb-10 pt-8">
+    <main className="mbti-page-bg">
+      <div className="mbti-shell w-full max-w-3xl pb-10">
         {/* Top left back */}
         <div className="flex items-center justify-between mb-4">
           <Link
             href="/mbti"
-            className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 backdrop-blur hover:bg-white"
+            className="mbti-back-btn"
           >
             <span aria-hidden>←</span>
             <span>MBTI 홈</span>
@@ -22,7 +22,7 @@ export default function CognitiveFunctionsGuidePage() {
         </div>
         
         {/* 헤더 */}
-        <header className="rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
+        <header className="mbti-card p-6">
           <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
             케미 점수는 어떻게 계산되나요?
           </h1>
@@ -177,7 +177,7 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-3xl border border-black/5 bg-white/80 p-5 shadow-sm backdrop-blur">
+    <div className="mbti-card p-5">
       <h2 className="text-base font-extrabold text-slate-900">{title}</h2>
       <div className="mt-3">{children}</div>
     </div>

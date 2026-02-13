@@ -4,7 +4,7 @@ import { SECTION_ID, SECTION_META } from "../_data/mbti/types";
 
 export default function GuideTOC({ sections }: { sections: GuideSection[] }) {
   return (
-    <section className="rounded-3xl border border-black/5 bg-white/70 p-4 shadow-sm">
+    <section className="mbti-card-soft rounded-3xl p-4">
       <div className="text-xs font-extrabold text-slate-500">바로가기</div>
 
       <div className="mt-3 flex flex-wrap gap-2">
@@ -17,10 +17,10 @@ export default function GuideTOC({ sections }: { sections: GuideSection[] }) {
             <a
               key={i}
               href={`#${id}`}
-              className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-extrabold text-slate-700 hover:border-black/20"
+              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-slate-200/70 bg-white/90 px-3 py-2 text-xs font-extrabold text-slate-700 shadow-[0_2px_8px_rgba(15,23,42,0.04)] hover:bg-white"
             >
               <span aria-hidden>{meta.badge}</span>
-              <span>{meta.label}</span>
+              <span className="whitespace-nowrap">{meta.label}</span>
             </a>
           );
         })}

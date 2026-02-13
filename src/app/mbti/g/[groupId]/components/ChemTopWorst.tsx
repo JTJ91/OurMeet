@@ -38,13 +38,13 @@ export default function ChemTopWorst({ best3, worst3, memberCount }: Props) {
         : "아직 비교할 조합이 없어요. (MBTI가 2명 이상 입력되어야 케미가 계산돼요.)";
 
     return (
-      <div className="mt-3 rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
+      <div className="mt-3 rounded-2xl border border-slate-200/70 bg-white/85 p-4 shadow-[0_6px_16px_rgba(15,23,42,0.05)]">
         <div className="text-xs font-extrabold text-slate-800">케미 순위</div>
         <p className="mt-1 text-xs leading-relaxed text-slate-500">{msg}</p>
 
         <div className="mt-3 grid grid-cols-2 gap-3">
           {["🔥 최고 TOP 3", "🥶 최악 WORST 3"].map((t, i) => (
-            <div key={i} className="rounded-xl bg-white/70 p-3 ring-1 ring-black/5">
+            <div key={i} className="rounded-xl border border-slate-200/70 bg-white/88 p-3">
               <div className="text-[11px] font-extrabold text-slate-500">{t}</div>
               <div className="mt-2 h-2 w-full rounded-full bg-slate-200/70" />
               <div className="mt-2 text-[11px] text-slate-400">아직 데이터 없음</div>
@@ -71,7 +71,7 @@ export default function ChemTopWorst({ best3, worst3, memberCount }: Props) {
             return (
               <li
                 key={`best-${p.aId}-${p.bId}`}
-                className="rounded-xl bg-white/60 px-3 py-2 ring-1 ring-black/5"
+                className="rounded-xl border border-slate-200/70 bg-white/88 px-3 py-2"
               >
                 <div className="flex items-start gap-2 text-xs font-extrabold text-slate-800">
                   <span className="shrink-0 text-slate-400">{idx + 1}.</span>
@@ -105,7 +105,7 @@ export default function ChemTopWorst({ best3, worst3, memberCount }: Props) {
             return (
               <li
                 key={`worst-${p.aId}-${p.bId}`}
-                className="rounded-xl bg-white/60 px-3 py-2 ring-1 ring-black/5"
+                className="rounded-xl border border-slate-200/70 bg-white/88 px-3 py-2"
               >
                 <div className="flex items-start gap-2 text-xs font-extrabold text-slate-800">
                   <span className="shrink-0 text-slate-400">{idx + 1}.</span>

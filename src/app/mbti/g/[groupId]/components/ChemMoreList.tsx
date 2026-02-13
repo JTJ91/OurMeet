@@ -37,10 +37,10 @@ export default function ChemMoreList({
         className="
           mt-2 inline-flex items-center gap-1
           rounded-full
-          bg-white/70
+          bg-white/88 border border-slate-200/70
           px-3 py-1
           text-[11px] font-extrabold text-slate-600
-          ring-1 ring-black/5
+          shadow-[0_4px_12px_rgba(15,23,42,0.04)]
           hover:bg-white
           active:scale-95
           transition
@@ -55,7 +55,7 @@ export default function ChemMoreList({
 
   return (
     <div className="mt-2 space-y-2">
-      <div className="overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/5">
+      <div className="overflow-hidden rounded-xl border border-slate-200/70 bg-white/88">
         <ul className="max-h-56 overflow-auto divide-y divide-black/5">
           {rest.map((p, idx) => (
             <li
@@ -88,10 +88,10 @@ export default function ChemMoreList({
         className="
           mx-auto mt-1 inline-flex items-center gap-1
           rounded-full
-          bg-white/60
+          bg-white/88 border border-slate-200/70
           px-4 py-1.5
           text-[11px] font-extrabold text-slate-500
-          ring-1 ring-black/5
+          shadow-[0_4px_12px_rgba(15,23,42,0.04)]
           hover:bg-white
           active:scale-95
           transition

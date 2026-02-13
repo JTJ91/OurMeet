@@ -21,13 +21,13 @@ export default async function GroupJoinPage({
   const isFull = group.members.length >= group.maxMembers;
 
   return (
-    <main className="min-h-screen bg-[#F5F9FF] text-slate-900 pb-10">
-      <div className="mx-auto max-w-[760px] px-5 pt-6">
+    <main className="mbti-page-bg pb-10">
+      <div className="mbti-shell">
         {/* 상단 */}
         <div className="mb-4 flex items-center justify-between">
           <Link
             href={`/mbti/g/${groupId}`}
-            className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-black/5 hover:bg-white"
+            className="mbti-back-btn"
           >
             ← 뒤로
           </Link>
@@ -38,7 +38,7 @@ export default async function GroupJoinPage({
         </div>
 
         {/* 카드 */}
-        <div className="rounded-3xl bg-white/80 p-5 ring-1 ring-black/5 shadow-sm backdrop-blur-md">
+        <div className="mbti-card p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="text-xs font-bold text-slate-500">모임</div>
@@ -52,9 +52,9 @@ export default async function GroupJoinPage({
             </div>
           </div>
 
-          <div className="mt-4 h-2 w-full rounded-full bg-slate-200">
+          <div className="mbti-progress-track mt-4">
             <div
-              className="h-2 rounded-full bg-[#1E88E5]"
+              className="mbti-progress-fill"
               style={{
                 width: `${Math.min(
                   100,
@@ -67,7 +67,7 @@ export default async function GroupJoinPage({
           <JoinFormClient groupId={groupId} isFull={isFull} />
         </div>
 
-        <div className="mt-4 rounded-3xl bg-white/70 p-5 ring-1 ring-black/5">
+        <div className="mbti-card-soft mt-4 p-5">
           <p className="text-xs leading-relaxed text-slate-500">
             ※ 결과는 재미를 위한 참고용이에요. 관계 판단/결정의 근거로 사용하지
             마세요.

@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState, memo } from "react";
 import { flushSync } from "react-dom";
-import { getCompatScore } from "@/app/lib/mbti/mbtiCompat";
 
 type Level = 1 | 2 | 3 | 4 | 5;
 
@@ -43,12 +42,32 @@ function hexToRgba(hex: string, a: number) {
   return `rgba(${r},${g},${b},${a})`;
 }
 
+function parseHex(hex: string) {
+  const h = hex.replace("#", "");
+  const v = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
+  return {
+    r: (v >> 16) & 255,
+    g: (v >> 8) & 255,
+    b: v & 255,
+  };
+}
+
+function mixHex(base: string, target: string, ratio: number) {
+  const t = Math.max(0, Math.min(1, ratio));
+  const a = parseHex(base);
+  const b = parseHex(target);
+  const r = Math.round(a.r + (b.r - a.r) * t);
+  const g = Math.round(a.g + (b.g - a.g) * t);
+  const bl = Math.round(a.b + (b.b - a.b) * t);
+  return `rgb(${r},${g},${bl})`;
+}
+
 function drawSoftShadowCircle(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   r: number,
-  fill: string,
+  fill: string | CanvasGradient | CanvasPattern,
   shadowColor: string,
   shadowBlur: number,
   shadowOffsetY = 0
@@ -62,6 +81,95 @@ function drawSoftShadowCircle(
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
   ctx.fill();
+  ctx.restore();
+}
+
+function drawPremiumNodeCircle(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  r: number,
+  baseColor: string,
+  isActive: boolean,
+  isHover: boolean,
+  dim: boolean
+) {
+  const top = dim ? "rgba(255,255,255,0.95)" : mixHex(baseColor, "#FFFFFF", 0.94);
+  const mid = dim ? "rgba(251,252,253,0.95)" : mixHex(baseColor, "#FFFFFF", 0.9);
+  const bottom = dim ? "rgba(248,250,252,0.95)" : mixHex(baseColor, "#F1F5F9", 0.9);
+
+  const fillGrad = ctx.createRadialGradient(
+    x - r * 0.12,
+    y - r * 0.2,
+    r * 0.1,
+    x,
+    y,
+    r * 1.02
+  );
+  fillGrad.addColorStop(0, top);
+  fillGrad.addColorStop(0.7, mid);
+  fillGrad.addColorStop(1, bottom);
+
+  const shadowBlur = isActive ? 13 : isHover ? 11 : dim ? 6 : 9;
+  const shadowColor = dim ? "rgba(15,23,42,0.05)" : "rgba(15,23,42,0.14)";
+  const shadowOffsetY = isActive ? 4 : 3;
+
+  drawSoftShadowCircle(ctx, x, y, r, fillGrad, shadowColor, shadowBlur, shadowOffsetY);
+
+  // Subtle inner ring.
+  ctx.save();
+  ctx.strokeStyle = dim ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.62)";
+  ctx.lineWidth = Math.max(0.8, r * 0.06);
+  ctx.beginPath();
+  ctx.arc(x, y, r * 0.84, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  // Minimal top highlight.
+  ctx.save();
+  ctx.strokeStyle = dim ? "rgba(255,255,255,0.28)" : "rgba(255,255,255,0.45)";
+  ctx.lineWidth = Math.max(0.8, r * 0.08);
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.arc(x, y, r * 0.8, Math.PI * 1.1, Math.PI * 1.62);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawPremiumCenterCircle(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  r: number
+) {
+  const fillGrad = ctx.createRadialGradient(
+    x - r * 0.16,
+    y - r * 0.24,
+    r * 0.08,
+    x,
+    y,
+    r * 1.02
+  );
+  fillGrad.addColorStop(0, "rgba(255,255,255,1)");
+  fillGrad.addColorStop(0.72, "rgba(248,250,252,1)");
+  fillGrad.addColorStop(1, "rgba(241,245,249,1)");
+
+  drawSoftShadowCircle(ctx, x, y, r, fillGrad, "rgba(15,23,42,0.16)", 14, 4);
+
+  ctx.save();
+  ctx.strokeStyle = "rgba(255,255,255,0.7)";
+  ctx.lineWidth = Math.max(1, r * 0.06);
+  ctx.beginPath();
+  ctx.arc(x, y, r * 0.86, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  ctx.strokeStyle = "rgba(15,23,42,0.12)";
+  ctx.lineWidth = Math.max(1.2, r * 0.08);
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.stroke();
   ctx.restore();
 }
 
@@ -146,6 +254,50 @@ function layoutOnRing(items: EgoNode[], radius: number, startAngle: number) {
   }
 
   return out;
+}
+
+function layoutAcrossRings(
+  rings: EgoNode[][],
+  radii: number[],
+  startAngle: number
+) {
+  const sortedRings = rings.map((items) =>
+    [...items].sort((a, b) =>
+      b.level !== a.level ? b.level - a.level : a.name.localeCompare(b.name)
+    )
+  );
+
+  const maxLen = Math.max(0, ...sortedRings.map((r) => r.length));
+  const ordered: Array<{ node: EgoNode; ringIndex: number }> = [];
+
+  // Interleave rings so all rings share global angular slots.
+  for (let i = 0; i < maxLen; i++) {
+    for (let ringIndex = 0; ringIndex < sortedRings.length; ringIndex++) {
+      const node = sortedRings[ringIndex][i];
+      if (node) ordered.push({ node, ringIndex });
+    }
+  }
+
+  const N = ordered.length;
+  if (!N) return [] as Array<EgoNode & { x: number; y: number; angle: number; ringIndex: number; r: number }>;
+
+  const twoPi = Math.PI * 2;
+  const step = twoPi / N;
+  const baseRot = startAngle + 0.45;
+  const halfStep = step / 2;
+
+  return ordered.map(({ node, ringIndex }, i) => {
+    const angle = baseRot + halfStep + i * step;
+    const r = radii[ringIndex];
+    return {
+      ...node,
+      angle,
+      x: Math.cos(angle) * r,
+      y: Math.sin(angle) * r,
+      ringIndex,
+      r,
+    };
+  });
 }
 
 type Placed = EgoNode & { x: number; y: number; ringIndex: number; r: number };
@@ -531,19 +683,12 @@ function EgoGraphCanvasResponsiveInner({
       ? [base, base + step, base + step * 2]
       : [base, base + step * 1.4];
 
-    const starts = few
-      ? [-Math.PI / 2]
-      : ringCount === 3
-      ? [-Math.PI / 2, -Math.PI / 2 + 0.4, -Math.PI / 2 + 0.15]
-      : [-Math.PI / 2, -Math.PI / 2 + 0.25];
+    if (few) {
+      const p = layoutOnRing(rings[0], ringR[0], -Math.PI / 2);
+      return p.map((node) => ({ ...node, ringIndex: 0, r: ringR[0] }));
+    }
 
-    const all: Placed[] = [];
-    rings.forEach((items, idx) => {
-      const p = layoutOnRing(items, ringR[idx], starts[idx]);
-      p.forEach((node) => all.push({ ...node, ringIndex: idx, r: ringR[idx] }));
-    });
-
-    return all;
+    return layoutAcrossRings(rings, ringR, -Math.PI / 2);
   }, [safeNodes, ringCount, size]);
 
   const ringsR = useMemo(
@@ -554,7 +699,10 @@ function EgoGraphCanvasResponsiveInner({
   // ✅ placed 기준 fitScale 계산 (placed 변화시에만)
   const contentFitRef = useRef({ nodeR_world: 0, margin_world: 0, contentR_world: 1 });
   useEffect(() => {
-    const nodeR_world = size * 0.048;
+    const n = placed.length;
+    const denseT = Math.max(0, Math.min(1, (n - 10) / 10));
+    const nodeScale = 1 - 0.04 * denseT;
+    const nodeR_world = size * 0.056 * nodeScale;
     const margin_world = size * 0.06;
     let maxDist = 0;
     for (const n of placed) {
@@ -617,8 +765,12 @@ function EgoGraphCanvasResponsiveInner({
       y: cy + wy * fitScale * dpr,
     });
 
-    const centerR = size * 0.07 * fitScale * dpr;
-    const nodeR = size * 0.058 * fitScale * dpr;
+    const denseT = Math.max(0, Math.min(1, (placed.length - 10) / 10));
+    const nodeScale = 1 - 0.04 * denseT;
+    const centerScale = 1 - 0.03 * denseT;
+
+    const centerR = size * 0.075 * centerScale * fitScale * dpr;
+    const nodeR = size * 0.062 * nodeScale * fitScale * dpr;
 
     // ✅ hover는 ref에서 읽기
     const hoverId = hoverIdRef.current;
@@ -686,14 +838,8 @@ function EgoGraphCanvasResponsiveInner({
       ctx.restore();
     });
 
-    // ✅ 중앙(입체감)
-    drawSoftShadowCircle(ctx, cx, cy, centerR, "#FFFFFF", "rgba(15,23,42,0.18)", 18 * dpr, 6 * dpr);
-
-    ctx.strokeStyle = "rgba(15,23,42,0.10)";
-    ctx.lineWidth = 2 * dpr;
-    ctx.beginPath();
-    ctx.arc(cx, cy, centerR, 0, Math.PI * 2);
-    ctx.stroke();
+    // ✅ 중앙(미니멀 프리미엄)
+    drawPremiumCenterCircle(ctx, cx, cy, centerR);
 
     // 중앙 텍스트
     ctx.textAlign = "center";
@@ -734,24 +880,20 @@ function EgoGraphCanvasResponsiveInner({
 
       ctx.globalAlpha = activeId ? (isActive ? 1 : 0.35) : 1;
 
-      // ✅ 그림자 비용: dim이면 blur 낮추기(미세 최적화)
-      const shadowBlur = (isActive ? 16 : isHover ? 14 : dim ? 8 : 12) * dpr;
-      const shadowColor = dim ? "rgba(15,23,42,0.05)" : "rgba(15,23,42,0.14)";
-      const shadowOffsetY = (isActive ? 6 : 4) * dpr;
-
-      drawSoftShadowCircle(ctx, p.x, p.y, r, "#FFFFFF", shadowColor, shadowBlur, shadowOffsetY);
-
-      ctx.save();
-      ctx.globalAlpha = dim ? 0.12 : 0.18;
-      ctx.fillStyle = "#FFFFFF";
-      ctx.beginPath();
-      ctx.arc(p.x - r * 0.25, p.y - r * 0.25, r * 0.45, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+      drawPremiumNodeCircle(
+        ctx,
+        p.x,
+        p.y,
+        r,
+        meta.color,
+        isActive,
+        isHover,
+        !!dim
+      );
 
       ctx.save();
-      ctx.strokeStyle = dim ? hexToRgba(meta.color, 0.22) : meta.color;
-      ctx.lineWidth = (isActive ? 6 : isHover ? 5 : 4) * dpr;
+      ctx.strokeStyle = dim ? hexToRgba(meta.color, 0.2) : hexToRgba(meta.color, isActive ? 0.82 : 0.72);
+      ctx.lineWidth = (isActive ? 4.4 : isHover ? 3.8 : 3.2) * dpr;
       ctx.beginPath();
       ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
       ctx.stroke();
