@@ -4,7 +4,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { QUESTIONS } from "@/app/lib/mbtiTest/questions";
 import { scoreMbti, type Answers, type MbtiTestResult } from "@/app/lib/mbtiTest/score";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+
 
 const SCALE = [
   { v: 1, label: "전혀 아니다" },
@@ -62,9 +63,38 @@ export default function MbtiTestClient() {
 
   const router = useRouter();
 
+  const sp = useSearchParams();
+
+  // from=basic|create|join (기본은 basic)
+  const from = (sp.get("from") ?? "basic") as "basic" | "create" | "join";
+  const groupId = sp.get("groupId") ?? "";
+  const returnTo = sp.get("returnTo"); // optional
+
   const progressPct = useMemo(() => {
     return Math.round(((step + 1) / total) * 100);
   }, [step, total]);
+
+  function goBackWithMbti(type: string) {
+    const mbtiQ = `mbti=${encodeURIComponent(type)}`;
+
+    // ✅ returnTo가 있으면 최우선
+    if (returnTo) {
+      const sep = returnTo.includes("?") ? "&" : "?";
+      router.push(`${returnTo}${sep}${mbtiQ}`);
+      return;
+    }
+
+    // ✅ returnTo 없으면: 너 프로젝트 join 라우트로 복귀
+    if (groupId) {
+      router.push(`/mbti/g/${encodeURIComponent(groupId)}/join?${mbtiQ}`);
+      return;
+    }
+
+    // ✅ 마지막 fallback
+    router.push(`/mbti/create?mbti=${encodeURIComponent(type)}`);
+  }
+
+
 
   function resetAll() {
     if (timerRef.current) window.clearTimeout(timerRef.current);
@@ -152,26 +182,48 @@ export default function MbtiTestClient() {
       </div>
 
       {/* ✅ 결과 카드 우측 하단 버튼 */}
-      <div className="mt-6 flex justify-end">
-        <button
-          type="button"
-          onClick={() =>
-            router.push(`/mbti/create?mbti=${encodeURIComponent(type)}`)
-          }
-          className="
-            rounded-full
-            bg-[#1E88E5]
-            px-5 py-2
-            text-xs font-extrabold text-white
-            shadow-sm
-            transition-all duration-200
-            hover:brightness-110
-            active:scale-[0.97]
-          "
-        >
-          이 결과로 모임 만들기
-        </button>
+      <div className="mt-6 flex justify-end gap-2">
+        {from === "create" && (
+          <button
+            type="button"
+            onClick={() => router.push(`/mbti/create?mbti=${encodeURIComponent(type)}`)}
+            className="
+              rounded-full bg-[#1E88E5] px-5 py-2 text-xs font-extrabold text-white
+              shadow-sm transition-all duration-200 hover:brightness-110 active:scale-[0.97]
+            "
+          >
+            이 결과로 모임 만들기
+          </button>
+        )}
+
+        {from === "join" && (
+          <button
+            type="button"
+            onClick={() => goBackWithMbti(type)}
+            className="
+              rounded-full bg-[#1E88E5] px-5 py-2 text-xs font-extrabold text-white
+              shadow-sm transition-all duration-200 hover:brightness-110 active:scale-[0.97]
+            "
+          >
+            이 결과로 참여하기
+          </button>
+        )}
+
+        {from === "basic" && (
+          <button
+            type="button"
+            onClick={() => router.push(`/mbti/create?mbti=${encodeURIComponent(type)}`)}
+            className="
+              rounded-full bg-[#1E88E5] px-5 py-2 text-xs font-extrabold text-white
+              shadow-sm transition-all duration-200 hover:brightness-110 active:scale-[0.97]
+            "
+          >
+            이 결과로 모임 만들기
+          </button>
+        )}
       </div>
+
+
     </div>
   );
 }

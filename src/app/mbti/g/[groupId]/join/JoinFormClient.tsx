@@ -5,7 +5,7 @@ import { joinGroupAction } from "@/app/mbti/actions/members";
 import { upsertSavedGroup } from "@/app/lib/mbti/groupHistory";
 import MbtiTestModal from "@/app/components/mbtiTest/MbtiTestModal8";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function isValidMbti(mbti: string) {
   return /^[EI][NS][TF][JP]$/.test(mbti);
@@ -27,6 +27,9 @@ export default function JoinFormClient({
   // ✅ 렌더 틈까지 커버하는 “진짜 잠금”
   const lockedRef = useRef(false);
   const router = useRouter();
+
+  const sp = useSearchParams();
+  const mbtiFromTest = (sp.get("mbti") ?? "").trim().toUpperCase();
 
   return (
     <form
@@ -155,6 +158,7 @@ export default function JoinFormClient({
             placeholder="예) ENFP"
             disabled={isFull || isSubmitting}
             aria-invalid={!!mbtiError}
+            defaultValue={mbtiFromTest}
             className={[
               "mt-2 h-12 w-full rounded-2xl border bg-white px-4 text-[16px] uppercase outline-none disabled:opacity-60",
               mbtiError ? "border-red-400 focus:border-red-400" : "border-black/10 focus:border-[#1E88E5]/50",
@@ -302,6 +306,9 @@ export default function JoinFormClient({
           setMbtiError(isValidMbti(v) ? null : "MBTI 형식이 올바르지 않아요. 예) ENFP"); // ✅ 에러도 동기화
           setTestOpen(false);
         }}
+        context="join"
+        groupId={groupId}
+        returnTo={`/mbti/g/${encodeURIComponent(groupId)}/join`}
       />
     </form>
 

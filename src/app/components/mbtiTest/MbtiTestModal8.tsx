@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { QUESTIONS_8 as QUESTIONS } from "@/app/lib/mbtiTest/questions8";
 import { scoreMbti, type Answers, type MbtiTestResult } from "@/app/lib/mbtiTest/score8";
+import Link from "next/link";
 
 const CHOICES = [
   { v: true, label: "그렇다" },
@@ -29,10 +30,17 @@ export default function MbtiTestModal({
   open,
   onClose,
   onComplete,
+  context = "basic",
+  groupId,
+  returnTo,
 }: {
   open: boolean;
   onClose: () => void;
   onComplete: (r: MbtiTestResult) => void;
+  // ✅ 추가
+  context?: "basic" | "create" | "join";
+  groupId?: string;
+  returnTo?: string; // join 페이지로 복귀용(선택)
 }) {
   const total = QUESTIONS.length;
 
@@ -80,6 +88,22 @@ export default function MbtiTestModal({
   const progressPct = useMemo(() => {
     return Math.round(((step + 1) / total) * 100);
   }, [step, total]);
+
+const detailHref = useMemo(() => {
+  const qp = new URLSearchParams();
+
+  if (context === "create") qp.set("from", "create");
+  else if (context === "join") {
+    qp.set("from", "join");
+    if (groupId) qp.set("groupId", groupId);
+    if (returnTo) qp.set("returnTo", returnTo);
+  } else {
+    qp.set("from", "basic");
+  }
+
+  const qs = qp.toString();
+    return `/mbti-test${qs ? `?${qs}` : ""}`;
+  }, [context, groupId, returnTo]);
 
   if (!open) return null;
 
@@ -178,8 +202,16 @@ export default function MbtiTestModal({
               </div>
 
               <div className="mt-3 text-[11px] font-bold text-slate-500">
-                ※ 답을 누르면 다음 문항으로 자동 이동합니다.
+                더 자세한 결과를 원하시면{" "}
+                <Link
+                  href={detailHref}
+                  className="underline underline-offset-2 hover:text-slate-700"
+                >
+                  MBTI 상세검사
+                </Link>
+                에서 확인할 수 있습니다.
               </div>
+
             </>
           ) : (
             result && <ResultView result={result} onUse={() => onComplete(result)} onClose={onClose} />

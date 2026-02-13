@@ -23,6 +23,8 @@ export default function CreateFormClient() {
   const mbtiInputRef = useRef<HTMLInputElement | null>(null);
 
   const sp = useSearchParams();
+
+  const mbtiFromTest = (sp.get("mbti") ?? "").trim().toUpperCase();
   
   // ✅ /mbti/create?mbti=ENFP 로 들어오면 자동 입력
   useEffect(() => {
@@ -162,6 +164,7 @@ export default function CreateFormClient() {
           placeholder="예) ENFP"
           disabled={isSubmitting}
           aria-invalid={!!mbtiError}
+          defaultValue={mbtiFromTest}
           className={[
             "mt-2 h-12 w-full rounded-2xl border bg-white px-4 text-[16px] uppercase outline-none disabled:opacity-60",
             mbtiError ? "border-red-400 focus:border-red-400" : "border-black/10 focus:border-[#1E88E5]/50",
@@ -308,6 +311,7 @@ export default function CreateFormClient() {
           setMbtiError(isValidMbti(v) ? null : "MBTI 형식이 올바르지 않아요. 예) ENFP");
           setTestOpen(false);
         }}
+        context="create"
       />
     </form>
   );
