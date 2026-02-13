@@ -14,54 +14,58 @@ export type Question = {
 };
 
 export const QUESTIONS_8: Question[] = [
+
   // =========================
-  // E/I
+  // E/I (친화력 + 에너지)
   // =========================
   {
     id: "q01",
     axis: "EI",
-    pole: "I",
-    text: "사람들과 오래 어울리고 나면, 보통 에너지가 충전되기보다 더 방전되는 편인가요?",
+    pole: "E",
+    text: "처음 만난 사람과도 금방 편하게 대화가 이어지는 편이다.",
     checkPair: "c1",
     checkKind: "OPPOSITE",
   },
   {
     id: "q02",
     axis: "EI",
-    pole: "E",
-    text: "혼자 생각에 잠기는 시간보다, 사람·활동·이벤트 같은 ‘바깥 세계’를 경험할 때 더 에너지가 나는 편인가요?",
+    pole: "I",
+    text: "사람을 만나고 나면 혼자만의 시간이 있어야 에너지가 다시 충전된다.",
     checkPair: "c1",
     checkKind: "OPPOSITE",
   },
 
+
   // =========================
-  // S/N
+  // N/S (상상력 중심)
   // =========================
   {
     id: "q03",
     axis: "NS",
-    pole: "S",
-    text: "새로운 걸 배울 때, 추상적인 이론이나 가능성보다 ‘구체적인 사실’과 ‘현실 예시’를 더 선호하나요?",
+    pole: "N",
+    text: "가만히 있어도 새로운 아이디어나 상상이 계속 떠오르는 편이다.",
     checkPair: "c2",
     checkKind: "OPPOSITE",
   },
   {
     id: "q04",
     axis: "NS",
-    pole: "N",
-    text: "눈앞의 사실을 그대로 보기보다, 그 안에 숨은 의미나 앞으로 어떻게 될지 상상하는 편인가요?",
+    pole: "S",
+    text: "막연한 상상보다는 눈에 보이고 확인된 정보가 훨씬 편하다.",
     checkPair: "c2",
     checkKind: "OPPOSITE",
   },
 
+
+
   // =========================
-  // T/F
+  // T/F (공감 vs 해결)
   // =========================
   {
     id: "q05",
     axis: "TF",
     pole: "T",
-    text: "결정을 내릴 때, 사람들의 기분보다 ‘맞고 틀림’이나 ‘공정한 기준’을 더 중요하게 생각하나요?",
+    text: "누군가 힘들다고 말하면, 나는 공감보다 해결 방법을 제시하는 쪽에 가깝다.",
     checkPair: "c3",
     checkKind: "OPPOSITE",
   },
@@ -69,19 +73,20 @@ export const QUESTIONS_8: Question[] = [
     id: "q06",
     axis: "TF",
     pole: "F",
-    text: "결정을 내릴 때, 논리적으로 맞는지보다 사람들의 기분과 분위기를 더 중요하게 생각하나요?",
+    text: "누군가 힘들다고 말하면, 나는 해결책보다 그 감정을 이해해주는 쪽에 가깝다.",
     checkPair: "c3",
     checkKind: "OPPOSITE",
   },
 
+
   // =========================
-  // J/P
+  // J/P (스트레스 + 계획 스타일)
   // =========================
   {
     id: "q07",
     axis: "JP",
     pole: "J",
-    text: "일정이 갑자기 바뀌면 마음이 불편해지는 편인가요?",
+    text: "이미 세운 계획이 틀어지면 예상보다 스트레스를 크게 받는 편이다.",
     checkPair: "c4",
     checkKind: "OPPOSITE",
   },
@@ -89,8 +94,9 @@ export const QUESTIONS_8: Question[] = [
     id: "q08",
     axis: "JP",
     pole: "P",
-    text: "여행/약속은 큰 틀만 잡아두고, 현장에서 분위기 보고 바꾸는 게 더 편한가요?",
+    text: "처음부터 세세하게 계획을 세우기보다, 큰 틀만 정하고 상황에 맞춰 움직이는 편이다.",
     checkPair: "c4",
     checkKind: "OPPOSITE",
   },
+
 ];
