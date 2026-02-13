@@ -169,11 +169,9 @@ function classifyChemType(a: string, b: string, score: number): ChemType {
 type ChemSummary = {
   dist: Record<ChemType, number>;
   byType: Record<ChemType, PairRow[]>;
-  headline: string;      // 상단 한 줄(짧게)
-  tag: string;           // 모임 타입 뱃지용
-  profile: string;       // “우리 모임은 …” 한 문장
-  friction: string[];    // 자주 부딪히는 포인트 3개
-  scenes: string[];      // 실제 장면 6개
+  headline: string;
+  tag: string;
+  profile: string;
 };
 
 function summarizeChemTypesDetailed(pairs: PairRow[]): ChemSummary {
@@ -187,8 +185,6 @@ function summarizeChemTypesDetailed(pairs: PairRow[]): ChemSummary {
       headline: "케미 리포트를 보려면 멤버가 2명 이상 필요해요.",
       tag: "📝 입력 필요",
       profile: "멤버를 추가하면 우리 모임의 분위기와 실제 상황 예시가 자동으로 생성돼요.",
-      friction: [],
-      scenes: [],
     };
   }
 
@@ -244,67 +240,10 @@ function summarizeChemTypesDetailed(pairs: PairRow[]): ChemSummary {
     return "우리 모임은 상황에 따라 분위기 색이 바뀌는 혼합형 타입의 모임이에요.";
   })();
 
-  // 분포 기반 마찰 포인트(3개만)
-  const friction: string[] = (() => {
-    if (explodePct >= 30) {
-      return [
-        "단톡 말투/답장 속도 때문에 감정 해석이 갈릴 수 있어요.",
-        "정산·지각·불참 같은 현실 이슈가 서운함으로 번지기 쉬워요.",
-        "서운함을 쌓아두면 다음 만남에서 갑자기 어색해질 수 있어요.",
-      ];
-    }
-    if (sparkPct >= 35) {
-      return [
-        "장소·메뉴·여행처럼 선택지가 많을 때 의견이 확 갈릴 수 있어요.",
-        "즉흥 vs 계획, 속도 차이로 답답함이 생길 수 있어요.",
-        "드립/농담 수위가 사람마다 달라서 피곤한 날엔 민감해질 수 있어요.",
-      ];
-    }
-    if (stablePct >= 40) {
-      return [
-        "대부분은 편하지만, 연락 템포 차이로 오해가 가끔 생길 수 있어요.",
-        "‘다 괜찮아’가 많아지면 결국 한 사람이 정리 담당이 될 수 있어요.",
-        "조용한 사람이 생기면 ‘기분이 안 좋나?’로 해석될 수 있어요.",
-      ];
-    }
-    if (complementPct >= 40) {
-      return [
-        "역할이 자연스럽게 고정되면 한쪽만 바빠질 수 있어요.",
-        "기여도 체감이 달라서 ‘왜 나만 하는 느낌이지?’가 생길 수 있어요.",
-        "디테일 vs 큰 그림으로 얘기할 때 서로 답답해질 수 있어요.",
-      ];
-    }
-    return [
-      "약속·정산·장소 선택 같은 현실 이슈에서 스타일 차이가 드러날 수 있어요.",
-      "직설/완곡 말투 차이로 의도 확인이 없으면 오해가 생길 수 있어요.",
-      "컨디션에 따라 텐션이 출렁이는 날이 있을 수 있어요.",
-    ];
-  })();
-
-  // 실제 장면(최대 6개)
-    // 실제 장면(최대 3개로 확 줄임)
-  const scenes: string[] = (() => {
-    const base3 = [
-      "단톡 답장 템포(읽씹/칼답) 차이 때문에 ‘무시’ vs ‘담백’으로 해석이 갈릴 수 있어요.",
-      "장소/메뉴/일정 정할 때 ‘아무 데나’가 진짜인 사람과 추천을 기대하는 사람이 섞여 결정이 늘어질 수 있어요.",
-      "정산·지각·불참 같은 현실 이슈가 ‘사정’ vs ‘성의’로 갈려서 감정이 남을 수 있어요.",
-    ];
-
-    if (explodePct >= 30) {
-      return [
-        "읽고 답이 늦어졌을 때, 한쪽은 ‘바쁘겠지’인데 다른 쪽은 ‘기분 상한 거지?’로 받아들일 수 있어요.",
-        "정산/지각 얘기에서 원칙을 말한 쪽은 ‘정리’인데, 다른 쪽은 ‘분위기 깨는 공격’으로 느낄 수 있어요.",
-        "농담 한 마디가 ‘장난’으로 끝나지 않고, 다음 만남까지 미세하게 어색함으로 남을 수 있어요.",
-      ];
-    }
-
-    return base3;
-  })();
-
 
   const headline = tag; // 상단은 짧게 뱃지 느낌으로
 
-  return { dist, byType, headline, tag, profile, friction, scenes };
+  return { dist, byType, headline, tag, profile};
 }
 
 function chemComboTitle(t: ChemType, a: string, b: string, score: number) {
@@ -524,40 +463,7 @@ export default function ChemReportSection({ pairs }: Props) {
                   {chem.profile}
                 </div>
               </div>
-
-              {/* 부딪히는 포인트(칩 형태) */}
-              {chem.friction?.length ? (
-                <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
-                  <div className="text-[11px] font-extrabold text-slate-500">자주 흔들리는 포인트</div>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {chem.friction.slice(0, 3).map((t: string, i: number) => (
-                      <span
-                        key={i}
-                        className="rounded-2xl bg-slate-50 px-2.5 py-1.5 text-[11px] font-bold text-slate-700 ring-1 ring-black/5"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              {/* 실제 장면(번호 카드) */}
-              {chem.scenes?.length ? (
-                <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
-                  <div className="text-[11px] font-extrabold text-slate-500">실제로 자주 나오는 장면</div>
-                  <ul className="mt-2 space-y-2">
-                    {chem.scenes.slice(0, 6).map((s: string, i: number) => (
-                      <li key={i} className="flex gap-2 rounded-xl bg-white/70 px-3 py-2 ring-1 ring-black/5">
-                        <div className="mt-[1px] h-5 w-5 shrink-0 rounded-full bg-slate-100 text-[11px] font-extrabold text-slate-600 flex items-center justify-center ring-1 ring-black/5">
-                          {i + 1}
-                        </div>
-                        <div className="text-[12px] leading-5 text-slate-700">{s}</div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
+  
             </div>
           </>
         )}
