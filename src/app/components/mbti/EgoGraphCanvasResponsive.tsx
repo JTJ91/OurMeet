@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState, memo } from "react";
+﻿import React, { useEffect, useMemo, useRef, useState, memo } from "react";
 import { flushSync } from "react-dom";
 
 type Level = 1 | 2 | 3 | 4 | 5;
@@ -15,8 +15,9 @@ type Props = {
   groupName?: string;
   memberCount?: number;
   centerName: string;
-  centerSub?: string; // ✅ 지금은 여기(센터 MBTI로 쓰는 중)
+  centerSub?: string; // ??지금�? ?�기(?�터 MBTI�??�는 �?
   nodes: EgoNode[];
+  pairAverageScore?: number | null;
   ringCount?: 2 | 3;
   maxSize?: number;
   minSize?: number;
@@ -26,12 +27,42 @@ type Props = {
 };
 
 const LEVEL_META: Record<Level, { label: string; color: string }> = {
-  5: { label: "찰떡궁합", color: "#1E88E5" },
-  4: { label: "합좋은편", color: "#00C853" },
-  3: { label: "그럭저럭", color: "#FDD835" },
-  2: { label: "조율필요", color: "#FB8C00" },
-  1: { label: "한계임박", color: "#D50000" },
+  5: { label: "\uCC30\uB5A1\uAD81\uD569", color: "#1E88E5" },
+  4: { label: "\uD569\uC88B\uC740\uD3B8", color: "#00C853" },
+  3: { label: "\uADF8\uB7ED\uC800\uB7ED", color: "#FDD835" },
+  2: { label: "\uC870\uC728\uD544\uC694", color: "#FB8C00" },
+  1: { label: "\uD55C\uACC4\uC784\uBC15", color: "#D50000" },
 };
+
+const MBTI_ANIMAL: Record<string, string> = {
+  INTJ: "🦉",
+  INTP: "🐙",
+  ENTJ: "🦁",
+  ENTP: "🦊",
+  INFJ: "🦌",
+  INFP: "🐰",
+  ENFJ: "🐬",
+  ENFP: "🦜",
+  ISTJ: "🐘",
+  ISFJ: "🐶",
+  ESTJ: "🦬",
+  ESFJ: "🐼",
+  ISTP: "🐺",
+  ISFP: "🦦",
+  ESTP: "🐯",
+  ESFP: "🐹",
+};
+
+function animalOf(mbti?: string) {
+  const key = (mbti || "").trim().toUpperCase();
+  return MBTI_ANIMAL[key] || "🐾";
+}
+
+function animalIconSrc(mbti?: string) {
+  const key = (mbti || "").trim().toUpperCase();
+  if (!/^[EI][NS][TF][JP]$/.test(key)) return null;
+  return `/mbti-animals/${key.toLowerCase()}.svg`;
+}
 
 function hexToRgba(hex: string, a: number) {
   const h = hex.replace("#", "");
@@ -94,44 +125,20 @@ function drawPremiumNodeCircle(
   isHover: boolean,
   dim: boolean
 ) {
-  const top = dim ? "rgba(255,255,255,0.95)" : mixHex(baseColor, "#FFFFFF", 0.94);
-  const mid = dim ? "rgba(251,252,253,0.95)" : mixHex(baseColor, "#FFFFFF", 0.9);
-  const bottom = dim ? "rgba(248,250,252,0.95)" : mixHex(baseColor, "#F1F5F9", 0.9);
+  // No inner fill: keep the node clean and icon-focused.
+  const shadowBlur = isActive ? 8 : isHover ? 7 : dim ? 3 : 5;
+  const shadowColor = dim ? "rgba(15,23,42,0.03)" : "rgba(15,23,42,0.08)";
+  const shadowOffsetY = isActive ? 2 : 1;
+  drawSoftShadowCircle(ctx, x, y, r, "rgba(255,255,255,0.001)", shadowColor, shadowBlur, shadowOffsetY);
 
-  const fillGrad = ctx.createRadialGradient(
-    x - r * 0.12,
-    y - r * 0.2,
-    r * 0.1,
-    x,
-    y,
-    r * 1.02
-  );
-  fillGrad.addColorStop(0, top);
-  fillGrad.addColorStop(0.7, mid);
-  fillGrad.addColorStop(1, bottom);
-
-  const shadowBlur = isActive ? 13 : isHover ? 11 : dim ? 6 : 9;
-  const shadowColor = dim ? "rgba(15,23,42,0.05)" : "rgba(15,23,42,0.14)";
-  const shadowOffsetY = isActive ? 4 : 3;
-
-  drawSoftShadowCircle(ctx, x, y, r, fillGrad, shadowColor, shadowBlur, shadowOffsetY);
-
-  // Subtle inner ring.
+  // Clean colored outer ring.
   ctx.save();
-  ctx.strokeStyle = dim ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.62)";
-  ctx.lineWidth = Math.max(0.8, r * 0.06);
+  const ringW = Math.max(1.4, r * (isActive ? 0.14 : isHover ? 0.12 : 0.1));
+  const ringR = Math.max(0, r - ringW / 2);
+  ctx.strokeStyle = dim ? hexToRgba(baseColor, 0.26) : hexToRgba(baseColor, isActive ? 0.82 : 0.7);
+  ctx.lineWidth = ringW;
   ctx.beginPath();
-  ctx.arc(x, y, r * 0.84, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
-
-  // Minimal top highlight.
-  ctx.save();
-  ctx.strokeStyle = dim ? "rgba(255,255,255,0.28)" : "rgba(255,255,255,0.45)";
-  ctx.lineWidth = Math.max(0.8, r * 0.08);
-  ctx.lineCap = "round";
-  ctx.beginPath();
-  ctx.arc(x, y, r * 0.8, Math.PI * 1.1, Math.PI * 1.62);
+  ctx.arc(x, y, ringR, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
 }
@@ -154,19 +161,19 @@ function drawPremiumCenterCircle(
   fillGrad.addColorStop(0.72, "rgba(248,250,252,1)");
   fillGrad.addColorStop(1, "rgba(241,245,249,1)");
 
-  drawSoftShadowCircle(ctx, x, y, r, fillGrad, "rgba(15,23,42,0.16)", 14, 4);
+  drawSoftShadowCircle(ctx, x, y, r, fillGrad, "rgba(15,23,42,0.11)", 10, 3);
 
   ctx.save();
-  ctx.strokeStyle = "rgba(255,255,255,0.7)";
-  ctx.lineWidth = Math.max(1, r * 0.06);
+  ctx.strokeStyle = "rgba(255,255,255,0.72)";
+  ctx.lineWidth = Math.max(1, r * 0.05);
   ctx.beginPath();
   ctx.arc(x, y, r * 0.86, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
 
   ctx.save();
-  ctx.strokeStyle = "rgba(15,23,42,0.12)";
-  ctx.lineWidth = Math.max(1.2, r * 0.08);
+  ctx.strokeStyle = "rgba(15,23,42,0.1)";
+  ctx.lineWidth = Math.max(1.2, r * 0.06);
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
   ctx.stroke();
@@ -300,6 +307,44 @@ function layoutAcrossRings(
   });
 }
 
+function layoutSunflower(nodes: EgoNode[], size: number) {
+  if (!nodes.length) return [] as Array<EgoNode & { x: number; y: number; angle: number; ringIndex: number; r: number }>;
+
+  const sorted = [...nodes].sort((a, b) => {
+    if (b.level !== a.level) return b.level - a.level;
+    const as = Number(a.score);
+    const bs = Number(b.score);
+    if (Number.isFinite(bs) && Number.isFinite(as) && bs !== as) return bs - as;
+    return a.name.localeCompare(b.name);
+  });
+
+  const n = sorted.length;
+  const golden = Math.PI * (3 - Math.sqrt(5)); // ~2.399963
+  const start = -Math.PI / 2 + 0.35;
+
+  const minR = size * 0.23;
+  const maxR = size * 0.56;
+  const span = Math.max(1, n - 1);
+
+  return sorted.map((node, i) => {
+    const t = i / span;
+    const levelBias = (5 - node.level) * 0.045; // lower compatibility sits slightly farther out
+    const rRaw = minR + (maxR - minR) * Math.sqrt(t);
+    const r = Math.min(maxR, Math.max(minR, rRaw * (1 + levelBias)));
+    const angle = start + i * golden + node.level * 0.06;
+    const ringIndex = t < 0.34 ? 0 : t < 0.67 ? 1 : 2;
+
+    return {
+      ...node,
+      angle,
+      x: Math.cos(angle) * r,
+      y: Math.sin(angle) * r,
+      ringIndex,
+      r,
+    };
+  });
+}
+
 type Placed = EgoNode & { x: number; y: number; ringIndex: number; r: number };
 
 function dist2(ax: number, ay: number, bx: number, by: number) {
@@ -326,7 +371,7 @@ function useElementSize<T extends HTMLElement>() {
   return { ref, w };
 }
 
-/** ✅ 한 줄 요약(점수) */
+/** ????�??�약(?�수) */
 function oneLineMessage(score?: number, color?: string) {
   const s = Number.isFinite(Number(score)) ? Number(score) : 0;
   const highlight = (text: string) => <span style={{ color, fontWeight: 800 }}>{text}</span>;
@@ -357,6 +402,22 @@ function scoreToBucket(score?: number): MsgBucket {
   if (s >= 50) return "TUNE";
   if (s >= 44) return "LANG";
   return "HARD";
+}
+
+function scoreToLevel(score: number): Level {
+  if (score >= 72) return 5;
+  if (score >= 66) return 4;
+  if (score >= 58) return 3;
+  if (score >= 50) return 2;
+  return 1;
+}
+
+function avgBandLabel(score: number) {
+  if (score >= 72) return "상위권";
+  if (score >= 66) return "양호";
+  if (score >= 58) return "보통";
+  if (score >= 50) return "조율 필요";
+  return "낮음";
 }
 
 type Fn = "Ni" | "Ne" | "Si" | "Se" | "Ti" | "Te" | "Fi" | "Fe";
@@ -508,16 +569,15 @@ function makeCognitiveMessage(
   const sharedLine = sharedTop
     ? pick(
         [
-          `공통분모는 ${fnName(sharedTop)}예요. 포인트만 맞으면 생각보다 금방 가까워져요.`,
-          `${fnName(sharedTop)} 쪽은 합이 좋아요. 여기서 신뢰가 빨리 쌓여요.`,
-          `둘 다 ${fnName(sharedTop)} 감각이 있어서, 한 번 맞으면 ‘아, 통한다’가 빨라요.`,
+          `공통분모는 ${fnName(sharedTop)}예요. 포인트만 맞으면 금방 가까워져요.`,
+          `${fnName(sharedTop)} 쪽 합이 좋아서 신뢰가 빨리 쌓여요.`,
         ],
         seed + 21
       )
     : pick(
         [
-          "공통분모가 얇은 편이라, 처음엔 서로를 ‘해석’하는 시간이 필요해요.",
-          "초반엔 결이 달라 보이지만, 패턴만 잡히면 생각보다 편해질 수 있어요.",
+          "공통분모가 얇은 편이라 초반에는 서로를 해석하는 시간이 필요해요.",
+          "처음엔 결이 달라 보여도 패턴이 잡히면 편해질 수 있어요.",
         ],
         seed + 21
       );
@@ -526,8 +586,8 @@ function makeCognitiveMessage(
     if (!clashTop) {
       return pick(
         [
-          `${scene}. 큰 충돌은 아니지만, 속도/우선순위가 엇갈릴 때만 조율하면 좋아요.`,
-          `${scene}. 포인트는 ‘해석 확인’이에요. 같은 말도 다르게 들릴 수 있어요.`,
+          `${scene}. 큰 충돌보다는 속도와 우선순위만 맞추면 좋아요.`,
+          `${scene}. 같은 말도 다르게 들릴 수 있어서 해석 확인이 중요해요.`,
         ],
         seed + 37
       );
@@ -538,9 +598,8 @@ function makeCognitiveMessage(
     if (bucket === "AUTO" || bucket === "HIGH") {
       return pick(
         [
-          `${scene}. ${axis} 방식은 다를 수 있는데, 오히려 서로 보완이 잘 돼요.`,
-          `${scene}. 특히 ${axis}에서 역할이 나뉘면서 팀플처럼 굴러가요.`,
-          `${scene}. ${axis} 결이 달라도, 기본 합이 좋아서 금방 맞춰져요.`,
+          `${scene}. ${axis} 방식이 달라도 오히려 보완이 잘 돼요.`,
+          `${scene}. ${axis}에서 역할이 나뉘면서 팀플처럼 굴러가요.`,
         ],
         seed + 37
       );
@@ -549,9 +608,8 @@ function makeCognitiveMessage(
     if (bucket === "LANG" || bucket === "HARD") {
       return pick(
         [
-          `${scene}. ${axis}에서 ‘친절의 기준’이 달라요. 그냥 두면 서로 서운해지기 쉬워요.`,
-          `${scene}. 특히 ${axis}에서 엇갈리면 “내 말이 그렇게 들려?”가 나올 수 있어요.`,
-          `${scene}. ${axis} 축이 갈려서, 한쪽은 빠르게 결론을 원하고 다른 쪽은 납득을 원해요.`,
+          `${scene}. ${axis}에서 친절의 기준이 달라 서운함이 생기기 쉬워요.`,
+          `${scene}. ${axis} 축이 갈려서 한쪽은 결론, 다른 쪽은 납득을 원할 수 있어요.`,
         ],
         seed + 37
       );
@@ -559,9 +617,8 @@ function makeCognitiveMessage(
 
     return pick(
       [
-        `${scene}. ${axis}에서 방식이 갈라져요. 결론 전에 전제만 맞추면 충돌이 확 줄어요.`,
-        `${scene}. ${axis} 축이 달라서, 한쪽은 “바로 하자”, 다른 쪽는 “납득이 먼저”로 갈릴 수 있어요.`,
-        `${scene}. 특히 ${axis}에서 조율이 필요해요. 한 문장만 더해도 체감이 달라져요.`,
+        `${scene}. ${axis}에서 방식이 갈라져요. 결론 전에 전제만 맞추면 충돌이 줄어요.`,
+        `${scene}. ${axis} 조율이 핵심이에요. 한 문장 더 설명하면 체감이 달라져요.`,
       ],
       seed + 37
     );
@@ -621,6 +678,7 @@ function EgoGraphCanvasResponsiveInner({
   centerName,
   centerSub,
   nodes,
+  pairAverageScore = null,
   ringCount = 3,
   maxSize = 760,
   minSize = 280,
@@ -631,14 +689,14 @@ function EgoGraphCanvasResponsiveInner({
   const { ref: wrapRef, w: wrapW } = useElementSize<HTMLDivElement>();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // ✅ UI에 필요한 상태만 React state로 유지
+  // ??UI???�요???�태�?React state�??��?
   const [activeId, setActiveId] = useState<string | null>(null);
   const [focusLevel, setFocusLevel] = useState<Level | null>(null);
 
-  // ✅ hover는 draw만 트리거(React re-render 방지)
+  // ??hover??draw�??�리�?React re-render 방�?)
   const hoverIdRef = useRef<string | null>(null);
 
-  // ✅ 캔버스/좌표 캐시 (hitTest 최적화)
+  // ??캔버??좌표 캐시 (hitTest 최적??
   const geomRef = useRef({
     rect: { left: 0, top: 0, width: 1, height: 1 },
     scaleX: 1,
@@ -652,11 +710,24 @@ function EgoGraphCanvasResponsiveInner({
     pts: [] as Array<{ id: string; x: number; y: number }>,
   });
 
-  // ✅ RAF로 draw 합치기
+  // ??RAF�?draw ?�치�?
   const rafRef = useRef<number | null>(null);
   const drawQueuedRef = useRef(false);
+  const iconCacheRef = useRef<Record<string, HTMLImageElement>>({});
 
   const safeNodes = useMemo(() => clampNodes(nodes, 20), [nodes]);
+  const demoAvgScore = useMemo(() => {
+    const scores = safeNodes
+      .map((n) => Number(n.score))
+      .filter((s) => Number.isFinite(s));
+    if (!scores.length) return null;
+    return scores.reduce((sum, s) => sum + s, 0) / scores.length;
+  }, [safeNodes]);
+  const avgScore = pairAverageScore ?? demoAvgScore;
+  const avgLevel = avgScore == null ? null : scoreToLevel(avgScore);
+  const avgColor = avgLevel ? LEVEL_META[avgLevel].color : "#94A3B8";
+  const avgPercent = avgScore == null ? 0 : Math.max(0, Math.min(100, avgScore));
+  const avgBand = avgScore == null ? "데이터 없음" : avgBandLabel(avgScore);
 
   const size = useMemo(() => {
     const raw = Math.floor(wrapW);
@@ -666,43 +737,25 @@ function EgoGraphCanvasResponsiveInner({
 
   const height = Math.floor(size * aspect);
 
-  const placed: Placed[] = useMemo(() => {
-    const few = safeNodes.length <= 4;
-    const rings = few ? [safeNodes] : mapToRings(safeNodes, ringCount);
-
-    const n = safeNodes.length;
-    const t = Math.max(0, Math.min(1, (n - 3) / 9));
-    const spread = 0.72 + 0.28 * t;
-
-    const base = size * 0.19 * spread;
-    const step = size * 0.18 * spread;
-
-    const ringR = few
-      ? [base + step * 0.9]
-      : ringCount === 3
-      ? [base, base + step, base + step * 2]
-      : [base, base + step * 1.4];
-
-    if (few) {
-      const p = layoutOnRing(rings[0], ringR[0], -Math.PI / 2);
-      return p.map((node) => ({ ...node, ringIndex: 0, r: ringR[0] }));
-    }
-
-    return layoutAcrossRings(rings, ringR, -Math.PI / 2);
-  }, [safeNodes, ringCount, size]);
+  const placed: Placed[] = useMemo(() => layoutSunflower(safeNodes, size), [safeNodes, size]);
 
   const ringsR = useMemo(
-    () => Array.from(new Set(placed.map((p) => p.r))).sort((a, b) => a - b),
+    () => {
+      if (!placed.length) return [] as number[];
+      const radii = placed.map((p) => Math.hypot(p.x, p.y)).sort((a, b) => a - b);
+      const at = (q: number) => radii[Math.max(0, Math.min(radii.length - 1, Math.floor((radii.length - 1) * q)))];
+      return Array.from(new Set([at(0.3), at(0.62), at(1)])).filter((v) => Number.isFinite(v));
+    },
     [placed]
   );
 
-  // ✅ placed 기준 fitScale 계산 (placed 변화시에만)
+  // ??placed 기�? fitScale 계산 (placed 변?�시?�만)
   const contentFitRef = useRef({ nodeR_world: 0, margin_world: 0, contentR_world: 1 });
   useEffect(() => {
     const n = placed.length;
     const denseT = Math.max(0, Math.min(1, (n - 10) / 10));
     const nodeScale = 1 - 0.04 * denseT;
-    const nodeR_world = size * 0.056 * nodeScale;
+    const nodeR_world = size * 0.062 * nodeScale;
     const margin_world = size * 0.06;
     let maxDist = 0;
     for (const n of placed) {
@@ -731,6 +784,30 @@ function EgoGraphCanvasResponsiveInner({
     });
   };
 
+  useEffect(() => {
+    const keys = Array.from(
+      new Set(
+        [
+          ...safeNodes.map((n) => (n.mbti || "").trim().toUpperCase()),
+          (centerSub || "").trim().toUpperCase(),
+        ]
+          .filter((m) => /^[EI][NS][TF][JP]$/.test(m))
+      )
+    );
+
+    keys.forEach((mbti) => {
+      if (iconCacheRef.current[mbti]) return;
+      const src = animalIconSrc(mbti);
+      if (!src) return;
+
+      const img = new Image();
+      img.decoding = "async";
+      img.onload = () => requestDraw();
+      img.src = src;
+      iconCacheRef.current[mbti] = img;
+    });
+  }, [safeNodes, centerSub]);
+
   const draw = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -742,11 +819,11 @@ function EgoGraphCanvasResponsiveInner({
     const w = canvas.width;
     const h = canvas.height;
 
-    // ✅ clear
+    // ??clear
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
-    // ✅ 배경(라이트)
+    // ??배경(?�이??
     const bg = ctx.createRadialGradient(
       w / 2,
       h / 2,
@@ -766,19 +843,19 @@ function EgoGraphCanvasResponsiveInner({
     });
 
     const denseT = Math.max(0, Math.min(1, (placed.length - 10) / 10));
-    const nodeScale = 1 - 0.04 * denseT;
-    const centerScale = 1 - 0.03 * denseT;
+    const nodeScale = 1 - 0.12 * denseT;
+    const centerScale = 1 - 0.08 * denseT;
 
     const centerR = size * 0.075 * centerScale * fitScale * dpr;
-    const nodeR = size * 0.062 * nodeScale * fitScale * dpr;
+    const nodeR = size * 0.068 * nodeScale * fitScale * dpr;
 
-    // ✅ hover는 ref에서 읽기
+    // ??hover??ref?�서 ?�기
     const hoverId = hoverIdRef.current;
 
     const isFocused = (lv: Level) => (focusLevel ? lv === focusLevel : true);
     const hasFocus = focusLevel !== null;
 
-    // ✅ 링 가이드
+    // ??�?가?�드
     ringsR.forEach((rr, idx) => {
       const rpx = rr * fitScale * dpr;
       ctx.save();
@@ -792,8 +869,8 @@ function EgoGraphCanvasResponsiveInner({
       ctx.restore();
     });
 
-    // ✅ 라인(노드 연결) — gradient 생성 비용 줄이려면 단색+alpha로도 충분함
-    // 지금은 기존 느낌 유지하되, focus/hover에서만 진하게.
+    // ???�인(?�드 ?�결) ??gradient ?�성 비용 줄이?�면 ?�색+alpha로도 충분??
+    // 지금�? 기존 ?�낌 ?��??�되, focus/hover?�서�?진하�?
     const orderedForLines =
       activeId === null
         ? placed
@@ -813,9 +890,9 @@ function EgoGraphCanvasResponsiveInner({
       const alpha = isActive ? 1 : hasFocus ? (focused ? 0.92 : 0.05) : 0.3;
       const baseLW = isActive ? 5.8 : isHover ? 5.0 : hasFocus ? (focused ? 4.2 : 2.0) : 3.0;
 
-      // ✅ gradient는 유지하되, alpha 낮을 때는 단색으로 가볍게(작은 최적화)
+      // ??gradient???��??�되, alpha ??�� ?�는 ?�색?�로 가볍게(?��? 최적??
       const useGrad = alpha > 0.25;
-      const stroke = useGrad
+      const stroke: string | CanvasGradient = useGrad
         ? (() => {
             const g = ctx.createLinearGradient(cx, cy, p.x, p.y);
             g.addColorStop(0, hexToRgba(col, Math.min(0.55, alpha)));
@@ -825,7 +902,7 @@ function EgoGraphCanvasResponsiveInner({
         : hexToRgba(col, alpha);
 
       ctx.save();
-      ctx.strokeStyle = stroke as any;
+      ctx.strokeStyle = stroke;
       ctx.globalAlpha = 1;
       ctx.lineWidth = baseLW * dpr;
       ctx.lineCap = "round";
@@ -833,28 +910,60 @@ function EgoGraphCanvasResponsiveInner({
       if (n.level <= 2) ctx.setLineDash([7 * dpr, 10 * dpr]);
       else ctx.setLineDash([]);
 
+      const dx = p.x - cx;
+      const dy = p.y - cy;
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+      const endScale = isActive ? 1.35 : isHover ? 1.08 : 1.0;
+      const endR = nodeR * endScale;
+      const pad = 2.5 * dpr;
+      const x1 = cx + ux * (centerR + pad);
+      const y1 = cy + uy * (centerR + pad);
+      const x2 = p.x - ux * (endR + pad);
+      const y2 = p.y - uy * (endR + pad);
+
       const bend = isActive ? 0.18 : 0.12;
-      drawCurvedLine(ctx, cx, cy, p.x, p.y, bend);
+      drawCurvedLine(ctx, x1, y1, x2, y2, bend);
       ctx.restore();
     });
 
-    // ✅ 중앙(미니멀 프리미엄)
+    // ??중앙(미니멀 ?�리미엄)
     drawPremiumCenterCircle(ctx, cx, cy, centerR);
 
-    // 중앙 텍스트
+    const centerMbtiKey = (centerSub || "").trim().toUpperCase();
+    const centerIcon = iconCacheRef.current[centerMbtiKey];
+    const centerIconR = centerR * 0.78;
+    const centerIconY = cy - centerR * 0.08;
+
+    if (centerIcon && centerIcon.complete && centerIcon.naturalWidth > 0) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, centerIconY, centerIconR, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(centerIcon, cx - centerIconR, centerIconY - centerIconR, centerIconR * 2, centerIconR * 2);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = "#0F172A";
+      ctx.font = `${Math.round(centerR * 1.25)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(animalOf(centerSub), cx, centerIconY);
+    }
+
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#0F172A";
-    ctx.font = `${Math.round(size * 0.042 * fitScale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
-    ctx.fillText(centerName, cx, cy - 2 * dpr);
+    ctx.font = `700 ${Math.round(size * 0.031 * fitScale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
+    ctx.fillText(centerName, cx, cy + centerR * 0.85);
 
     if (centerSub) {
       ctx.fillStyle = "rgba(15,23,42,0.55)";
-      ctx.font = `${Math.round(size * 0.028 * fitScale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
-      ctx.fillText(centerSub, cx, cy + centerR * 0.55);
+      ctx.font = `700 ${Math.round(size * 0.023 * fitScale * dpr)}px ui-sans-serif, system-ui, -apple-system`;
+      ctx.fillText(centerSub.toUpperCase(), cx, cy + centerR * 1.25);
     }
 
-    // ✅ 노드 + hitTest용 screen 좌표 캐시
     const pts: Array<{ id: string; x: number; y: number }> = [];
 
     placed.forEach((n) => {
@@ -891,50 +1000,66 @@ function EgoGraphCanvasResponsiveInner({
         !!dim
       );
 
+      const label = n.name.length > 5 ? `${n.name.slice(0, 4)}...` : n.name;
+      const mbtiKey = (n.mbti || "").trim().toUpperCase();
+      const iconImg = iconCacheRef.current[mbtiKey];
+      const iconR = r * 0.98;
+
+      if (iconImg && iconImg.complete && iconImg.naturalWidth > 0) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, iconR, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(iconImg, p.x - iconR, p.y - iconR, iconR * 2, iconR * 2);
+        ctx.restore();
+      } else {
+        const emoji = animalOf(n.mbti);
+        ctx.fillStyle = dim ? "rgba(15,23,42,0.35)" : "#0F172A";
+        ctx.font = `${Math.round(r * 0.9)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(emoji, p.x, p.y + 0.5 * dpr);
+      }
+
+      // Name + MBTI under node
       ctx.save();
-      ctx.strokeStyle = dim ? hexToRgba(meta.color, 0.2) : hexToRgba(meta.color, isActive ? 0.82 : 0.72);
-      ctx.lineWidth = (isActive ? 4.4 : isHover ? 3.8 : 3.2) * dpr;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-
-      const label = n.name.length > 4 ? `${n.name.slice(0, 3)}…` : n.name;
-      const textScale = isActive ? 1.2 : isHover ? 1.05 : 1;
-      const fontWeight = isActive ? 700 : 600;
-
+      const nameY = p.y + r + Math.max(10 * dpr, r * 0.55);
       ctx.fillStyle = activeId
         ? isActive
           ? "#0F172A"
-          : "rgba(15,23,42,0.35)"
+          : "rgba(15,23,42,0.38)"
         : dim
-        ? "rgba(15,23,42,0.40)"
+        ? "rgba(15,23,42,0.45)"
         : "#0F172A";
-
-      ctx.font = `${fontWeight} ${Math.round(size * 0.032 * fitScale * dpr * textScale)}px ui-sans-serif, system-ui, -apple-system`;
+      ctx.font = `${isActive ? 700 : 650} ${Math.max(11, Math.round(r * 0.42))}px ui-sans-serif, system-ui, -apple-system`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(label, p.x, p.y + 0.5 * dpr);
+      ctx.fillText(label, p.x, nameY);
+      ctx.fillStyle = dim ? "rgba(15,23,42,0.42)" : "rgba(15,23,42,0.62)";
+      ctx.font = `700 ${Math.max(9, Math.round(r * 0.3))}px ui-sans-serif, system-ui, -apple-system`;
+      ctx.fillText(mbtiKey, p.x, nameY + Math.max(9 * dpr, r * 0.42));
+      ctx.restore();
     });
 
-    // ✅ hitTest 캐시 갱신
+    // ??hitTest 캐시 갱신
     geomRef.current.pts = pts;
 
-    // ✅ hit radius 캐시: 실제 노드 반지름 기반으로 (빈공간 클릭 오판 줄이기)
-    const hitR = nodeR * 1.08; // 1.05~1.15 사이 취향(작을수록 빈공간 잘 잡힘)
+    // ??hit radius 캐시: ?�제 ?�드 반�?�?기반?�로 (빈공�??�릭 ?�판 줄이�?
+    const hitR = nodeR * 1.08; // 1.05~1.15 ?�이 취향(?�을?�록 빈공�????�힘)
     geomRef.current.hitR2 = hitR * hitR;
 
     ctx.globalAlpha = 1;
   };
 
-  // ✅ 1) 캔버스 버퍼/스케일 업데이트: size/height 변할 때만
+  // ??1) 캔버??버퍼/?��????�데?�트: size/height 변???�만
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
-    // CSS 크기
+    // CSS ?�기
     canvas.style.width = "100%";
     canvas.style.height = `${height}px`;
     const rect = canvas.getBoundingClientRect();
@@ -942,7 +1067,7 @@ function EgoGraphCanvasResponsiveInner({
     const cssW = Math.round(rect.width);
     const cssH = Math.round(rect.height);
 
-    // CSS 정수 고정
+    // CSS ?�수 고정
     canvas.style.width = `${cssW}px`;
     canvas.style.height = `${cssH}px`;
 
@@ -972,15 +1097,15 @@ function EgoGraphCanvasResponsiveInner({
       drawQueuedRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [height, size, placed]); // placed 변화도 fitScale 영향을 줄 수 있음
+  }, [height, size, placed]); // placed 변?�도 fitScale ?�향??�????�음
 
-  // ✅ 2) draw 트리거: state 변화(hover 제외)
+  // ??2) draw ?�리�? state 변??hover ?�외)
   useEffect(() => {
     requestDraw();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId, focusLevel, centerName, centerSub, ringsR]);
 
-  // ✅ rect는 스크롤로도 변하니 포인터 이벤트에서 최신화(가벼운 수준)
+  // ??rect???�크롤로??변?�니 ?�인???�벤?�에??최신??가벼운 ?��?)
   const refreshRect = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -1009,7 +1134,7 @@ function EgoGraphCanvasResponsiveInner({
     refreshRect();
     const id = hitTest(e.clientX, e.clientY);
 
-    // ✅ 빈공간 클릭 = 즉시 해제
+    // ??빈공�??�릭 = 즉시 ?�제
     if (!id) {
       flushSync(() => {
         setActiveId(null);
@@ -1020,11 +1145,11 @@ function EgoGraphCanvasResponsiveInner({
       const canvas = canvasRef.current;
       if (canvas) canvas.style.cursor = "default";
 
-      draw(); // ✅ 이제 최신 state로 즉시 draw 됨
+      draw(); // ???�제 최신 state�?즉시 draw ??
       return;
     }
 
-    // ✅ 노드 클릭: 토글(next를 먼저 계산해서 동기 반영)
+    // ???�드 ?�릭: ?��?(next�?먼�? 계산?�서 ?�기 반영)
     const next = (activeId === id) ? null : id;
 
     flushSync(() => {
@@ -1037,8 +1162,8 @@ function EgoGraphCanvasResponsiveInner({
       if (canvas) canvas.style.cursor = "default";
     }
 
-    draw();        // ✅ 클릭 즉시 커짐/작아짐 반영
-    requestDraw(); // ✅ 혹시 잔여 RAF가 있으면 안전하게 한 번 더
+    draw();        // ???�릭 즉시 커짐/?�아�?반영
+    requestDraw(); // ???�시 ?�여 RAF가 ?�으�??�전?�게 ??�???
   };
 
 
@@ -1048,9 +1173,9 @@ function EgoGraphCanvasResponsiveInner({
     refreshRect();
     const id = hitTest(e.clientX, e.clientY);
 
-    // activeId가 null이고, hover만 커지는 게 싫으면:
+    // activeId가 null?�고, hover�?커�???�??�으�?
     if (activeId === null && id !== null) {
-      // hover를 유지할지 말지는 취향
+      // hover�??��??��? 말�???취향
     }
 
     if (hoverIdRef.current !== id) {
@@ -1081,6 +1206,34 @@ function EgoGraphCanvasResponsiveInner({
 
   return (
     <div ref={wrapRef} style={{ width: "100%" }}>
+      <div className="bg-[rgb(248,250,252)] py-1">
+        <div className="mx-auto w-full max-w-[260px] px-1">
+          <div className="flex items-center justify-between gap-3">
+          <span className="text-[11px] font-semibold tracking-wide text-slate-500">
+            우리 모임 평균 점수
+          </span>
+          <span className="text-sm font-bold tabular-nums" style={{ color: avgColor }}>
+            {avgScore == null ? "-" : `${avgScore.toFixed(2)}점`}
+          </span>
+        </div>
+
+        <div className="mt-1.5 relative h-1.5 overflow-hidden rounded-full bg-black/[0.06]">
+          <div
+            className="h-full rounded-full transition-all duration-300"
+            style={{
+              width: `${avgPercent}%`,
+              background: `linear-gradient(90deg, ${hexToRgba(avgColor, 0.75)}, ${hexToRgba(avgColor, 1)})`,
+              boxShadow: `0 0 10px ${hexToRgba(avgColor, 0.22)}`,
+            }}
+          />
+        </div>
+
+        <div className="mt-1 text-center text-[11px] font-semibold" style={{ color: avgColor }}>
+          {avgBand}
+        </div>
+        </div>
+      </div>
+
       <canvas
         ref={canvasRef}
         onClick={onClick}
@@ -1112,7 +1265,7 @@ function EgoGraphCanvasResponsiveInner({
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="font-semibold text-slate-900 truncate">{activeNode.name}</span>
-                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-300">?</span>
                   <span className="font-semibold text-slate-600">{activeNode.mbti}</span>
                 </div>
 
@@ -1209,7 +1362,8 @@ const areEqual = (prev: Props, next: Props) => {
     prev.memberCount === next.memberCount &&
     prev.centerName === next.centerName &&
     prev.centerSub === next.centerSub &&
-    prev.nodes === next.nodes && // ✅ 핵심: nodes 참조가 같으면 캔버스 리렌더 스킵
+    prev.nodes === next.nodes && // ???�심: nodes 참조가 같으�?캔버??리렌???�킵
+    prev.pairAverageScore === next.pairAverageScore &&
     prev.ringCount === next.ringCount &&
     prev.maxSize === next.maxSize &&
     prev.minSize === next.minSize &&
@@ -1220,3 +1374,8 @@ const areEqual = (prev: Props, next: Props) => {
 };
 
 export default memo(EgoGraphCanvasResponsiveInner, areEqual);
+
+
+
+
+

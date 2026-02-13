@@ -14,12 +14,14 @@ export default function GraphClient({
   center,
   nodes,
   memberCount,
+  pairAverageScore,
 }: {
   groupId: string;
   groupName: string;
   center: { id: string; nickname: string; mbti: string };
   nodes: EgoNode[];
   memberCount: number;
+  pairAverageScore: number | null;
 }) {
   const router = useRouter();
   const sp = useSearchParams();
@@ -105,6 +107,7 @@ export default function GraphClient({
         centerName={center.nickname}
         centerSub={center.mbti}
         nodes={nodes}
+        pairAverageScore={pairAverageScore}
         ringCount={3}
         showLegend
         onCenterChange={(id) => {

@@ -95,6 +95,20 @@ export default async function GraphServer({
     };
   });
 
+  const pairScores: number[] = [];
+  for (let i = 0; i < members.length; i++) {
+    for (let j = i + 1; j < members.length; j++) {
+      const a = members[i];
+      const b = members[j];
+      const compat = getCompatScore(a.id, a.mbti, b.id, b.mbti);
+      if (Number.isFinite(compat.score)) pairScores.push(compat.score);
+    }
+  }
+  const pairAverageScore =
+    pairScores.length > 0
+      ? pairScores.reduce((sum, score) => sum + score, 0) / pairScores.length
+      : null;
+
   return (
     <GraphSectionCard
       title="관계도"
@@ -106,6 +120,7 @@ export default async function GraphServer({
         center={center}
         nodes={nodes}
         memberCount={members.length}
+        pairAverageScore={pairAverageScore}
       />
     </GraphSectionCard>
   );
