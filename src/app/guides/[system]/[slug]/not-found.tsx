@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function GuideNotFound() {
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
-      <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-10">
+      <div className="mbti-shell pb-16 pt-10">
         <div className="rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
           <h1 className="text-xl font-extrabold">가이드를 찾을 수 없어요</h1>
           <p className="mt-3 text-sm text-slate-700">주소가 잘못되었거나 글이 이동되었을 수 있어요.</p>

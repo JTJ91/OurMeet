@@ -1,4 +1,4 @@
-import Link from "next/link";
+import BackNavButton from "@/app/components/BackNavButton";
 
 export const metadata = {
   title: "자주 묻는 질문 | 모임랭크",
@@ -11,18 +11,17 @@ export default function FAQPage() {
     <main className="mbti-page-bg">
       <div className="mbti-shell w-full max-w-3xl pb-16 pt-10">
         {/* Top left back */}
-        <div className="mb-4 flex items-center justify-between">
-          <Link
-            href="/mbti"
+        <div className="mbti-card-frame mb-4 flex items-center justify-between">
+          <BackNavButton
+            label="뒤로가기"
+            icon="←"
+            fallbackHref="/mbti"
             className="mbti-back-btn"
-          >
-            <span aria-hidden>←</span>
-            <span>MBTI홈</span>
-          </Link>
+          />
         </div>
 
         {/* 헤더 */}
-        <header className="mbti-card p-6">
+        <header className="mbti-card mbti-card-frame p-6">
           <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
             자주 묻는 질문(FAQ)
           </h1>
@@ -216,7 +215,7 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mbti-card p-5">
+    <div className="mbti-card mbti-card-frame p-5">
       <h2 className="text-base font-extrabold text-slate-900">{title}</h2>
       <div className="mt-3">{children}</div>
     </div>

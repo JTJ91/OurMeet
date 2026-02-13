@@ -24,7 +24,7 @@ export default async function GroupJoinPage({
     <main className="mbti-page-bg pb-10">
       <div className="mbti-shell">
         {/* 상단 */}
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mbti-card-frame mb-4 flex items-center justify-between">
           <Link
             href={`/mbti/g/${groupId}`}
             className="mbti-back-btn"
@@ -38,7 +38,7 @@ export default async function GroupJoinPage({
         </div>
 
         {/* 카드 */}
-        <div className="mbti-card p-5">
+        <div className="mbti-card mbti-card-frame p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="text-xs font-bold text-slate-500">모임</div>
@@ -67,7 +67,7 @@ export default async function GroupJoinPage({
           <JoinFormClient groupId={groupId} isFull={isFull} />
         </div>
 
-        <div className="mbti-card-soft mt-4 p-5">
+        <div className="mbti-card-soft mbti-card-frame mt-4 p-5">
           <p className="text-xs leading-relaxed text-slate-500">
             ※ 결과는 재미를 위한 참고용이에요. 관계 판단/결정의 근거로 사용하지
             마세요.

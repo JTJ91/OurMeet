@@ -18,10 +18,10 @@ export default function GuideLayout({
 }) {
   return (
     <main className="mbti-page-bg">
-      <div className="mbti-shell w-full max-w-3xl pb-16">
+      <div className="mbti-shell pb-16">
         {/* Back */}
         {!hideTopBack && (
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mbti-card-frame mb-4 flex items-center justify-between">
             <Link
               href="/guides"
               className="mbti-back-btn whitespace-nowrap"
@@ -36,7 +36,7 @@ export default function GuideLayout({
 
         {/* Header */}
         {!hideHeader && (
-          <header className="mbti-card p-6">
+          <header className="mbti-card mbti-card-frame p-6">
             <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
               {title}
             </h1>
@@ -81,7 +81,7 @@ export function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mbti-card p-5">
+    <div className="mbti-card mbti-card-frame p-5">
       <h2 className="text-base font-extrabold text-slate-900">{title}</h2>
       <div className="mt-3">{children}</div>
     </div>

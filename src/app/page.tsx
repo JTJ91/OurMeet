@@ -9,7 +9,7 @@ export const metadata = {
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
-      <div className="mx-auto flex min-h-screen max-w-[820px] flex-col items-center justify-center px-6 py-20 text-center">
+      <div className="mbti-shell flex min-h-screen flex-col items-center justify-center px-6 py-20 text-center">
 
         <div className="relative text-4xl font-black tracking-tight sm:text-5xl">
           <span>

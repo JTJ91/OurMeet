@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { readSavedGroups, removeSavedGroup, SavedGroup } from "@/app/lib/mbti/groupHistory";
 
-export default function BottomCTA() {
+export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: boolean }) {
   const [isScrolling, setIsScrolling] = useState(false);
   const [nowTs, setNowTs] = useState(() => Date.now());
 
@@ -90,19 +90,21 @@ export default function BottomCTA() {
     <div
       data-bottom-cta
       className={[
-        "fixed inset-x-0 bottom-0 z-50 sm:static sm:z-auto sm:mt-10",
+        desktopSticky
+          ? "fixed inset-x-0 bottom-0 z-50"
+          : "fixed inset-x-0 bottom-0 z-50 sm:static sm:z-auto sm:mt-10",
         menuOpen ? "hidden" : "",
       ].join(" ")}
     >
-      <div className="mx-auto max-w-[820px] px-5 pb-5 sm:pb-0">
+      <div className="mbti-card-frame px-5 pb-5 sm:pb-0">
         <div
-          className={`
-            rounded-3xl border border-slate-200/70 bg-white/88 p-3
-            backdrop-blur-sm shadow-[0_12px_34px_rgba(15,23,42,0.12)]
-            transition-all duration-200 ease-out
-            ${isScrolling ? "scale-95 opacity-90" : "scale-100 opacity-100"}
-            sm:scale-100 sm:opacity-100 sm:bg-transparent sm:shadow-none sm:ring-0 sm:p-0
-          `}
+          className={[
+            "rounded-3xl border border-slate-200/70 bg-white/88 p-3",
+            "backdrop-blur-sm shadow-[0_12px_34px_rgba(15,23,42,0.12)]",
+            "transition-all duration-200 ease-out",
+            isScrolling ? "scale-95 opacity-90" : "scale-100 opacity-100",
+            desktopSticky ? "" : "sm:scale-100 sm:opacity-100 sm:bg-transparent sm:shadow-none sm:ring-0 sm:p-0",
+          ].join(" ")}
         >
           <div className="grid grid-cols-2 items-stretch gap-3">
             {/* 모임 만들기 */}

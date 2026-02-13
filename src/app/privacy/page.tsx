@@ -9,9 +9,9 @@ export const metadata = {
 export default function PrivacyPolicyPage() {
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
-      <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-10">
+      <div className="mbti-shell pb-16 pt-10">
         {/* Top left back */}
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mbti-card-frame mb-4 flex items-center justify-between">
           <BackNavButton
             label="뒤로가기"
             icon="←"
@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
         </div>
 
         {/* 헤더 */}
-        <header className="rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
+        <header className="mbti-card-frame rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
           <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
             개인정보처리방침
           </h1>
@@ -187,19 +187,6 @@ export default function PrivacyPolicyPage() {
             </p>
           </Card>
 
-          {/* CTA */}
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <BackNavButton
-              label="뒤로가기"
-              className="flex-1 rounded-full border border-slate-300 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            />
-            <a
-              href="/create"
-              className="flex-1 rounded-full bg-[#1E88E5] px-6 py-3 text-center text-sm font-semibold text-white shadow-md transition hover:bg-[#1E88E5]/90"
-            >
-              우리 모임 케미 보러가기 →
-            </a>
-          </div>
         </section>
       </div>
     </main>
@@ -214,7 +201,7 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-3xl border border-black/5 bg-white/80 p-5 shadow-sm backdrop-blur">
+    <div className="mbti-card-frame rounded-3xl border border-black/5 bg-white/80 p-5 shadow-sm backdrop-blur">
       <h2 className="text-base font-extrabold text-slate-900">{title}</h2>
       <div className="mt-3">{children}</div>
     </div>

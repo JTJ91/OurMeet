@@ -685,16 +685,17 @@ function EgoGraphCanvasResponsiveInner({
   }, [memberSignature, pairAverageScore, demoAvgScore]);
 
   const avgScore = pairAverageScore ?? frozenDemoAvgRef.current ?? demoAvgScore;
-  const avgLevel = avgScore == null ? null : scoreToLevel(avgScore);
+  const canShowAverage = (memberCount ?? safeNodes.length + 1) >= 2;
+  const avgLevel = !canShowAverage || avgScore == null ? null : scoreToLevel(avgScore);
   const avgColor = avgLevel ? LEVEL_META[avgLevel].color : "#94A3B8";
-  const avgPercent = avgScore == null ? 0 : Math.max(0, Math.min(100, avgScore));
-  const avgBand = avgScore == null ? "데이터 없음" : avgBandLabel(avgScore);
+  const avgPercent = !canShowAverage || avgScore == null ? 0 : Math.max(0, Math.min(100, avgScore));
+  const avgBand = !canShowAverage ? "참여자 2명부터 표시" : avgScore == null ? "데이터 없음" : avgBandLabel(avgScore);
 
   const size = useMemo(() => {
     const raw = Math.floor(wrapW);
-    if (raw > 768) return Math.min(900, raw);
-    return Math.max(280, Math.min(420, raw));
-  }, [wrapW]);
+    if (raw > 768) return Math.min(maxSize, raw);
+    return Math.max(minSize, Math.min(420, raw));
+  }, [wrapW, maxSize, minSize]);
 
   const height = Math.floor(size * aspect);
 
@@ -812,6 +813,7 @@ function EgoGraphCanvasResponsiveInner({
     const nodeR = size * 0.089 * nodeScale * fitScale * dpr;
     const centerR = nodeR * 1.04;
     let graphCy = cy;
+    const mobileTextBoost = size <= 430 ? 1.16 : 1;
 
     // Keep node + label bounds inside canvas vertically.
     const fitVertically = () => {
@@ -951,12 +953,12 @@ function EgoGraphCanvasResponsiveInner({
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#0F172A";
-    ctx.font = `700 ${Math.max(11, Math.round(centerR * 0.42))}px ui-sans-serif, system-ui, -apple-system`;
+    ctx.font = `700 ${Math.max(12, Math.round(centerR * 0.42 * mobileTextBoost))}px ui-sans-serif, system-ui, -apple-system`;
     ctx.fillText(centerName, cx, centerNameY);
 
     if (centerSub) {
       ctx.fillStyle = "rgba(15,23,42,0.62)";
-      ctx.font = `700 ${Math.max(9, Math.round(centerR * 0.3))}px ui-sans-serif, system-ui, -apple-system`;
+      ctx.font = `700 ${Math.max(10, Math.round(centerR * 0.3 * mobileTextBoost))}px ui-sans-serif, system-ui, -apple-system`;
       ctx.fillText(centerSub.toUpperCase(), cx, centerNameY + Math.max(10 * dpr, centerR * 0.5));
     }
     ctx.restore();
@@ -1031,7 +1033,8 @@ function EgoGraphCanvasResponsiveInner({
         : dim
         ? "rgba(15,23,42,0.45)"
         : "#0F172A";
-      ctx.font = `${isActive ? 700 : 650} ${Math.max(11, Math.round(r * 0.42))}px ui-sans-serif, system-ui, -apple-system`;
+      const nameFontPx = Math.max(12, Math.round(r * 0.42 * mobileTextBoost));
+      ctx.font = `${isActive ? 700 : 650} ${nameFontPx}px ui-sans-serif, system-ui, -apple-system`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(label, p.x, nameY);
@@ -1039,7 +1042,8 @@ function EgoGraphCanvasResponsiveInner({
       if (!activeId && hasFocus && !focused) {
         ctx.fillStyle = "rgba(15,23,42,0.3)";
       }
-      ctx.font = `700 ${Math.max(9, Math.round(r * 0.3))}px ui-sans-serif, system-ui, -apple-system`;
+      const mbtiFontPx = Math.max(10, Math.round(r * 0.3 * mobileTextBoost));
+      ctx.font = `700 ${mbtiFontPx}px ui-sans-serif, system-ui, -apple-system`;
       ctx.fillText(mbtiKey, p.x, nameY + Math.max(10 * dpr, r * 0.5));
       ctx.restore();
     });
@@ -1214,9 +1218,11 @@ function EgoGraphCanvasResponsiveInner({
           <span className="text-[11px] font-semibold tracking-wide text-slate-500">
             우리 모임 평균 점수
           </span>
-          <span className="text-sm font-bold tabular-nums" style={{ color: avgColor }}>
-            {avgScore == null ? "-" : `${avgScore.toFixed(2)}점`}
-          </span>
+          {canShowAverage ? (
+            <span className="text-sm font-bold tabular-nums" style={{ color: avgColor }}>
+              {avgScore == null ? "-" : `${avgScore.toFixed(2)}점`}
+            </span>
+          ) : null}
         </div>
 
         <div className="mt-1.5 relative h-1.5 overflow-hidden rounded-full bg-black/[0.06]">

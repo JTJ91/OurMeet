@@ -67,7 +67,7 @@ export default function Home() {
   return (
     <main className="mbti-page-bg pb-10">
       <div className="mbti-shell flex min-h-screen flex-col">
-        <div className="flex items-center justify-between">
+        <div className="mbti-card-frame flex items-center justify-between">
           <Link href="/" className="mbti-back-btn">
             <span aria-hidden>←</span>
             <span>메인으로</span>
@@ -75,7 +75,7 @@ export default function Home() {
         </div>
 
         <section className="mt-4">
-          <div className="mbti-card p-6">
+          <div className="mbti-card mbti-card-frame p-6">
             <h1 className="text-3xl font-extrabold leading-tight">
               우리 모임
               <br />
@@ -98,7 +98,7 @@ export default function Home() {
         </section>
 
         <section className="mt-10">
-          <div className="mbti-card mx-auto w-full max-w-[400px] overflow-hidden md:max-w-[640px] lg:max-w-[760px]">
+          <div className="mbti-card mbti-card-frame overflow-hidden">
             <EgoGraphCanvasResponsive
               centerName={center.name}
               centerSub={center.mbti}
@@ -113,38 +113,38 @@ export default function Home() {
         </section>
 
         <section className="mt-5">
-          <div className="mbti-card p-4">
+          <div className="mbti-card mbti-card-frame p-4">
             <div className="mb-3 text-xs font-extrabold text-slate-500">빠른 시작</div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-2">
               <Link
                 href="/mbti-test"
-                className="rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white"
+                className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white"
               >
-                MBTI 검사
-                <div className="mt-0.5 text-[11px] font-semibold text-slate-500">정식 60문항 검사</div>
+                <span>MBTI 검사</span>
+                <span className="text-[11px] font-semibold text-slate-500">정식 60문항 검사</span>
               </Link>
 
               <Link
                 href="/guides/mbti"
-                className="rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white"
+                className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white"
               >
-                모임 속 MBTI
-                <div className="mt-0.5 text-[11px] font-semibold text-slate-500">상황별 케미 가이드</div>
+                <span>모임 속 MBTI</span>
+                <span className="text-[11px] font-semibold text-slate-500">상황별 케미 가이드</span>
               </Link>
 
               <Link
                 href="/mbti/cognitive-functions"
-                className="rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white"
+                className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white"
               >
-                이용 가이드
-                <div className="mt-0.5 text-[11px] font-semibold text-slate-500">점수 계산 방식 안내</div>
+                <span>이용 가이드</span>
+                <span className="text-[11px] font-semibold text-slate-500">점수 계산 방식 안내</span>
               </Link>
             </div>
           </div>
         </section>
       </div>
 
-      <BottomCTA />
+      <BottomCTA desktopSticky />
     </main>
   );
 }

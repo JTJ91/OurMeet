@@ -197,7 +197,7 @@ export default function AppHeader() {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 backdrop-blur-sm">
-        <div className="mx-auto flex h-12 max-w-[820px] items-center justify-between px-5">
+        <div className="mx-auto flex h-12 max-w-[740px] items-center justify-between px-5">
           {/* Brand */}
           <Link href="/" className="flex items-center gap-2">
             <span className="text-sm font-extrabold tracking-tight text-slate-900">

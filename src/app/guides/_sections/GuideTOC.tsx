@@ -4,7 +4,7 @@ import { SECTION_ID, SECTION_META } from "../_data/mbti/types";
 
 export default function GuideTOC({ sections }: { sections: GuideSection[] }) {
   return (
-    <section className="mbti-card-soft rounded-3xl p-4">
+    <section className="mbti-card-soft mbti-card-frame rounded-3xl p-4">
       <div className="text-xs font-extrabold text-slate-500">바로가기</div>
 
       <div className="mt-3 flex flex-wrap gap-2">

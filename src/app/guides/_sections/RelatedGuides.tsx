@@ -16,7 +16,7 @@ export default function RelatedGuides({ guide, system }: Props) {
   if (list.length === 0) return null;
 
   return (
-    <section className="rounded-3xl border border-black/5 bg-white/70 p-5 shadow-sm">
+    <section className="mbti-card-frame rounded-3xl border border-black/5 bg-white/70 p-5 shadow-sm">
       <div className="text-xs font-extrabold tracking-wide text-slate-500">
         RELATED
       </div>

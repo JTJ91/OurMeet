@@ -10,9 +10,9 @@ export const metadata = {
 export default function MbtiTestPage() {
   return (
     <main className="mbti-page-bg">
-      <div className="mbti-shell w-full max-w-[820px] pb-16 pt-10">
+      <div className="mbti-shell pb-16 pt-10">
         {/* Top bar */}
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mbti-card-frame mb-4 flex items-center justify-between">
         <Link
             href="/mbti"
             className="mbti-back-btn"
@@ -24,7 +24,7 @@ export default function MbtiTestPage() {
 
 
         {/* Header */}
-        <header className="mbti-card p-6">
+        <header className="mbti-card mbti-card-frame p-6">
         <h1 className="text-3xl font-extrabold leading-tight text-slate-900">
             MBTI 정식 검사
             <br />
@@ -51,7 +51,7 @@ export default function MbtiTestPage() {
 
 
         {/* Test Card */}
-        <section className="mbti-card mt-5 p-5">
+        <section className="mbti-card mbti-card-frame mt-5 p-5">
           <MbtiTestClient />
         </section>
 

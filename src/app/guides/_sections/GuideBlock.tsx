@@ -16,7 +16,7 @@ export default function GuideBlock({
           <section
             key={idx}
             id={id}
-            className="scroll-mt-24 rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm"
+            className="mbti-card-frame scroll-mt-24 rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm"
           >
             <h2 className="text-lg font-black">{section.title}</h2>
 

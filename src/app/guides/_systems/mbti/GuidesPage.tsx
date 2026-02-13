@@ -10,11 +10,11 @@ export default function MbtiGuidesPage() {
 
   return (
     <main className="mbti-page-bg">
-      <div className="mbti-shell w-full max-w-3xl pb-16">
+      <div className="mbti-shell pb-16">
         <div id="top" />
 
         {/* 뒤로가기 */}
-        <div className="mb-4">
+        <div className="mbti-card-frame mb-4">
           <Link
             href="/mbti"
             className="mbti-back-btn"
@@ -24,7 +24,7 @@ export default function MbtiGuidesPage() {
         </div>
 
         {/* 헤더 */}
-        <header className="mbti-card p-6">
+        <header className="mbti-card mbti-card-frame p-6">
           <h1 className="mt-2 text-2xl font-black leading-tight">
             모임에서 <span className="text-slate-600">자주 터지는 순간</span>을
             <br />
@@ -38,14 +38,14 @@ export default function MbtiGuidesPage() {
 
         {/* 상단 카테고리 */}
         <section className="mt-6">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3">
             {ORDER.map((k) => {
               const m = GROUP_META[k];
               return (
                 <a
                   key={k}
                   href={`#${m.anchor}`}
-                  className="mbti-card group rounded-3xl p-5 transition hover:bg-white"
+                  className="mbti-card mbti-card-frame group rounded-3xl p-5 transition hover:bg-white"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -74,7 +74,7 @@ export default function MbtiGuidesPage() {
 
             return (
               <section key={k} id={m.anchor} className="scroll-mt-24">
-                <div className="mt-10">
+                <div className="mbti-card-frame mt-10">
                   <div className="mb-5 h-[2px] w-full bg-black/5" />
                   <div className="flex items-end justify-between gap-3">
                     <div>
@@ -103,7 +103,7 @@ export default function MbtiGuidesPage() {
                       key={g.slug}
                       id={g.slug}                 // ✅ 앵커 타겟을 Link(=a)에 직접
                       href={`/guides/${system}/${g.slug}`}
-                      className="mbti-card scroll-mt-24 rounded-3xl p-5 transition hover:bg-white"
+                      className="mbti-card mbti-card-frame scroll-mt-24 rounded-3xl p-5 transition hover:bg-white"
                     >
                       <div className="flex items-start justify-between gap-3">  {/* ✅ items-start */}
                         <div>

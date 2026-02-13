@@ -8,7 +8,7 @@ export default function CreatePage() {
       {/* Centered "mobile-like" container */}
       <div className="mbti-shell flex flex-col">
         {/* Top left back */}
-        <div className="flex items-center justify-between">
+        <div className="mbti-card-frame flex items-center justify-between">
           <Link
             href="/mbti"
             className="mbti-back-btn"
@@ -20,7 +20,7 @@ export default function CreatePage() {
 
         {/* Hero 카드 (메인과 유사) */}
         <section className="mt-4">
-          <div className="mbti-card p-6">
+          <div className="mbti-card mbti-card-frame p-6">
             <h2 className="text-2xl font-extrabold leading-tight">
               <span className="underline decoration-[#FDD835]/70">
                 모임 만들기
@@ -36,7 +36,7 @@ export default function CreatePage() {
 
         {/* Form 카드 */}
         <section className="mt-6">
-          <div className="mbti-card p-5">
+          <div className="mbti-card mbti-card-frame p-5">
             <CreateFormClient />
           </div>
         </section>

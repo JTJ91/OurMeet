@@ -21,7 +21,7 @@ export default function GuideHero({ guide, system }: Props) {
     system === "mbti" ? "MBTI 홈" : system === "saju" ? "사주 홈" : "메인";
 
   return (
-    <header className="mbti-card p-6">
+    <header className="mbti-card mbti-card-frame p-6">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="inline-flex items-center gap-2 whitespace-nowrap text-xs font-extrabold text-slate-600">
           <span className="text-base">{meta.badge}</span>
