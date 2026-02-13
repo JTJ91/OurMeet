@@ -103,6 +103,11 @@ export default function CreateFormClient() {
 
         form.setAttribute("aria-busy", "true");
       }}
+      onKeyDown={(e) => {
+        if (e.key !== "Enter") return;
+        if ((e.nativeEvent as KeyboardEvent).isComposing) return;
+        e.preventDefault();
+      }}
     >
       {/* 모임 이름 */}
       <label className="block">

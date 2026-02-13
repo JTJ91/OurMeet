@@ -100,6 +100,11 @@ export default function JoinFormClient({
         // 폼 전체도 busy 표시(선택)
         form.setAttribute("aria-busy", "true");
       }}
+      onKeyDown={(e) => {
+        if (e.key !== "Enter") return;
+        if ((e.nativeEvent as KeyboardEvent).isComposing) return;
+        e.preventDefault();
+      }}
     >
       <input type="hidden" name="groupId" value={groupId} />
 
