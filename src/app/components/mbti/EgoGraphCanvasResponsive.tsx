@@ -954,14 +954,17 @@ function EgoGraphCanvasResponsiveInner({
     const centerNameY = graphCy + centerR + Math.max(10 * dpr, centerR * 0.55);
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
+    const centerNameFontPx = Math.max(12, Math.round(centerR * 0.42 * mobileTextBoost * graphTextScale));
     ctx.fillStyle = "#0F172A";
-    ctx.font = `700 ${Math.max(12, Math.round(centerR * 0.42 * mobileTextBoost * graphTextScale))}px ui-sans-serif, system-ui, -apple-system`;
+    ctx.font = `700 ${centerNameFontPx}px ui-sans-serif, system-ui, -apple-system`;
     ctx.fillText(centerName, cx, centerNameY);
 
     if (centerSub) {
+      const centerMbtiFontPx = Math.max(10, Math.round(centerR * 0.3 * mobileTextBoost * graphTextScale));
+      const centerLineGap = Math.max(10 * dpr, centerNameFontPx * 0.7, centerMbtiFontPx * 1.05);
       ctx.fillStyle = "rgba(15,23,42,0.62)";
-      ctx.font = `700 ${Math.max(10, Math.round(centerR * 0.3 * mobileTextBoost * graphTextScale))}px ui-sans-serif, system-ui, -apple-system`;
-      ctx.fillText(centerSub.toUpperCase(), cx, centerNameY + Math.max(10 * dpr, centerR * 0.5));
+      ctx.font = `700 ${centerMbtiFontPx}px ui-sans-serif, system-ui, -apple-system`;
+      ctx.fillText(centerSub.toUpperCase(), cx, centerNameY + centerLineGap);
     }
     ctx.restore();
 
@@ -1051,8 +1054,9 @@ function EgoGraphCanvasResponsiveInner({
         10,
         Math.round(r * 0.3 * mobileTextBoost * graphTextScale * (isActive ? 1.14 : 1))
       );
+      const labelLineGap = Math.max(10 * dpr, nameFontPx * 0.7, mbtiFontPx * 1.05);
       ctx.font = `700 ${mbtiFontPx}px ui-sans-serif, system-ui, -apple-system`;
-      ctx.fillText(mbtiKey, p.x, nameY + Math.max(10 * dpr, r * 0.5));
+      ctx.fillText(mbtiKey, p.x, nameY + labelLineGap);
       ctx.restore();
     });
 
