@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 import AppHeader from "@/app/components/AppHeader";
 import Footer from "@/app/components/Footer";
 import ClientOverlays from "@/app/components/ClientOverlays";
@@ -11,11 +12,9 @@ type Props = {
 
 export default function RootChrome({ children }: Props) {
   const pathname = usePathname() || "/";
-  const isPrefixedLocaleRoute = /^\/(ko|en|ja)(?=\/|$)/.test(pathname);
-  const isDefaultLocaleManagedRoute =
-    pathname === "/" ||
-    /^\/(mbti(?:\/.*)?|mbti-test(?:\/.*)?|faq\/mbti(?:\/.*)?|guides(?:\/.*)?|privacy(?:\/.*)?|terms(?:\/.*)?)$/.test(pathname);
-  const isLocalizedRoute = isPrefixedLocaleRoute || isDefaultLocaleManagedRoute;
+  const params = useParams<{ locale?: string }>();
+  const locale = params?.locale;
+  const isLocalizedRoute = locale === "ko" || locale === "en" || locale === "ja";
 
   if (isLocalizedRoute) return <div className="flex-1">{children}</div>;
 
