@@ -38,12 +38,25 @@ export default function HomePageIntlClient({ locale }: Props) {
         </div>
 
         <h1 className="mt-8 max-w-[620px] text-xl font-extrabold leading-relaxed text-slate-800 sm:text-2xl">
-          {t("headline1")}
+          {t("headlinePrefix")}{" "}
+          <span className="text-[#1E88E5]">{t("headlineAccent")}</span>
           <br className="hidden sm:block" />
-          {t("headline2")}
+          {t("headlineSuffix")}
         </h1>
 
-        <p className="mt-6 max-w-[640px] text-[15px] leading-8 text-slate-600">{t("description1")}</p>
+        <p className="mt-6 max-w-[640px] text-[15px] leading-8 text-slate-600">
+          {t("descriptionLead")}{" "}
+          <span className="font-semibold text-slate-900">{t("descriptionDirection")}</span>,{" "}
+          <span className="font-semibold text-slate-900">{t("descriptionSpeed")}</span>,{" "}
+          <span className="font-semibold text-slate-900">{t("descriptionBalance")}</span>{" "}
+          {t("descriptionBridge")}
+          <br className="hidden sm:block" />
+          {t("descriptionTailLead")}{" "}
+          <span className="font-semibold text-[#1E88E5]">{t("descriptionRank")}</span>{" "}
+          {t("descriptionTailAnd")}{" "}
+          <span className="font-semibold text-[#1E88E5]">{t("descriptionGraph")}</span>
+          {t("descriptionTailEnd")}
+        </p>
 
         <p className="mt-6 max-w-[600px] text-[14px] leading-7 text-slate-500">{t("description2")}</p>
 

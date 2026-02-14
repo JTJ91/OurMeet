@@ -3,8 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import EgoGraphCanvasResponsive, { EgoNode } from "@/app/components/mbti/EgoGraphCanvasResponsive";
-import EgoGraphCanvasResponsiveIntl from "@/app/[locale]/components/mbti/EgoGraphCanvasResponsive";
+import EgoGraphCanvasResponsiveIntl, { EgoNode } from "@/app/[locale]/components/mbti/EgoGraphCanvasResponsive";
 import SaveGroupClient from "@/app/[locale]/components/SaveGroupClient";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -30,7 +29,6 @@ export default function GraphClientIntl({
 }) {
   const t = useTranslations("groupGraph.client");
   const base = locale === "ko" ? "" : `/${locale}`;
-  const EgoGraphCanvas = locale === "en" || locale === "ja" ? EgoGraphCanvasResponsiveIntl : EgoGraphCanvasResponsive;
 
   const router = useRouter();
   const sp = useSearchParams();
@@ -72,7 +70,7 @@ export default function GraphClientIntl({
               active:scale-[0.98]
             "
           >
-            <span aria-hidden className="text-[13px]">＋</span>
+            <span aria-hidden className="text-[13px]">🫶</span>
             <span className="whitespace-nowrap">{t("join")}</span>
           </Link>
 
@@ -94,7 +92,7 @@ export default function GraphClientIntl({
     <>
       {slotEl ? createPortal(actions, slotEl) : null}
 
-      <EgoGraphCanvas
+      <EgoGraphCanvasResponsiveIntl
         groupName={groupName}
         memberCount={memberCount}
         centerName={center.nickname}

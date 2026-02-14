@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createGroupAction } from "@/app/[locale]/mbti/actions/group";
 import { upsertSavedGroup } from "@/app/lib/mbti/groupHistory";
-import MbtiTestModal from "@/app/components/mbtiTest/MbtiTestModal8";
+import MbtiTestModal from "@/app/[locale]/components/mbtiTest/MbtiTestModal8";
 import { sanitizeNicknameInput } from "@/app/[locale]/mbti/lib/nickname";
 
 type Props = {
@@ -203,23 +203,23 @@ export default function CreateFormClientIntl({ locale }: Props) {
         <div className="mt-2 grid grid-cols-2 gap-2">
           <label className="cursor-pointer">
             <input type="radio" name="judge" value="LOGIC" defaultChecked className="peer sr-only" />
-            <div className="min-h-[5.25rem] rounded-2xl bg-white px-3 py-2 ring-1 ring-black/10 flex flex-col items-center justify-center gap-1 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
-              <div className="text-[13px] font-extrabold leading-tight text-slate-800">
+            <div className="h-14 rounded-2xl bg-white px-4 ring-1 ring-black/10 flex flex-col items-center justify-center gap-0.5 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
+              <div className="text-[13px] font-extrabold text-slate-800">
                 <span aria-hidden="true">🔍 </span>
                 {t("judge.logic.title")}
               </div>
-              <div className="text-[11px] leading-tight text-slate-500">{t("judge.logic.desc")}</div>
+              <div className="text-[11px] text-slate-500">{t("judge.logic.desc")}</div>
             </div>
           </label>
 
           <label className="cursor-pointer">
             <input type="radio" name="judge" value="PEOPLE" className="peer sr-only" />
-            <div className="min-h-[5.25rem] rounded-2xl bg-white px-3 py-2 ring-1 ring-black/10 flex flex-col items-center justify-center gap-1 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
-              <div className="text-[13px] font-extrabold leading-tight text-slate-800">
+            <div className="h-14 rounded-2xl bg-white px-4 ring-1 ring-black/10 flex flex-col items-center justify-center gap-0.5 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
+              <div className="text-[13px] font-extrabold text-slate-800">
                 <span aria-hidden="true">🤝 </span>
                 {t("judge.people.title")}
               </div>
-              <div className="text-[11px] leading-tight text-slate-500">{t("judge.people.desc")}</div>
+              <div className="text-[11px] text-slate-500">{t("judge.people.desc")}</div>
             </div>
           </label>
         </div>
@@ -232,23 +232,23 @@ export default function CreateFormClientIntl({ locale }: Props) {
         <div className="mt-2 grid grid-cols-2 gap-2">
           <label className="cursor-pointer">
             <input type="radio" name="info" value="IDEA" defaultChecked className="peer sr-only" />
-            <div className="min-h-[5.25rem] rounded-2xl bg-white px-3 py-2 ring-1 ring-black/10 flex flex-col items-center justify-center gap-1 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
-              <div className="text-[13px] font-extrabold leading-tight text-slate-800">
+            <div className="h-14 rounded-2xl bg-white px-4 ring-1 ring-black/10 flex flex-col items-center justify-center gap-0.5 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
+              <div className="text-[13px] font-extrabold text-slate-800">
                 <span aria-hidden="true">💡 </span>
                 {t("info.idea.title")}
               </div>
-              <div className="text-[11px] leading-tight text-slate-500">{t("info.idea.desc")}</div>
+              <div className="text-[11px] text-slate-500">{t("info.idea.desc")}</div>
             </div>
           </label>
 
           <label className="cursor-pointer">
             <input type="radio" name="info" value="FACT" className="peer sr-only" />
-            <div className="min-h-[5.25rem] rounded-2xl bg-white px-3 py-2 ring-1 ring-black/10 flex flex-col items-center justify-center gap-1 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
-              <div className="text-[13px] font-extrabold leading-tight text-slate-800">
+            <div className="h-14 rounded-2xl bg-white px-4 ring-1 ring-black/10 flex flex-col items-center justify-center gap-0.5 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
+              <div className="text-[13px] font-extrabold text-slate-800">
                 <span aria-hidden="true">📌 </span>
                 {t("info.fact.title")}
               </div>
-              <div className="text-[11px] leading-tight text-slate-500">{t("info.fact.desc")}</div>
+              <div className="text-[11px] text-slate-500">{t("info.fact.desc")}</div>
             </div>
           </label>
         </div>

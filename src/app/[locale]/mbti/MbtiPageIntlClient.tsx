@@ -3,8 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import EgoGraphCanvasResponsive, { EgoNode } from "@/app/components/mbti/EgoGraphCanvasResponsive";
-import EgoGraphCanvasResponsiveIntl from "@/app/[locale]/components/mbti/EgoGraphCanvasResponsive";
+import EgoGraphCanvasResponsiveIntl, { EgoNode } from "@/app/[locale]/components/mbti/EgoGraphCanvasResponsive";
 import { calcCompatLevel, calcCompatScore } from "@/app/lib/mbti/mbtiCompat";
 import BottomCTA from "@/app/[locale]/components/BottomCTA";
 import membersByLocale from "./members.json";
@@ -30,7 +29,6 @@ export default function MbtiPageIntlClient({ locale }: Props) {
   const t = useTranslations("mbti.page");
   const members = useMemo(() => getMembers(locale), [locale]);
   const base = locale === "ko" ? "" : `/${locale}`;
-  const EgoGraphCanvas = locale === "en" || locale === "ja" ? EgoGraphCanvasResponsiveIntl : EgoGraphCanvasResponsive;
 
   const initialCenterId = members[0].id;
   const [centerId, setCenterId] = useState<string>(initialCenterId);
@@ -88,9 +86,11 @@ export default function MbtiPageIntlClient({ locale }: Props) {
             </h1>
 
             <p className="mt-3 text-sm leading-relaxed text-slate-600">
-              <b className="text-[#1E88E5]">{t("descriptionStrong")}</b>
+              <b className="text-[#1E88E5]">{t("descriptionLead")}</b>
+              {t("descriptionLeadSuffix")}
               <br />
-              {t("description")}
+              {t("descriptionPrefix")} <b className="text-slate-800">{t("descriptionEmphasis")}</b>
+              {t("descriptionSuffix")}
             </p>
 
             <Link
@@ -104,7 +104,7 @@ export default function MbtiPageIntlClient({ locale }: Props) {
 
         <section className="mt-10">
           <div className="mbti-card mbti-card-frame overflow-hidden">
-            <EgoGraphCanvas
+            <EgoGraphCanvasResponsiveIntl
               centerName={center.name}
               centerSub={center.mbti}
               nodes={otherNodes}
@@ -123,26 +123,26 @@ export default function MbtiPageIntlClient({ locale }: Props) {
             <div className="grid grid-cols-1 gap-2">
               <Link
                 href={`${base}/mbti-test`}
-                className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white"
+                className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white"
               >
-                <span className="leading-snug">{t("testLabel")}</span>
-                <span className="text-right text-[11px] font-semibold leading-snug text-slate-500">{t("testDesc")}</span>
+                <span>{t("testLabel")}</span>
+                <span className="text-[11px] font-semibold text-slate-500">{t("testDesc")}</span>
               </Link>
 
               <Link
                 href={`${base}/guides/mbti`}
-                className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white"
+                className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white"
               >
-                <span className="leading-snug">{t("guidesLabel")}</span>
-                <span className="text-right text-[11px] font-semibold leading-snug text-slate-500">{t("guidesDesc")}</span>
+                <span>{t("guidesLabel")}</span>
+                <span className="text-[11px] font-semibold text-slate-500">{t("guidesDesc")}</span>
               </Link>
 
               <Link
                 href={`${base}/mbti/cognitive-functions`}
-                className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white"
+                className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white"
               >
-                <span className="leading-snug">{t("usageLabel")}</span>
-                <span className="text-right text-[11px] font-semibold leading-snug text-slate-500">{t("usageDesc")}</span>
+                <span>{t("usageLabel")}</span>
+                <span className="text-[11px] font-semibold text-slate-500">{t("usageDesc")}</span>
               </Link>
             </div>
           </div>

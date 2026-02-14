@@ -29,7 +29,7 @@ export default async function LocalizedCreatePage({ params }: Props) {
       <div className="mbti-shell flex flex-col">
         <div className="mbti-card-frame flex items-center justify-between">
           <Link href={`${base}/mbti`} className="mbti-back-btn">
-            <span aria-hidden>{"<"}</span>
+            <span aria-hidden>←</span>
             <span>{t("back")}</span>
           </Link>
         </div>
@@ -43,7 +43,8 @@ export default async function LocalizedCreatePage({ params }: Props) {
             <p className="mt-3 text-sm leading-relaxed text-slate-600">
               {t("description1")}
               <br />
-              {t("description2")}
+              {t("description2Prefix")} <b className="text-slate-800">{t("description2Strong")}</b>
+              {t("description2Suffix")}
             </p>
           </div>
         </section>

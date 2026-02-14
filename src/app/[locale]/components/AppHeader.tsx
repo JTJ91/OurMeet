@@ -91,8 +91,12 @@ export default function AppHeader() {
   const t = useTranslations("components.header");
   const d = useTranslations("components.headerDrawer");
   const brand = t("brand");
-  const accentStart = brand.toLowerCase().lastIndexOf("rank");
-  const hasAccent = accentStart > 0;
+  const accentStart = (() => {
+    if (locale === "ko") return brand.indexOf("랭");
+    if (locale === "ja") return brand.indexOf("ランク");
+    return brand.toLowerCase().lastIndexOf("rank");
+  })();
+  const hasAccent = accentStart >= 0;
 
   const [open, setOpen] = useState(false);
   const [nowTs, setNowTs] = useState(() => Date.now());

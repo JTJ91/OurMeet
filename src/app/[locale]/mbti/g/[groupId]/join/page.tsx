@@ -40,6 +40,7 @@ export default async function LocalizedGroupJoinPage({ params }: Props) {
       <div className="mbti-shell">
         <div className="mbti-card-frame mb-4 flex items-center justify-between">
           <Link href={`${base}/mbti/g/${groupId}`} className="mbti-back-btn">
+            <span aria-hidden>←</span>{" "}
             {t("back")}
           </Link>
 
@@ -53,7 +54,8 @@ export default async function LocalizedGroupJoinPage({ params }: Props) {
               <div className="text-xs font-bold text-slate-500">{t("groupLabel")}</div>
               <h1 className="mt-1 text-2xl font-extrabold tracking-tight">{group.name}</h1>
               <p className="mt-2 text-sm text-slate-600">
-                {t("membersNow", { count: group.members.length })} / {t("maxMembers", { count: group.maxMembers })}
+                {t("membersPrefix")} <b>{group.members.length}{t("memberUnit")}</b> {t("membersMiddle")}{" "}
+                <b>{group.maxMembers}{t("memberUnit")}</b>
               </p>
             </div>
           </div>

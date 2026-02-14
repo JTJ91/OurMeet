@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import MbtiTestClient from "@/app/mbti-test/MbtiTestClient";
+import MbtiTestClient from "./MbtiTestClient";
 import { alternatesForPath } from "@/i18n/metadata";
 
 type Props = {
@@ -29,7 +29,7 @@ export default async function LocalizedMbtiTestPage({ params }: Props) {
       <div className="mbti-shell pb-16 pt-10">
         <div className="mbti-card-frame mb-4 flex items-center justify-between">
           <Link href={`${base}/mbti`} className="mbti-back-btn">
-            <span aria-hidden>{"<"}</span>
+            <span aria-hidden>←</span>
             <span>{t("backToMbti")}</span>
           </Link>
         </div>
@@ -42,9 +42,11 @@ export default async function LocalizedMbtiTestPage({ params }: Props) {
           </h1>
 
           <p className="mt-3 text-sm leading-relaxed text-slate-600">
-            <b className="text-[#1E88E5]">{t("descriptionStrong")}</b>
+            <b className="text-[#1E88E5]">{t("descriptionLead")}</b>
+            {t("descriptionLeadSuffix")}
             <br />
-            {t("description")}
+            {t("descriptionPrefix")} <b className="text-slate-800">{t("descriptionEmphasis")}</b>
+            {t("descriptionSuffix")}
           </p>
 
           <Link

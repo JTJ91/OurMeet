@@ -26,10 +26,11 @@ export default function Footer() {
     return normalized === "/" ? `/${locale}` : `/${locale}${normalized}`;
   };
 
-  const mbtiContext = bare.startsWith("/mbti") || bare.startsWith("/guides/mbti");
+  const mbtiContext =
+    bare.startsWith("/mbti") || bare.startsWith("/guides/mbti") || bare.startsWith("/systems/mbti");
 
   return (
-    <footer className="bg-[#F5F9FF] pb-24 text-center text-xs text-slate-500">
+    <footer className="bg-[#F5F9FF] pb-30 text-center text-xs text-slate-500">
       <div className="flex flex-wrap items-center justify-center gap-3">
         {mbtiContext ? (
           <>
@@ -38,6 +39,8 @@ export default function Footer() {
             <Link href={toLocalePath("/guides/mbti")} className="transition hover:text-slate-700">{t("mbtiGuides")}</Link>
             <span className="text-slate-300">·</span>
             <Link href={toLocalePath("/mbti/cognitive-functions")} className="transition hover:text-slate-700">{t("cognitive")}</Link>
+            <span className="text-slate-300">·</span>
+            <Link href={toLocalePath("/faq/mbti")} className="transition hover:text-slate-700">{t("faq")}</Link>
           </>
         ) : null}
       </div>

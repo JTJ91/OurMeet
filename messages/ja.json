@@ -12,9 +12,12 @@
       "backToMbti": "MBTIホーム",
       "title": "MBTI正式テスト",
       "subtitle": "60問でより正確に",
-      "descriptionStrong": "認知機能ベース",
-      "description": "エネルギー方向と判断スタイルを分析し、より正確なMBTI結果を確認します。",
-      "quickLink": "簡単テストはこちら",
+      "descriptionLead": "認知機能ベース",
+      "descriptionLeadSuffix": "で",
+      "descriptionPrefix": "あなたの",
+      "descriptionEmphasis": "エネルギー方向と判断スタイル",
+      "descriptionSuffix": "を分析し、より精密なMBTI結果を確認します。",
+      "quickLink": "簡単テストはこちら →",
       "footerNote": "MBTIは参考ツールです。状況や経験により結果は変わることがあります。"
     }
   },
@@ -23,7 +26,9 @@
       "back": "戻る",
       "title": "グループ作成",
       "description1": "グループ名、ニックネーム、MBTIを入力すると",
-      "description2": "最初の相性順位がすぐ作成されます。"
+      "description2Prefix": "すぐに",
+      "description2Strong": "招待リンク",
+      "description2Suffix": "を作成できます。"
     },
     "form": {
       "errors": {
@@ -85,8 +90,9 @@
       "back": "戻る",
       "title": "グループ参加",
       "groupLabel": "グループ",
-      "membersNow": "現在 {count} 人が参加中",
-      "maxMembers": "最大 {count} 人",
+      "membersPrefix": "現在",
+      "membersMiddle": "参加中 · 最大",
+      "memberUnit": "人",
       "disclaimer": "結果は参考と楽しみのための情報です。関係判断の唯一の根拠として使用しないでください。"
     },
     "form": {
@@ -145,9 +151,12 @@
     "page": {
       "backHome": "ホームへ",
       "titleLine1": "私たちのグループ",
-      "titleLine2": "誰と誰の相性が良い？",
-      "descriptionStrong": "MBTI認知機能ベース",
-      "description": "考え方と会話リズムを比較して、関係のケミを確認します。",
+      "titleLine2": "誰と誰の相性が良いか?",
+      "descriptionLead": "MBTI認知機能",
+      "descriptionLeadSuffix": "を基準に",
+      "descriptionPrefix": "互いの",
+      "descriptionEmphasis": "考え方と会話リズム",
+      "descriptionSuffix": "を比較して、関係のケミを確認します。",
       "cognitiveGuide": "MBTI認知機能とは？",
       "quickStart": "クイックスタート",
       "testLabel": "MBTIテスト",
@@ -427,13 +436,23 @@
   "landing": {
     "brandPrefix": "グループ",
     "brandAccent": "ランク",
-    "headline1": "グループ内で誰と誰の相性が良いかを",
-    "headline2": "関係の流れとして可視化します",
-    "description1": "単純な相性を超えて、会話の方向、判断スタイル、役割バランスを基準に関係を整理します。",
-    "description2": "リンク一つでルームを作成し、参加すると結果が自動生成されます。",
+    "headlinePrefix": "グループ内で",
+    "headlineAccent": "誰と誰の相性が良いか",
+    "headlineSuffix": "関係の流れとして可視化します",
+    "descriptionLead": "単純な相性ではなく",
+    "descriptionDirection": "会話の方向",
+    "descriptionSpeed": "判断の速さ",
+    "descriptionBalance": "役割のバランス",
+    "descriptionBridge": "を基準に",
+    "descriptionTailLead": "グループのケミを",
+    "descriptionRank": "ランキング",
+    "descriptionTailAnd": "と",
+    "descriptionGraph": "関係図",
+    "descriptionTailEnd": "で整理します。",
+    "description2": "友達・会社・地域の集まりまで、リンク一つでルームを作成し、参加すると結果が自動生成されます。",
     "startMbti": "MBTIで始める",
     "sajuSoon": "四柱 (準備中)",
-    "footer": "ログインなしで利用でき、最近のグループはこの端末に保存されます"
+    "footer": "ログインなしで利用可能 · 最近のグループはこの端末に保存されます"
   },
   "groupGraph": {
     "server": {
@@ -734,6 +753,7 @@
       "mbtiHome": "MBTIホーム",
       "mbtiGuides": "グループ内MBTI",
       "cognitive": "認知機能",
+      "faq": "よくある質問",
       "terms": "利用規約",
       "privacy": "プライバシーポリシー",
       "copyright": "2026 モイムランク. すべての権利を保有します。"

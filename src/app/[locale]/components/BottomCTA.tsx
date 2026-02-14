@@ -22,9 +22,30 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
   const locale = detectLocale(pathname);
   const t = useTranslations("components.bottomCta");
 
+  const [nowTs, setNowTs] = useState(() => Date.now());
   const [groups, setGroups] = useState<SavedGroup[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  function formatRelativeTime(ts: number, now: number) {
+    const diff = Math.max(0, now - ts);
+    const sec = Math.floor(diff / 1000);
+    const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+    if (sec < 10) return rtf.format(0, "second");
+    if (sec < 60) return rtf.format(-sec, "second");
+    const min = Math.floor(sec / 60);
+    if (min < 60) return rtf.format(-min, "minute");
+    const hour = Math.floor(min / 60);
+    if (hour < 24) return rtf.format(-hour, "hour");
+    const day = Math.floor(hour / 24);
+    if (day < 7) return rtf.format(-day, "day");
+    const week = Math.floor(day / 7);
+    if (week < 5) return rtf.format(-week, "week");
+    const month = Math.floor(day / 30);
+    if (month < 12) return rtf.format(-month, "month");
+    const year = Math.floor(day / 365);
+    return rtf.format(-year, "year");
+  }
 
   useEffect(() => {
     const onMenu = (e: Event) => {
@@ -47,19 +68,23 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
     };
   }, []);
 
+  useEffect(() => {
+    const timer = window.setInterval(() => setNowTs(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
   const hasAny = groups.length > 0;
   const subtitle = useMemo(() => {
     if (!hasAny) return t("recentEmpty");
     return t("recentCount", { count: groups.length });
   }, [hasAny, groups.length, t]);
 
-  if (menuOpen) return null;
-
   return (
     <div
       data-bottom-cta
       className={[
         desktopSticky ? "fixed inset-x-0 bottom-0 z-50" : "fixed inset-x-0 bottom-0 z-50 sm:static sm:z-auto sm:mt-10",
+        menuOpen ? "hidden" : "",
       ].join(" ")}
     >
       <div className="mbti-card-frame px-5 pb-5 sm:pb-0">
@@ -79,7 +104,7 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
                 className="mbti-primary-btn relative flex h-14 w-full items-center justify-center rounded-2xl px-4 text-sm font-extrabold text-white transition-all duration-200 active:scale-[0.98]"
               >
                 <span className="inline-flex items-center gap-2 whitespace-nowrap">
-                  <span aria-hidden>+</span>
+                  <span aria-hidden>✨</span>
                   <span>{t("createGroup")}</span>
                 </span>
               </button>
@@ -141,10 +166,13 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
                                 <div className="truncate text-sm font-extrabold text-slate-800">{g.name}</div>
                                 {(g.myNickname || g.myMbti) && (
                                   <div className="mt-1 truncate text-[11px] font-bold text-slate-500">
-                                    {g.myNickname ?? "-"}
+                                    {g.myNickname ?? "?"}
                                     {g.myMbti ? ` · ${g.myMbti.toUpperCase()}` : ""}
                                   </div>
                                 )}
+                              </div>
+                              <div className="shrink-0 text-[11px] font-bold text-slate-500">
+                                {formatRelativeTime(g.lastSeenAt, nowTs)}
                               </div>
                             </div>
                           </Link>

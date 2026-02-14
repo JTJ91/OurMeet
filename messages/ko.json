@@ -12,10 +12,13 @@
       "backToMbti": "MBTI 홈",
       "title": "MBTI 정식 검사",
       "subtitle": "60문항으로 더 정확하게",
-      "descriptionStrong": "인지기능 기반",
-      "description": "에너지 방향과 판단 방식을 분석해 더 정확한 MBTI 결과를 확인합니다.",
-      "quickLink": "간단 검사는 여기에서",
-      "footerNote": "MBTI는 참고 도구이며 상황과 경험에 따라 결과가 달라질 수 있습니다."
+      "descriptionLead": "인지기능 기반",
+      "descriptionLeadSuffix": "으로",
+      "descriptionPrefix": "당신의",
+      "descriptionEmphasis": "에너지 방향과 판단 방식",
+      "descriptionSuffix": "을 분석해 더 정밀한 MBTI 결과를 확인해요.",
+      "quickLink": "간단 검사는 여기에서 →",
+      "footerNote": "※ MBTI는 참고용이며, 상황·경험에 따라 결과가 달라질 수 있습니다."
     }
   },
   "create": {
@@ -23,7 +26,9 @@
       "back": "뒤로가기",
       "title": "모임 만들기",
       "description1": "모임 이름, 별명, MBTI를 입력하면",
-      "description2": "바로 첫 궁합 순위가 생성됩니다."
+      "description2Prefix": "바로",
+      "description2Strong": "초대 링크",
+      "description2Suffix": "를 만들 수 있어요."
     },
     "form": {
       "errors": {
@@ -85,9 +90,10 @@
       "back": "뒤로",
       "title": "모임 참가",
       "groupLabel": "모임",
-      "membersNow": "현재 {count}명 참가 중",
-      "maxMembers": "최대 {count}명",
-      "disclaimer": "결과는 참고와 재미를 위한 정보입니다. 관계 판단의 유일한 근거로 사용하지 마세요."
+      "membersPrefix": "현재",
+      "membersMiddle": "참여 중 · 최대",
+      "memberUnit": "명",
+      "disclaimer": "※ 결과는 재미를 위한 참고용이에요. 관계 판단/결정의 근거로 사용하지 마세요."
     },
     "form": {
       "errors": {
@@ -145,10 +151,13 @@
     "page": {
       "backHome": "메인으로",
       "titleLine1": "우리 모임",
-      "titleLine2": "누가 누구랑 잘 맞을까",
-      "descriptionStrong": "MBTI 인지기능 기반",
-      "description": "서로의 생각 방식과 대화 리듬을 비교해 관계 케미를 확인해요.",
-      "cognitiveGuide": "MBTI 인지기능이란",
+      "titleLine2": "누가 누구랑 잘 맞을까?",
+      "descriptionLead": "MBTI 인지기능",
+      "descriptionLeadSuffix": "을 기반으로",
+      "descriptionPrefix": "서로의",
+      "descriptionEmphasis": "생각 방식과 대화 리듬",
+      "descriptionSuffix": "을 비교해 관계 케미를 확인해요.",
+      "cognitiveGuide": "MBTI 인지기능이란?",
       "quickStart": "빠른 시작",
       "testLabel": "MBTI 검사",
       "testDesc": "정식 60문항 검사",
@@ -426,14 +435,24 @@
   },
   "landing": {
     "brandPrefix": "모임",
-    "brandAccent": "랭크",
-    "headline1": "우리 모임 안에서 누가 누구와 잘 맞는지",
-    "headline2": "흐름으로 보여주는 케미 분석",
-    "description1": "단순 궁합을 넘어, 대화 방향과 결정 스타일, 역할 균형을 기준으로 모임의 관계를 정리합니다.",
-    "description2": "링크 하나로 방을 만들고 각자 참여하면 결과가 자동으로 생성됩니다.",
+    "brandAccent": "랭킹",
+    "headlinePrefix": "우리 모임 안에서",
+    "headlineAccent": "누가 누구랑 잘 맞는지",
+    "headlineSuffix": "흐름으로 보여주는 케미 분석",
+    "descriptionLead": "단순한 궁합이 아니라",
+    "descriptionDirection": "대화의 방향",
+    "descriptionSpeed": "결정 속도",
+    "descriptionBalance": "역할의 균형",
+    "descriptionBridge": "을 기반으로",
+    "descriptionTailLead": "모임의 케미를",
+    "descriptionRank": "랭킹",
+    "descriptionTailAnd": "과",
+    "descriptionGraph": "관계도",
+    "descriptionTailEnd": "로 정리합니다.",
+    "description2": "친구, 회사, 동네 모임까지 — 링크 하나로 방을 만들고 각자 참여하면 결과가 자동으로 생성됩니다.",
     "startMbti": "MBTI로 시작하기",
     "sajuSoon": "사주 (준비중)",
-    "footer": "로그인 없이 사용 가능하며 최근 모임은 이 기기에 저장됩니다"
+    "footer": "로그인 없이 사용 가능 · 최근 모임은 이 기기에 저장됩니다"
   },
   "groupGraph": {
     "server": {
@@ -442,9 +461,9 @@
       "emptyMembers": "아직 참여한 멤버가 없어요."
     },
     "client": {
-      "centerInfo": "센터 정보",
+      "centerInfo": "내 정보",
       "centerLabel": "{nickname} · {mbti}",
-      "saveGuide": "저장하기를 누르면 {center} 기준으로 최근모임 목록에 기록돼요.",
+      "saveGuide": "‘저장하기’를 누르면 {center} 기준으로 최근모임 목록에 기록돼요.",
       "join": "참여하기",
       "saveTitle": "현재 센터({center}) 기준으로 저장"
     }
@@ -722,7 +741,7 @@
   },
   "components": {
     "header": {
-      "brand": "모임랭크",
+      "brand": "모임랭킹",
       "mbti": "MBTI",
       "guides": "가이드",
       "create": "모임 만들기"
@@ -734,6 +753,7 @@
       "mbtiHome": "MBTI 홈",
       "mbtiGuides": "모임 속 MBTI",
       "cognitive": "인지기능",
+      "faq": "자주 묻는 질문",
       "terms": "이용 약관",
       "privacy": "개인정보처리방침",
       "copyright": "2026 모임랭크. All rights reserved."

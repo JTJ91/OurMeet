@@ -12,9 +12,12 @@
       "backToMbti": "MBTI Home",
       "title": "MBTI Full Test",
       "subtitle": "More accurate with 60 questions",
-      "descriptionStrong": "Cognitive function based",
-      "description": "We analyze your energy direction and judgment style for a more precise MBTI result.",
-      "quickLink": "Go to quick test",
+      "descriptionLead": "Cognitive function based",
+      "descriptionLeadSuffix": "",
+      "descriptionPrefix": "We analyze your",
+      "descriptionEmphasis": "energy direction and judgment style",
+      "descriptionSuffix": " for a more precise MBTI result.",
+      "quickLink": "Go to quick test →",
       "footerNote": "MBTI is a reference tool. Results may vary by context and experience."
     }
   },
@@ -23,7 +26,9 @@
       "back": "Back",
       "title": "Create a Group",
       "description1": "Enter your group name, nickname, and MBTI.",
-      "description2": "Your first group ranking is created right away."
+      "description2Prefix": "You can create an",
+      "description2Strong": "invite link",
+      "description2Suffix": " right away."
     },
     "form": {
       "errors": {
@@ -85,8 +90,9 @@
       "back": "Back",
       "title": "Join Group",
       "groupLabel": "Group",
-      "membersNow": "{count} members joined now",
-      "maxMembers": "max {count}",
+      "membersPrefix": "",
+      "membersMiddle": "joined · max",
+      "memberUnit": "",
       "disclaimer": "These results are for reference and fun. Do not use them as the only basis for relationship decisions."
     },
     "form": {
@@ -145,9 +151,12 @@
     "page": {
       "backHome": "Back to Home",
       "titleLine1": "Our Group",
-      "titleLine2": "Who pairs well with whom",
-      "descriptionStrong": "Based on MBTI cognitive functions",
-      "description": "Compare thinking style and conversation rhythm to check relationship chemistry.",
+      "titleLine2": "Who pairs well with whom?",
+      "descriptionLead": "MBTI cognitive functions",
+      "descriptionLeadSuffix": " based on",
+      "descriptionPrefix": "Compare",
+      "descriptionEmphasis": "thinking style and conversation rhythm",
+      "descriptionSuffix": " to check relationship chemistry.",
       "cognitiveGuide": "What are MBTI cognitive functions",
       "quickStart": "Quick Start",
       "testLabel": "MBTI Test",
@@ -399,13 +408,23 @@
   "landing": {
     "brandPrefix": "Group",
     "brandAccent": "Rank",
-    "headline1": "See who matches well within your group",
-    "headline2": "Chemistry analysis shown as interaction flow",
-    "description1": "Beyond simple compatibility, we organize group relationships by conversation direction, decision style, and role balance.",
-    "description2": "Create a room with one link, invite members, and results are generated automatically.",
+    "headlinePrefix": "In our group,",
+    "headlineAccent": "who matches best with whom",
+    "headlineSuffix": "Chemistry analysis shown as interaction flow",
+    "descriptionLead": "Not just simple compatibility, but",
+    "descriptionDirection": "conversation direction",
+    "descriptionSpeed": "decision speed",
+    "descriptionBalance": "role balance",
+    "descriptionBridge": "as the basis,",
+    "descriptionTailLead": "we organize group chemistry with",
+    "descriptionRank": "ranking",
+    "descriptionTailAnd": "and",
+    "descriptionGraph": "relationship graphs",
+    "descriptionTailEnd": ".",
+    "description2": "From friends to coworkers and local circles, create a room with one link and results are generated automatically as everyone joins.",
     "startMbti": "Start with MBTI",
     "sajuSoon": "Saju (Coming Soon)",
-    "footer": "No login required, and recent groups are saved on this device"
+    "footer": "No login required · recent groups are saved on this device"
   },
   "groupGraph": {
     "server": {
@@ -706,6 +725,7 @@
       "mbtiHome": "MBTI Home",
       "mbtiGuides": "MBTI in Groups",
       "cognitive": "Cognitive Functions",
+      "faq": "FAQ",
       "terms": "Terms",
       "privacy": "Privacy",
       "copyright": "2026 Moimrank. All rights reserved."

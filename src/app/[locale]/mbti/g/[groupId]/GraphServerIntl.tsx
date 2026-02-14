@@ -29,6 +29,7 @@ function GraphSectionCard({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-[#1E88E5]/10 px-2.5 py-1 text-[11px] font-extrabold text-[#1E88E5]">
+                  <span aria-hidden className="mr-1">🧭</span>
                   {title}
                 </span>
                 {subtitle ? <span className="text-[11px] font-bold text-slate-500">{subtitle}</span> : null}
