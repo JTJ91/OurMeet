@@ -5,7 +5,6 @@ import Link from "next/link";
 import { readSavedGroups, removeSavedGroup, SavedGroup } from "@/app/lib/mbti/groupHistory";
 
 export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: boolean }) {
-  const [isScrolling, setIsScrolling] = useState(false);
   const [nowTs, setNowTs] = useState(() => Date.now());
 
   const [groups, setGroups] = useState<SavedGroup[]>([]);
@@ -53,24 +52,14 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
 
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-
-    const handleScroll = () => {
-      setIsScrolling(true);
-      clearTimeout(timeout);
-      timeout = setTimeout(() => setIsScrolling(false), 150);
-    };
-
     const load = () => setGroups(readSavedGroups());
     load();
 
     // 다른 탭에서 바뀐 경우 반영
     window.addEventListener("storage", load);
-    window.addEventListener("scroll", handleScroll);
 
     return () => {
       window.removeEventListener("storage", load);
-      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -100,9 +89,9 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
         <div
           className={[
             "rounded-3xl border border-slate-200/70 bg-white/88 p-3",
-            "backdrop-blur-sm shadow-[0_12px_34px_rgba(15,23,42,0.12)]",
+            "shadow-[0_12px_34px_rgba(15,23,42,0.12)]",
             "transition-all duration-200 ease-out",
-            isScrolling ? "scale-95 opacity-90" : "scale-100 opacity-100",
+            "scale-100 opacity-100",
             desktopSticky ? "" : "sm:scale-100 sm:opacity-100 sm:bg-transparent sm:shadow-none sm:ring-0 sm:p-0",
           ].join(" ")}
         >
@@ -254,4 +243,3 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
     </div>
   );
 }
-

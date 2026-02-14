@@ -21,10 +21,18 @@ import { alternatesForPath } from "@/i18n/metadata";
 
 type TranslateFn = (key: string, values?: Record<string, any>) => string;
 
+function isMeaningfulTranslation(text: string) {
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+  if (/[\p{L}\p{N}]/u.test(trimmed)) return true;
+  return /\{[^}]+\}/.test(trimmed);
+}
+
 function tx(t: TranslateFn | undefined, key: string, fallback: string, values?: Record<string, unknown>) {
   if (!t) return fallback;
   try {
-    return t(key, values);
+    const translated = t(key, values);
+    return isMeaningfulTranslation(translated) ? translated : fallback;
   } catch {
     return fallback;
   }

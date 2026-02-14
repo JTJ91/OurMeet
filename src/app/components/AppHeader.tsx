@@ -198,7 +198,7 @@ export default function AppHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 backdrop-blur-sm">
+      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/95">
         <div className="mx-auto flex h-12 max-w-[740px] items-center px-3 sm:px-5">
           {/* Brand */}
           <Link href="/" className="flex min-w-0 flex-1 items-center gap-1.5 pr-2">
@@ -217,7 +217,7 @@ export default function AppHeader() {
             <button
               type="button"
               onClick={toggleDrawer}
-              className="group inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white/85 shadow-[0_4px_12px_rgba(15,23,42,0.05)] backdrop-blur-sm transition hover:bg-white"
+              className="group inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white shadow-[0_4px_12px_rgba(15,23,42,0.05)] transition hover:bg-white"
               aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
               aria-expanded={open}
             >

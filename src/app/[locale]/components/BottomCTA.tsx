@@ -22,7 +22,6 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
   const locale = detectLocale(pathname);
   const t = useTranslations("components.bottomCta");
 
-  const [isScrolling, setIsScrolling] = useState(false);
   const [groups, setGroups] = useState<SavedGroup[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,22 +37,13 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
   }, []);
 
   useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>;
-    const onScroll = () => {
-      setIsScrolling(true);
-      clearTimeout(timeout);
-      timeout = setTimeout(() => setIsScrolling(false), 150);
-    };
-
     const load = () => setGroups(readSavedGroups());
     load();
 
     window.addEventListener("storage", load);
-    window.addEventListener("scroll", onScroll);
 
     return () => {
       window.removeEventListener("storage", load);
-      window.removeEventListener("scroll", onScroll);
     };
   }, []);
 
@@ -76,9 +66,9 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
         <div
           className={[
             "rounded-3xl border border-slate-200/70 bg-white/88 p-3",
-            "backdrop-blur-sm shadow-[0_12px_34px_rgba(15,23,42,0.12)]",
+            "shadow-[0_12px_34px_rgba(15,23,42,0.12)]",
             "transition-all duration-200 ease-out",
-            isScrolling ? "scale-95 opacity-90" : "scale-100 opacity-100",
+            "scale-100 opacity-100",
             desktopSticky ? "" : "sm:scale-100 sm:opacity-100 sm:bg-transparent sm:shadow-none sm:ring-0 sm:p-0",
           ].join(" ")}
         >
