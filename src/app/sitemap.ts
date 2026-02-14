@@ -14,11 +14,14 @@ function localizePath(path: string, locale: Locale) {
   return path === "/" ? `/${locale}` : `/${locale}${path}`;
 }
 
-function languageAlternates(path: string): Record<Locale, string> {
-  return locales.reduce((acc, locale) => {
+function languageAlternates(path: string): Record<string, string> {
+  const languages = locales.reduce((acc, locale) => {
     acc[locale] = url(localizePath(path, locale));
     return acc;
-  }, {} as Record<Locale, string>);
+  }, {} as Record<string, string>);
+
+  languages["x-default"] = url(localizePath(path, defaultLocale));
+  return languages;
 }
 
 function expandByLocale(
