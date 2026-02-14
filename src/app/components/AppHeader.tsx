@@ -118,6 +118,7 @@ function MenuIcon({ open }: { open: boolean }) {
 
 export default function AppHeader() {
   const pathname = usePathname();
+  const isRootPage = (pathname ?? "/") === "/";
 
   const [open, setOpen] = useState(false);
   const [nowTs, setNowTs] = useState(() => Date.now());
@@ -177,7 +178,7 @@ export default function AppHeader() {
       const next = !v;
       if (next) {
         setGroups(readSavedGroups());
-        setOpenKey((k) => k ?? "mbti");
+        setOpenKey((k) => (isRootPage ? null : k ?? "mbti"));
       } else {
         setRecentOpen(false);
         setOpenKey(null);

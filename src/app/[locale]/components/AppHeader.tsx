@@ -86,6 +86,7 @@ export default function AppHeader() {
   const pathname = usePathname() || "/";
   const locale = detectLocale(pathname);
   const barePath = stripLocale(pathname);
+  const isRootPage = barePath === "/";
 
   const t = useTranslations("components.header");
   const d = useTranslations("components.headerDrawer");
@@ -184,6 +185,20 @@ export default function AppHeader() {
     setOpenKey(null);
   };
 
+  const toggleDrawer = () => {
+    setOpen((v) => {
+      const next = !v;
+      if (next) {
+        setGroups(readSavedGroups());
+        setOpenKey((k) => (isRootPage ? null : k ?? "mbti"));
+      } else {
+        setRecentOpen(false);
+        setOpenKey(null);
+      }
+      return next;
+    });
+  };
+
   const isActiveHref = (href: string) => {
     if (href === "/mbti") return barePath === "/mbti";
     return barePath === href || barePath.startsWith(`${href}/`);
@@ -207,7 +222,7 @@ export default function AppHeader() {
             <LocaleSwitcher />
             <button
               type="button"
-              onClick={() => setOpen((v) => !v)}
+              onClick={toggleDrawer}
               className="group inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white/85 shadow-[0_4px_12px_rgba(15,23,42,0.05)] backdrop-blur-sm transition hover:bg-white"
               aria-label={open ? d("close") : d("open")}
               aria-expanded={open}
