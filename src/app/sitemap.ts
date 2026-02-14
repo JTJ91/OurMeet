@@ -14,15 +14,27 @@ function localizePath(path: string, locale: Locale) {
   return path === "/" ? `/${locale}` : `/${locale}${path}`;
 }
 
+function languageAlternates(path: string): Record<Locale, string> {
+  return locales.reduce((acc, locale) => {
+    acc[locale] = url(localizePath(path, locale));
+    return acc;
+  }, {} as Record<Locale, string>);
+}
+
 function expandByLocale(
   path: string,
   options: Pick<MetadataRoute.Sitemap[number], "changeFrequency" | "priority" | "lastModified">
 ): MetadataRoute.Sitemap {
+  const alternates = languageAlternates(path);
+
   return locales.map((locale) => ({
     url: url(localizePath(path, locale)),
     lastModified: options.lastModified,
     changeFrequency: options.changeFrequency,
     priority: options.priority,
+    alternates: {
+      languages: alternates,
+    },
   }));
 }
 
