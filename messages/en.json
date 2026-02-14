@@ -1,0 +1,759 @@
+{
+  "nav": {
+    "home": "Home",
+    "mbti": "MBTI"
+  },
+  "home": {
+    "title": "Check your group chemistry instantly",
+    "description": "Analyze team compatibility and relationships based on personality types."
+  },
+  "mbtiTest": {
+    "page": {
+      "backToMbti": "MBTI Home",
+      "title": "MBTI Full Test",
+      "subtitle": "More accurate with 60 questions",
+      "descriptionStrong": "Cognitive function based",
+      "description": "We analyze your energy direction and judgment style for a more precise MBTI result.",
+      "quickLink": "Go to quick test",
+      "footerNote": "MBTI is a reference tool. Results may vary by context and experience."
+    }
+  },
+  "create": {
+    "page": {
+      "back": "Back",
+      "title": "Create a Group",
+      "description1": "Enter your group name, nickname, and MBTI.",
+      "description2": "Your first group ranking is created right away."
+    },
+    "form": {
+      "errors": {
+        "createFailed": "A problem occurred while creating the group."
+      },
+      "groupName": {
+        "label": "Group Name",
+        "placeholder": "e.g. Company Soccer Group"
+      },
+      "nickname": {
+        "label": "My Nickname",
+        "placeholder": "e.g. Alex, Emma, Ryan",
+        "hint": "Up to 3 characters, no spaces"
+      },
+      "mbti": {
+        "quickTest": "Quick MBTI Test",
+        "placeholder": "e.g. ENFP",
+        "invalid": "Invalid MBTI format. Example: ENFP",
+        "hint": "Use ENFP format, 4 letters with no spaces"
+      },
+      "judge": {
+        "legend": "Decision Style",
+        "help": "When your group needs a conclusion, what do you prioritize first",
+        "logic": {
+          "title": "Evidence and Efficiency",
+          "desc": "Fact and logic centered"
+        },
+        "people": {
+          "title": "Empathy and Atmosphere",
+          "desc": "Consider people and emotions"
+        }
+      },
+      "info": {
+        "legend": "Information Preference",
+        "help": "What type of information feels easier in conversation",
+        "idea": {
+          "title": "Ideas",
+          "desc": "Meaning and possibility focused"
+        },
+        "fact": {
+          "title": "Reality and Facts",
+          "desc": "Prefer experience and data"
+        }
+      },
+      "submit": {
+        "creating": "Creating...",
+        "create": "Create Group"
+      }
+    },
+    "actionErrors": {
+      "required": "Group name, nickname, and MBTI are required.",
+      "nicknameLength": "Nickname must be 1 to 3 characters with no spaces.",
+      "mbtiInvalid": "Invalid MBTI format. Example: ENFP",
+      "memberCreateFailed": "Failed to create member."
+    }
+  },
+  "join": {
+    "page": {
+      "back": "Back",
+      "title": "Join Group",
+      "groupLabel": "Group",
+      "membersNow": "{count} members joined now",
+      "maxMembers": "max {count}",
+      "disclaimer": "These results are for reference and fun. Do not use them as the only basis for relationship decisions."
+    },
+    "form": {
+      "errors": {
+        "joinFailed": "A problem occurred while joining."
+      },
+      "nickname": {
+        "label": "My Nickname",
+        "placeholder": "e.g. Alex, Emma, Ryan",
+        "hint": "Up to 3 characters, no spaces"
+      },
+      "mbti": {
+        "quickTest": "Quick MBTI Test",
+        "placeholder": "e.g. ENFP",
+        "invalid": "Invalid MBTI format. Example: ENFP",
+        "hint": "Use ENFP format, 4 letters with no spaces"
+      },
+      "judge": {
+        "legend": "Decision Style",
+        "help": "When your group needs a conclusion, what do you prioritize first",
+        "logic": {
+          "title": "Evidence and Efficiency",
+          "desc": "Fact and logic centered"
+        },
+        "people": {
+          "title": "Empathy and Atmosphere",
+          "desc": "Consider people and emotions"
+        }
+      },
+      "info": {
+        "legend": "Information Preference",
+        "help": "What type of information feels easier in conversation",
+        "idea": {
+          "title": "Ideas",
+          "desc": "Meaning and possibility focused"
+        },
+        "fact": {
+          "title": "Reality and Facts",
+          "desc": "Prefer experience and data"
+        }
+      },
+      "submit": {
+        "full": "This group is full",
+        "joining": "Joining...",
+        "join": "Join Group"
+      }
+    },
+    "actionErrors": {
+      "required": "Required fields are missing.",
+      "mbtiInvalid": "Invalid MBTI format. Example: ENFP",
+      "groupNotFound": "Group does not exist.",
+      "groupFull": "This group is already full."
+    }
+  },
+  "mbti": {
+    "page": {
+      "backHome": "Back to Home",
+      "titleLine1": "Our Group",
+      "titleLine2": "Who pairs well with whom",
+      "descriptionStrong": "Based on MBTI cognitive functions",
+      "description": "Compare thinking style and conversation rhythm to check relationship chemistry.",
+      "cognitiveGuide": "What are MBTI cognitive functions",
+      "quickStart": "Quick Start",
+      "testLabel": "MBTI Test",
+      "testDesc": "Official 60-question test",
+      "guidesLabel": "MBTI in Groups",
+      "guidesDesc": "Situation-based chemistry guide",
+      "usageLabel": "Usage Guide",
+      "usageDesc": "How scores are calculated"
+    },
+    "egoGraphCanvas": {
+      "levels": {
+        "1": "Critical",
+        "2": "Needs Tuning",
+        "3": "Mixed",
+        "4": "Pretty Good",
+        "5": "Best Match"
+      },
+      "scoreUnit": "pts",
+      "scoreWithUnit": "{score} pts",
+      "avg": {
+        "title": "Group average score",
+        "minMembers": "Shown from 2 participants",
+        "noData": "No data",
+        "bands": {
+          "high": "Top tier",
+          "good": "Good",
+          "normal": "Average",
+          "tune": "Needs tuning",
+          "low": "Low"
+        }
+      },
+      "guide": {
+        "title": "Tap a name to inspect the relationship",
+        "subtitle": "If you tap 'View as Center' in the card, the perspective changes."
+      },
+      "center": {
+        "aria": "View this person as center",
+        "button": "View as Center"
+      },
+      "oneLine": {
+        "s76": "This is almost a <h>perfect line</h>. It works without effort.",
+        "s74": "Top-tier chemistry. <h>The more you're together, the easier it gets</h>.",
+        "s72": "The rhythm feels natural. <h>Communication clicks</h>.",
+        "s70": "Baseline fit is good. <h>Conflicts don't drag on</h>.",
+        "s66": "You match fairly well. <h>Low burden even when together</h>.",
+        "s62": "A decent pair. <h>If you tune the pace gap</h>, it gets better.",
+        "s58": "Not bad, but <h>the vibe differs a bit</h>.",
+        "s54": "From here, <h>coordination is key</h>.",
+        "s50": "The difference is <h>clearly noticeable</h>.",
+        "s46": "During conversation, <h>question marks may appear often</h>.",
+        "s44": "Sometimes you may think <h>'Why are we this different?'</h>.",
+        "s42": "If left alone, there's a high chance you'll <h>just talk past each other</h>.",
+        "base": "To be blunt, this is a <h>high-collision pair</h>."
+      },
+      "fnName": {
+        "Se": "Direct sensing (now)",
+        "Si": "Memory and experience",
+        "Ne": "Ideas and expansion",
+        "Ni": "Meaning and flow",
+        "Te": "Decision and structure",
+        "Ti": "Logic and analysis",
+        "Fe": "Atmosphere and care",
+        "Fi": "Values and sincerity"
+      },
+      "bucketSituation": {
+        "AUTO": { "0": "Conversation flows naturally", "1": "No heavy explanation needed", "2": "The exchange keeps going" },
+        "HIGH": { "0": "Rhythm matches well", "1": "Back-and-forth speed is similar", "2": "Breathing room feels easy" },
+        "GOOD": { "0": "Mostly smooth", "1": "Low fatigue overall", "2": "Roles settle quickly" },
+        "OK": { "0": "Differences depend on topic", "1": "Attention axes can diverge", "2": "Interpretation can vary" },
+        "TUNE": { "0": "Need to align assumptions", "1": "Decision criteria differ", "2": "Check-back questions matter" },
+        "LANG": { "0": "Some translation is needed", "1": "Conversation tone can cross", "2": "Pace control helps" },
+        "HARD": { "0": "Misunderstanding prevention mode", "1": "Short and explicit is safer", "2": "Better keep it light today" }
+      },
+      "cognitive": {
+        "shared": {
+          "withFn": {
+            "0": "Your common ground is {fn}. If you align the point, you get close quickly.",
+            "1": "You build trust quickly because {fn} alignment is strong."
+          },
+          "withoutFn": {
+            "0": "Common ground is relatively thin, so early on you need time to decode each other.",
+            "1": "At first the texture may feel different, but it can get easier once patterns emerge."
+          }
+        },
+        "clash": {
+          "noClash": {
+            "0": "{scene}. More than big collisions, aligning pace and priority is enough.",
+            "1": "{scene}. The same words can land differently, so interpretation checks are important."
+          },
+          "high": {
+            "0": "{scene}. Even if approaches differ on {axis}, it can complement well.",
+            "1": "{scene}. Around {axis}, role split helps it run like teamwork."
+          },
+          "low": {
+            "0": "{scene}. Around {axis}, different kindness standards can easily create hurt feelings.",
+            "1": "{scene}. On {axis}, one side may want conclusion while the other wants understanding."
+          },
+          "mid": {
+            "0": "{scene}. Around {axis}, methods split. If assumptions align before conclusion, conflict drops.",
+            "1": "{scene}. Coordination on {axis} is the key. One extra sentence changes the feeling."
+          }
+        }
+      }
+    }
+  },
+  "cognitive": {
+    "page": {
+      "back": "Back",
+      "title": "How is chemistry score calculated?",
+      "intro1": "Moimrank does not compare only the four MBTI letters. Instead, we compare how each type's ",
+      "introHighlight": "thinking habit (cognitive functions)",
+      "intro1Tail": " interacts with another.",
+      "intro2": "In short, we look at whether the way people observe, think, and decide connects smoothly.",
+      "section1": {
+        "title": "What are cognitive functions?",
+        "lead": "People differ in how they process information and make decisions.",
+        "bullets": {
+          "0": "✔ Some people first notice possibilities and ideas.",
+          "1": "✔ Some people first notice facts and details.",
+          "2": "✔ Some people judge by logic and efficiency.",
+          "3": "✔ Some people prioritize values and emotions."
+        },
+        "tail": "These baseline thinking patterns are called cognitive functions."
+      },
+      "section2": {
+        "title": "How Moimrank reads chemistry",
+        "items": {
+          "0": {
+            "title": "1) Do the dominant styles collide?",
+            "body": "If both strongly push the same standard, decisions can be fast, but control conflicts may grow."
+          },
+          "1": {
+            "title": "2) Do they complement each other?",
+            "body": "When one person's strength fills the other's weak spot, conversation tends to flow naturally."
+          },
+          "2": {
+            "title": "3) Is their direction similar?",
+            "body": "We check whether both focus on big-picture meaning, practical reality, or a balanced mix."
+          },
+          "3": {
+            "title": "4) Do sensitive triggers overlap?",
+            "body": "If stress triggers are similar, the chance of friction can increase."
+          }
+        }
+      },
+      "section3": {
+        "title": "Why scores differ",
+        "lead": "The score is not a simple same-or-different personality check.",
+        "bullets": {
+          "0": "✔ Does conversation flow naturally?",
+          "1": "✔ Can roles split well?",
+          "2": "✔ Do ideas clash often?",
+          "3": "✔ Are pace and standards far apart?"
+        },
+        "tail": "We combine these factors. That is why even the same MBTI pairing can feel different by context."
+      },
+      "section4": {
+        "title": "How to read chemistry tiers",
+        "items": {
+          "0": {
+            "label": "Best Match",
+            "body": "Strengths connect well and conversation flows with little effort."
+          },
+          "1": {
+            "label": "Pretty Good",
+            "body": "Overall comfortable and stable."
+          },
+          "2": {
+            "label": "Mixed",
+            "body": "It can feel different depending on the situation."
+          },
+          "3": {
+            "label": "Needs Tuning",
+            "body": "It can improve when both sides actively coordinate."
+          },
+          "4": {
+            "label": "Critical",
+            "body": "Thinking styles can collide often. Distance control and role clarity become important."
+          }
+        }
+      },
+      "section5": {
+        "title": "Please remember",
+        "p1": "This result is for understanding communication and collaboration better, not for judging people.",
+        "p2": "A low score does not mean someone is a bad match. It means misunderstandings are more likely if the current pattern stays unchanged."
+      }
+    }
+  },
+  "faq": {
+    "mbti": {
+      "page": {
+        "back": "Back",
+        "title": "Frequently Asked Questions",
+        "intro": "Key questions about MBTI group chemistry are summarized below.",
+        "q1": "What does this service provide",
+        "a1": "It organizes group chemistry, role suggestions, and conversation tendencies based on MBTI.",
+        "q2": "Does a high score always mean a good relationship",
+        "a2": "No. It only indicates that communication may flow more naturally. Context still matters.",
+        "q3": "Can I change my MBTI later",
+        "a3": "Yes. If you edit MBTI, results are recalculated immediately."
+      }
+    }
+  },
+  "privacy": {
+    "page": {
+      "back": "Back",
+      "title": "Privacy Policy",
+      "effectiveDateLabel": "Effective date",
+      "effectiveDate": "2026-01-01",
+      "intro": "We collect and use only the minimum information required to provide the service.",
+      "section1Title": "Collected information",
+      "section1Body": "Nickname, MBTI, and usage logs required for service operation.",
+      "section2Title": "Purpose of use",
+      "section2Body": "Provide core features, improve service quality, and prevent abuse.",
+      "section3Title": "Retention and deletion",
+      "section3Body": "Data is retained only as long as needed, then deleted according to policy.",
+      "contactLabel": "Contact",
+      "contact": "taejuwork@gmail.com"
+    }
+  },
+  "terms": {
+    "page": {
+      "back": "Back",
+      "title": "Terms of Service",
+      "effectiveDateLabel": "Effective date",
+      "effectiveDate": "2026-01-01",
+      "intro": "These terms define rights, obligations, and responsibilities for service use.",
+      "section1Title": "Service use",
+      "section1Body": "Users must comply with applicable laws and these terms.",
+      "section2Title": "User responsibility",
+      "section2Body": "Users are responsible for information they enter and resulting actions.",
+      "section3Title": "Limitation of liability",
+      "section3Body": "Service results are reference information and do not guarantee outcomes.",
+      "section4Title": "Changes to terms",
+      "section4Body": "Terms may be updated, and important changes will be announced."
+    }
+  },
+  "guides": {
+    "system": {
+      "sajuComingSoon": "Saju guides are in preparation."
+    },
+    "notFound": {
+      "title": "Guide not found",
+      "description": "The address may be incorrect or the post may have moved.",
+      "list": "Guide list",
+      "home": "Home"
+    }
+  },
+  "landing": {
+    "brandPrefix": "Group",
+    "brandAccent": "Rank",
+    "headline1": "See who matches well within your group",
+    "headline2": "Chemistry analysis shown as interaction flow",
+    "description1": "Beyond simple compatibility, we organize group relationships by conversation direction, decision style, and role balance.",
+    "description2": "Create a room with one link, invite members, and results are generated automatically.",
+    "startMbti": "Start with MBTI",
+    "sajuSoon": "Saju (Coming Soon)",
+    "footer": "No login required, and recent groups are saved on this device"
+  },
+  "groupGraph": {
+    "server": {
+      "title": "Relationship Graph",
+      "subtitle": "Chemistry links from the selected center",
+      "emptyMembers": "No members have joined yet."
+    },
+    "client": {
+      "centerInfo": "Center Info",
+      "centerLabel": "{nickname} · {mbti}",
+      "saveGuide": "Press save to store {center} as the baseline in recent groups.",
+      "join": "Join",
+      "saveTitle": "Save with current center ({center})"
+    }
+  },
+  "groupActions": {
+    "invite": {
+      "shareTitle": "Group Invite",
+      "shareText": "Join the group with this link.",
+      "shareButton": "Share",
+      "copiedToast": "Link copied"
+    },
+    "save": {
+      "save": "Save",
+      "saved": "Saved ✓"
+    }
+  },
+  "groupComponents": {
+    "chemTopWorst": {
+      "title": "Chemistry Ranking",
+      "bestHeader": "Top 3",
+      "worstHeader": "Bottom 3",
+      "bestTag": "Top",
+      "worstTag": "Bottom",
+      "scoreUnit": "pts",
+      "empty": {
+        "oneMember": "There is no chemistry pair yet because only one member is present. Add one more member to view rankings.",
+        "needMbti": "There are no comparable pairs yet. (Chemistry is calculated when at least 2 MBTI entries exist.)",
+        "noData": "No data yet"
+      }
+    },
+    "chemMoreList": {
+      "more": "+{count} more pairs",
+      "collapse": "Collapse"
+    },
+    "roleMoreList": {
+      "more": "+{count} more members",
+      "collapse": "Collapse",
+      "fitTitle": "Fit score {fit}"
+    },
+    "chemReport": {
+      "emptyNeedMembers": "At least 2 members with MBTI are needed to view rankings.",
+      "overallOutOf": "Out of {count} pairs",
+      "noneType": "No pairs are classified as this type yet.",
+      "scoreUnit": "pts",
+      "groupProfileTitle": "Group Profile",
+      "topType": "Main type: {type}",
+      "labels": {
+        "stable": "🌊 Stable",
+        "complement": "🧩 Complement",
+        "spark": "⚡ Spark",
+        "explode": "🧨 Explode"
+      },
+      "comments": {
+        "stable": "If conversation tempo aligns, these pairs stay comfortable for long.",
+        "complement": "With clear role split, the group runs like a team play.",
+        "spark": "Fast bonding, but assumptions may clash at times.",
+        "explode": "On rough days, tone alone can split the mood."
+      },
+      "profiles": {
+        "explodeHigh": "This group needs clearer alignment to prevent misunderstandings.",
+        "sparkHigh": "High energy and quick bonding, with periodic tuning needed.",
+        "stableHigh": "Many comfortable long-term pairings make this group stable.",
+        "complementHigh": "Members tend to fill each other's gaps well.",
+        "mixed": "This group shows mixed chemistry depending on the situation."
+      },
+      "comboNames": {
+        "steady": "Steady teamwork",
+        "balanced": "Different but comfortable",
+        "stable": "Stable difference",
+        "fill-gap": "Gap-filling duo",
+        "role-share": "Role-sharing duo",
+        "stimulating": "Mutual stimulation duo",
+        "spark": "Spark pair",
+        "risk": "High-risk pair",
+        "caution": "Tone-caution pair"
+      }
+    }
+  },
+  "groupPage": {
+    "back": "Back",
+    "groupLabel": "Group",
+    "chemRankTitle": "Chemistry Ranking",
+    "chemRankSubtitle": "Top and bottom pairs",
+    "distributionTitle": "MBTI Distribution",
+    "distributionSubtitle": "Group tendency ratio",
+    "reportTitle": "Chemistry Report",
+    "reportSubtitle": "Group pair ranking",
+    "rolesTitle": "Group Role Recommendation",
+    "rolesSubtitle": "Who is strong in which role",
+    "footerNote": "This result is for reference and fun. Do not use it as the basis for relationship decisions.",
+    "membersStatus": "{current} joined · max {max}",
+    "graphLoadingTitle": "Loading relationship graph",
+    "graphLoadingWait": "Please wait",
+    "graphLoadingDesc": "Preparing the graph first. You can already view the content above.",
+    "distributionEmpty": "No MBTI has been entered yet. Even one entry starts the distribution.",
+    "rolesEmpty": "When MBTI is entered, the system automatically identifies which roles are strong in this group.",
+    "memberCount": "{count} members",
+    "fitTitle": "Fit {score}",
+    "scoreUnit": "pts",
+    "noTendency": "No members in this tendency",
+    "countFormat": "{value}/{total} ({percent}%)",
+    "balanceLabel": "balance",
+    "mostlyPrefix": "Mostly {line}",
+    "distribution": {
+      "axisTitles": {
+        "energy": "Energy",
+        "info": "Information",
+        "judgement": "Judgment",
+        "style": "Style"
+      },
+      "axisLabels": {
+        "eiE": "E (Extraversion)",
+        "eiI": "I (Introversion)",
+        "nsN": "N (Intuition)",
+        "nsS": "S (Sensing)",
+        "tfT": "T (Thinking)",
+        "tfF": "F (Feeling)",
+        "jpJ": "J (Judging)",
+        "jpP": "P (Perceiving)"
+      },
+      "vibeSummaryTitle": "Group Atmosphere Summary",
+      "cautionPoint": "Caution Point",
+      "balanceOne": "Neither side dominates, so the tone shifts naturally by situation.",
+      "axisOne": {
+        "ei": {
+          "E": "Conversation flows naturally and gets lively quickly.",
+          "I": "It is quieter, but when they speak, they are very concise."
+        },
+        "ns": {
+          "N": "Discussion extends well from one topic to another idea.",
+          "S": "Even if talk drifts, it tends to return to execution."
+        },
+        "tf": {
+          "T": "The flow is to organize and think first, then check emotions.",
+          "F": "Before conclusion, people first share how they feel."
+        },
+        "jp": {
+          "J": "Someone naturally organizes and closes the flow.",
+          "P": "Conclusions stay open and the group adjusts while trying."
+        }
+      },
+      "vibe": {
+        "core": {
+          "situational": "Situational",
+          "talkative": "Talkative",
+          "quietCore": "Quiet Core",
+          "balanceSense": "Sense of Balance",
+          "ideaRush": "Idea Rush",
+          "practicalConclusion": "Practical Conclusion",
+          "flexibleOps": "Flexible Operation",
+          "organizerPresent": "Organizer Present",
+          "impromptuOps": "Impromptu Operation"
+        },
+        "scene": {
+          "ei": {
+            "tie": "Speak when needed, rest when needed.",
+            "talk": "conversation",
+            "talkFirst": "starts with",
+            "ignite": "ignition",
+            "and": "and",
+            "silence": "silence",
+            "shortOnly": "is only brief.",
+            "quiet": "quiet",
+            "quietThen": "then when speaking once,",
+            "core": "the core",
+            "preciseOnly": "is precise."
+          },
+          "ns": {
+            "bigPicture": "big picture",
+            "with": "and",
+            "detail": "detail",
+            "alternate": "appear in turns.",
+            "topic": "topic",
+            "sidePath": "expands sideways into",
+            "expand": "expansion",
+            "normal": "which is normal.",
+            "offTopic": "Even if talk drifts, it returns to",
+            "execution": "execution",
+            "backToExec": "in the end."
+          },
+          "jp": {
+            "conclusion": "conclusion",
+            "openClose": "stays open and closes when needed.",
+            "organize": "organization",
+            "organizerAppears": "naturally appears and closes the meeting.",
+            "laterFirst": "comes later, first",
+            "roll": "keep it moving",
+            "adjust": "and adjust."
+          }
+        },
+        "caution": {
+          "direct": "directness",
+          "directTail": "may be felt strongly.",
+          "summary": "summary phrasing",
+          "summaryTail": "needs one softening line.",
+          "conclusionTail": "can be delayed.",
+          "decideItem": "decision items",
+          "decideTail": "should be fixed in advance.",
+          "schedule": "schedule",
+          "scheduleTail": "can change often.",
+          "deadline": "deadline",
+          "deadlineTail": "is enough to keep one.",
+          "noBigDownside": "There is no major downside, and",
+          "clearTopic": "it works better when the topic is clear."
+        }
+      },
+      "mostlyPrefix": "Mostly {line}"
+    },
+    "roles": {
+      "labels": {
+        "STRATEGY": "Strategy Lead",
+        "VIBE": "Atmosphere Lead",
+        "EXEC": "Execution Lead",
+        "ORGANIZE": "Organization and Decision Lead",
+        "MEDIATOR": "Mediation and Coordination Lead"
+      },
+      "badges": {
+        "STRATEGY": {
+          "1": "Strategy Architect",
+          "2": "Structure Specialist",
+          "3": "Idea Brain",
+          "4": "Strategy Support"
+        },
+        "VIBE": {
+          "1": "Atmosphere Maker",
+          "2": "Empathy Leader",
+          "3": "Conversation Facilitator",
+          "4": "Communication Support"
+        },
+        "EXEC": {
+          "1": "Execution Engine",
+          "2": "Action Captain",
+          "3": "Momentum Driver",
+          "4": "Participant"
+        },
+        "ORGANIZE": {
+          "1": "Organization Ace",
+          "2": "Decision Specialist",
+          "3": "System Manager",
+          "4": "Organization Support"
+        },
+        "MEDIATOR": {
+          "1": "Peace Keeper",
+          "2": "Coordination Specialist",
+          "3": "Emotion Balancer",
+          "4": "Mediation Support"
+        }
+      },
+      "desc": {
+        "STRATEGY": "Tends to see big patterns first. Strong at setting direction and designing structure.",
+        "VIBE": "Tends to read the room and connect conversations well. Strong at easing awkward moments.",
+        "EXEC": "Tends to move quickly with a try-first approach. Strong at driving momentum.",
+        "ORGANIZE": "Tends to organize priorities and conclusions well. Strong at wrapping up discussions.",
+        "MEDIATOR": "Tends to smooth differences in viewpoints. Strong at reducing friction."
+      },
+      "empty": {
+        "STRATEGY": "Without someone setting direction, meetings can run long.",
+        "VIBE": "Without someone shaping atmosphere, conversations can become stiff.",
+        "EXEC": "Without someone pushing execution, ideas can stall.",
+        "ORGANIZE": "Without an organize/decision role, conclusions may be delayed.",
+        "MEDIATOR": "Without a mediator, small misunderstandings can last longer."
+      },
+      "summary": {
+        "headline": {
+          "noMembers": "As more members join, role tendencies become clearer.",
+          "noDistribution": "Role distribution is still thin. More MBTI inputs are needed.",
+          "default": "This group is strong in {mainRole}, and also has strength in {secondaryRole}."
+        },
+        "tip": {
+          "default": "Roles are not fixed. It is natural for them to change by situation.",
+          "lack": "Caution: {role} is currently missing. Without someone in this role, meetings can run long."
+        }
+      }
+    }
+  },
+  "components": {
+    "header": {
+      "brand": "Moimrank",
+      "mbti": "MBTI",
+      "guides": "Guides",
+      "create": "Create Group"
+    },
+    "backNav": {
+      "label": "Back"
+    },
+    "footer": {
+      "mbtiHome": "MBTI Home",
+      "mbtiGuides": "MBTI in Groups",
+      "cognitive": "Cognitive Functions",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "copyright": "2026 Moimrank. All rights reserved."
+    },
+    "toTop": {
+      "ariaLabel": "Back to top",
+      "label": "Top"
+    },
+    "bottomCta": {
+      "createGroup": "Create Group",
+      "recentGroups": "Recent Groups",
+      "recentEmpty": "No recently joined groups",
+      "recentCount": "{count} recent groups",
+      "close": "Close",
+      "recentJoined": "Recently joined groups",
+      "tapToOpen": "Tap to open that group",
+      "noHistory": "No saved groups yet",
+      "historyHint": "When you create or join a group, it will appear here.",
+      "remove": "Remove"
+    },
+    "headerDrawer": {
+      "navigation": "Navigation",
+      "quickMenu": "Quick Menu",
+      "open": "Open menu",
+      "close": "Close",
+      "remove": "Remove",
+      "recentSavedCount": "Saved groups {count}",
+      "recentNone": "No saved groups",
+      "recentEmptyHelp": "Groups you create or join will appear here.",
+      "tipTitle": "Tip:",
+      "tipBody": "Check group-type chemistry guides at a glance in \"MBTI in Groups\".",
+      "mbti": {
+        "title": "MBTI",
+        "desc": "Cognitive function based chemistry",
+        "home": "MBTI Home",
+        "test": "MBTI Test",
+        "guideSection": "Guides",
+        "cognitive": "Cognitive Functions",
+        "groupGuide": "MBTI in Groups",
+        "groupSection": "Groups",
+        "create": "Create Group",
+        "recent": "Recent Groups"
+      },
+      "saju": {
+        "title": "Saju",
+        "desc": "Coming Soon",
+        "comingSoon": "Coming Soon"
+      }
+    }
+  }
+}

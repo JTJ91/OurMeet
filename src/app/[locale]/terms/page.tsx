@@ -1,0 +1,49 @@
+﻿import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function LocalizedTermsPage({ params }: Props) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "terms.page" });
+  const base = locale === "ko" ? "" : `/${locale}`;
+
+  return (
+    <main className="min-h-screen bg-[#F5F9FF] text-slate-900">
+      <div className="mbti-shell pb-16 pt-10">
+        <div className="mbti-card-frame mb-4 flex items-center justify-between">
+          <Link href={`${base}/mbti`} className="mbti-back-btn">
+            <span aria-hidden>←</span>
+            <span>{t("back")}</span>
+          </Link>
+        </div>
+
+        <header className="mbti-card-frame rounded-3xl border border-black/5 bg-white/80 p-6 shadow-sm">
+          <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t("title")}</h1>
+          <p className="mt-4 text-sm leading-7 text-slate-700">{t("intro")}</p>
+          <p className="mt-3 text-xs font-semibold text-slate-600">
+            {t("effectiveDateLabel")}: {t("effectiveDate")}
+          </p>
+        </header>
+
+        <section className="mt-8 space-y-4">
+          <Card title={t("section1Title")} body={t("section1Body")} />
+          <Card title={t("section2Title")} body={t("section2Body")} />
+          <Card title={t("section3Title")} body={t("section3Body")} />
+          <Card title={t("section4Title")} body={t("section4Body")} />
+        </section>
+      </div>
+    </main>
+  );
+}
+
+function Card({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="mbti-card mbti-card-frame p-5">
+      <h2 className="text-base font-extrabold text-slate-900">{title}</h2>
+      <p className="mt-3 text-sm leading-7 text-slate-700">{body}</p>
+    </div>
+  );
+}

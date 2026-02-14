@@ -20,7 +20,6 @@ export default function InviteActions({ groupId }: { groupId: string }) {
       if (navigator.share) {
         await navigator.share({
           title: "모임 초대",
-          text: "이 링크로 모임에 참여해요",
           url: fullUrl,
         });
         return;

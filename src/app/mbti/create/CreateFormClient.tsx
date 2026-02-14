@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createGroupAction } from "@/app/mbti/actions/group";
 import { upsertSavedGroup } from "@/app/lib/mbti/groupHistory";
+import { sanitizeNicknameInput } from "@/app/mbti/lib/nickname";
 import { useRouter } from "next/navigation";
 import MbtiTestModal from "@/app/components/mbtiTest/MbtiTestModal8";
 import { useSearchParams } from "next/navigation";
@@ -82,7 +83,7 @@ export default function CreateFormClient() {
         if (!groupEl || !nickEl || !mbtiEl) return;
 
         groupEl.value = groupEl.value.trim();
-        nickEl.value = nickEl.value.replace(/\s/g, "").slice(0, 3);
+        nickEl.value = sanitizeNicknameInput(nickEl.value || "");
         const mbti = mbtiEl.value.replace(/\s/g, "").toUpperCase().slice(0, 4);
         mbtiEl.value = mbti;
 
@@ -127,12 +128,18 @@ export default function CreateFormClient() {
         <input
           name="nickname"
           required
-          maxLength={3}
+          maxLength={6}
           placeholder="예) 태주"
           disabled={isSubmitting}
           className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-white px-4 text-[16px] outline-none focus:border-[#1E88E5]/50 disabled:opacity-60"
+          onKeyDown={(e) => {
+            if (e.key === " ") e.preventDefault();
+          }}
+          onChange={(e) => {
+            e.currentTarget.value = sanitizeNicknameInput(e.currentTarget.value);
+          }}
         />
-        <p className="mt-1 text-[11px] text-slate-500">공백 없이 최대 3글자</p>
+        <p className="mt-1 text-[11px] text-slate-500">공백 없이 한글/일본어 3자, 영어 6자</p>
       </label>
 
       {/* MBTI */}

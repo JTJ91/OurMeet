@@ -1,12 +1,21 @@
 import Link from "next/link";
 
-import { listGuidesByGroup } from "../../_data/mbti/guides";
+import { listGuidesByGroupIntl } from "../../_data/mbti/guides-intl";
 import { GROUP_META, type GroupType } from "../../_data/mbti/types";
+import { GROUP_META_I18N, PAGE_COPY, type GuidesLocale } from "./listI18n";
 
 const ORDER: GroupType[] = ["FRIENDS", "WORK", "LOCAL", "SPORTS", "GAMES"];
 
-export default function MbtiGuidesPage() {
+type Props = {
+  locale?: GuidesLocale;
+};
+
+export default function MbtiGuidesPage({ locale = "ko" }: Props) {
   const system = "mbti";
+  const copy = PAGE_COPY[locale];
+  const base = locale === "ko" ? "" : `/${locale}`;
+  const groupMeta = GROUP_META_I18N[locale];
+  const formatCount = (count: number) => (locale === "en" ? `${count} ${copy.countSuffix}` : `${count}${copy.countSuffix}`);
 
   return (
     <main className="mbti-page-bg">
@@ -16,23 +25,22 @@ export default function MbtiGuidesPage() {
         {/* 뒤로가기 */}
         <div className="mbti-card-frame mb-4">
           <Link
-            href="/mbti"
+            href={`${base}/mbti`}
             className="mbti-back-btn"
           >
-            ← 뒤로가기
+            ← {copy.back}
           </Link>
         </div>
 
         {/* 헤더 */}
         <header className="mbti-card mbti-card-frame p-6">
           <h1 className="mt-2 text-2xl font-black leading-tight">
-            모임에서 <span className="text-slate-600">자주 터지는 순간</span>을
+            {copy.heroLine1}
             <br />
-            MBTI로 <span className="text-slate-600">쉽게</span> 정리했어요
+            {copy.heroLine2}
           </h1>
           <p className="mt-3 text-sm leading-7 text-slate-700">
-            친구/회사/동네/운동/게임 같은 현실 모임에서
-            <b> 어떤 조합에서 어떤 오해가 생기는지</b>부터 보시면 됩니다.
+            {copy.heroDesc}
           </p>
         </header>
 
@@ -41,6 +49,7 @@ export default function MbtiGuidesPage() {
           <div className="grid grid-cols-1 gap-3">
             {ORDER.map((k) => {
               const m = GROUP_META[k];
+              const lm = groupMeta[k];
               return (
                 <a
                   key={k}
@@ -51,12 +60,12 @@ export default function MbtiGuidesPage() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-lg">{m.badge}</span>
-                        <div className="text-base font-black">{m.label}</div>
+                        <div className="text-base font-black">{lm.label}</div>
                       </div>
-                      <div className="mt-1 text-sm text-slate-600">{m.desc}</div>
+                      <div className="mt-1 text-sm text-slate-600">{lm.desc}</div>
                     </div>
                     <div className="mbti-back-btn shrink-0 px-3 py-1 text-xs font-extrabold">
-                      바로보기 →
+                      {copy.jump} →
                     </div>
                   </div>
                 </a>
@@ -69,7 +78,8 @@ export default function MbtiGuidesPage() {
         <section className="mt-8 space-y-10">
           {ORDER.map((k) => {
             const m = GROUP_META[k];
-            const list = listGuidesByGroup(k);
+            const lm = groupMeta[k];
+            const list = listGuidesByGroupIntl(k, locale);
             if (list.length === 0) return null;
 
             return (
@@ -80,43 +90,45 @@ export default function MbtiGuidesPage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xl">{m.badge}</span>
-                        <h2 className="text-2xl font-black tracking-tight">{m.label}</h2>
+                        <h2 className="text-2xl font-black tracking-tight">{lm.label}</h2>
                         <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-extrabold text-slate-600">
-                          {list.length}개
+                          {formatCount(list.length)}
                         </span>
                       </div>
-                      <p className="mt-2 text-sm text-slate-600">{m.desc}</p>
+                      <p className="mt-2 text-sm text-slate-600">{lm.desc}</p>
                     </div>
 
                     <a
                       href="#top"
                       className="mbti-back-btn"
                     >
-                      위로
+                      {copy.top}
                     </a>
                   </div>
                 </div>
 
                 <div className="mt-4 grid gap-3">
-                  {list.map((g) => (
-                    <Link
-                      key={g.slug}
-                      id={g.slug}                 // ✅ 앵커 타겟을 Link(=a)에 직접
-                      href={`/guides/${system}/${g.slug}`}
-                      className="mbti-card mbti-card-frame scroll-mt-24 rounded-3xl p-5 transition hover:bg-white"
-                    >
-                      <div className="flex items-start justify-between gap-3">  {/* ✅ items-start */}
-                        <div>
-                          <div className="text-lg font-black">{g.title}</div>
-                          <p className="mt-2 text-sm text-slate-700">{g.description}</p>
-                        </div>
+                  {list.map((g) => {
+                    return (
+                      <Link
+                        key={g.slug}
+                        id={g.slug}
+                        href={`${base}/guides/${system}/${g.slug}`}
+                        className="mbti-card mbti-card-frame scroll-mt-24 rounded-3xl p-5 transition hover:bg-white"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="text-lg font-black">{g.title}</div>
+                            <p className="mt-2 text-sm text-slate-700">{g.description}</p>
+                          </div>
 
-                        <div className="mbti-back-btn shrink-0 self-start px-3 py-1 text-xs font-extrabold">
-                          읽기 →
+                          <div className="mbti-back-btn shrink-0 self-start px-3 py-1 text-xs font-extrabold">
+                            {copy.read} →
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  ))}
+                      </Link>
+                    );
+                  })}
 
 
                 </div>

@@ -1,0 +1,47 @@
+{
+  "ko": [
+    { "id": "1", "name": "\uD0DC\uC8FC", "mbti": "ESTP" },
+    { "id": "2", "name": "\uBBFC\uC11C", "mbti": "ESTJ" },
+    { "id": "3", "name": "\uC11C\uC5F0", "mbti": "ENTJ" },
+    { "id": "4", "name": "\uD604\uC6B0", "mbti": "ESFJ" },
+    { "id": "5", "name": "\uC9C0\uC724", "mbti": "ENTJ" },
+    { "id": "6", "name": "\uB3C4\uC724", "mbti": "ISTP" },
+    { "id": "7", "name": "\uC9C0\uBBFC", "mbti": "ISFP" },
+    { "id": "8", "name": "\uC720\uC9C4", "mbti": "INTP" },
+    { "id": "9", "name": "\uC218\uC544", "mbti": "ENFJ" },
+    { "id": "10", "name": "\uD558\uB098", "mbti": "ENTP" },
+    { "id": "11", "name": "\uCC44\uC6D0", "mbti": "ENFP" },
+    { "id": "12", "name": "\uC900\uD638", "mbti": "ISTJ" },
+    { "id": "13", "name": "\uC608\uB9B0", "mbti": "ESFP" }
+  ],
+  "en": [
+    { "id": "1", "name": "Alex", "mbti": "ESTP" },
+    { "id": "2", "name": "Mason", "mbti": "ESTJ" },
+    { "id": "3", "name": "Emma", "mbti": "ENTJ" },
+    { "id": "4", "name": "Noah", "mbti": "ESFJ" },
+    { "id": "5", "name": "Olivia", "mbti": "ENTJ" },
+    { "id": "6", "name": "Liam", "mbti": "ISTP" },
+    { "id": "7", "name": "Ava", "mbti": "ISFP" },
+    { "id": "8", "name": "Ethan", "mbti": "INTP" },
+    { "id": "9", "name": "Sophia", "mbti": "ENFJ" },
+    { "id": "10", "name": "Mia", "mbti": "ENTP" },
+    { "id": "11", "name": "Chloe", "mbti": "ENFP" },
+    { "id": "12", "name": "James", "mbti": "ISTJ" },
+    { "id": "13", "name": "Lily", "mbti": "ESFP" }
+  ],
+  "ja": [
+    { "id": "1", "name": "\u30CF\u30EB\u30C8", "mbti": "ESTP" },
+    { "id": "2", "name": "\u30BD\u30A6\u30BF", "mbti": "ESTJ" },
+    { "id": "3", "name": "\u30E6\u30A4", "mbti": "ENTJ" },
+    { "id": "4", "name": "\u30EC\u30F3", "mbti": "ESFJ" },
+    { "id": "5", "name": "\u30B5\u30AF\u30E9", "mbti": "ENTJ" },
+    { "id": "6", "name": "\u30DF\u30CA\u30C8", "mbti": "ISTP" },
+    { "id": "7", "name": "\u30D2\u30CA", "mbti": "ISFP" },
+    { "id": "8", "name": "\u30EA\u30AF", "mbti": "INTP" },
+    { "id": "9", "name": "\u30A2\u30AA\u30A4", "mbti": "ENFJ" },
+    { "id": "10", "name": "\u30E6\u30CA", "mbti": "ENTP" },
+    { "id": "11", "name": "\u30CA\u30CA", "mbti": "ENFP" },
+    { "id": "12", "name": "\u30BF\u30AF\u30DF", "mbti": "ISTJ" },
+    { "id": "13", "name": "\u30EA\u30F3", "mbti": "ESFP" }
+  ]
+}

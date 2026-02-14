@@ -1,31 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { Guide } from "../_data/mbti/types";
 import { GROUP_META } from "../_data/mbti/types";
+import { GROUP_META_I18N, type GuidesLocale } from "../_systems/mbti/listI18n";
+import { DETAIL_COPY } from "../_systems/mbti/detailI18n";
 
 type Props = {
   guide: Guide;
   system: string; // "mbti" | "saju" ...
+  locale?: GuidesLocale;
 };
 
-export default function GuideHero({ guide, system }: Props) {
-  const router = useRouter();
+export default function GuideHero({ guide, system, locale = "ko" }: Props) {
   const meta = GROUP_META[guide.groupType];
+  const localizedMeta = GROUP_META_I18N[locale][guide.groupType];
+  const copy = DETAIL_COPY[locale];
+  const base = locale === "ko" ? "" : `/${locale}`;
 
   const systemPath =
-    system === "mbti" ? "/mbti" : system === "saju" ? "/saju" : "/";
+    system === "mbti" ? `${base}/mbti` : system === "saju" ? `${base}/saju` : `${base}/`;
 
   const systemLabel =
-    system === "mbti" ? "MBTI 홈" : system === "saju" ? "사주 홈" : "메인";
+    system === "mbti" ? copy.systemLabel.mbti : system === "saju" ? copy.systemLabel.saju : copy.systemLabel.main;
 
   return (
     <header className="mbti-card mbti-card-frame p-6">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="inline-flex items-center gap-2 whitespace-nowrap text-xs font-extrabold text-slate-600">
           <span className="text-base">{meta.badge}</span>
-          <span>{meta.label}</span>
+          <span>{localizedMeta.label}</span>
         </div>
 
         <div className="flex flex-wrap items-center justify-end gap-2">
@@ -37,10 +41,10 @@ export default function GuideHero({ guide, system }: Props) {
           </Link>
 
           <Link
-            href={`/guides/${system}#${guide.slug}`}   // ✅ mbti면 /guides/mbti#friends-xxx
+            href={`${base}/guides/${system}#${guide.slug}`}
             className="mbti-back-btn px-3 py-2 text-xs font-bold whitespace-nowrap"
           >
-            ← 가이드 목록
+            ← {copy.guideList}
           </Link>
         </div>
       </div>

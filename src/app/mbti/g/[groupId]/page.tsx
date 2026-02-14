@@ -1036,13 +1036,13 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                         <div className="text-[11px] font-extrabold text-slate-500">{row.title}</div>
 
                         {/* ✅ first (다수파) */}
-                        <div className="mt-2 flex items-center justify-between text-xs font-extrabold">
-                          <span className="font-extrabold" style={{ color: MBTI_COLOR[first.key] }}>
+                        <div className="mt-2">
+                          <div className="text-xs font-extrabold leading-tight break-words" style={{ color: MBTI_COLOR[first.key] }}>
                             {first.label}
-                          </span>
-                          <span className="font-semibold" style={{ color: MBTI_COLOR[first.key] }}>
-                            {first.v}/{distTotal}명 ({firstPct}%)
-                          </span>
+                          </div>
+                          <div className="mt-1 text-right text-[11px] font-semibold leading-tight tabular-nums" style={{ color: MBTI_COLOR[first.key] }}>
+                            {first.v}/{distTotal} ({firstPct}%)
+                          </div>
                         </div>
                         <div className="mt-2 h-2 w-full rounded-full bg-slate-200">
                           <div
@@ -1052,13 +1052,13 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                         </div>
 
                         {/* ✅ second (소수파) */}
-                        <div className="mt-2 flex items-center justify-between text-xs font-extrabold">
-                          <span className="font-extrabold" style={{ color: MBTI_COLOR[second.key] }}>
+                        <div className="mt-2">
+                          <div className="text-xs font-extrabold leading-tight break-words" style={{ color: MBTI_COLOR[second.key] }}>
                             {second.label}
-                          </span>
-                          <span className="font-semibold" style={{ color: MBTI_COLOR[second.key] }}>
-                            {second.v}/{distTotal}명 ({secondPct}%)
-                          </span>
+                          </div>
+                          <div className="mt-1 text-right text-[11px] font-semibold leading-tight tabular-nums" style={{ color: MBTI_COLOR[second.key] }}>
+                            {second.v}/{distTotal} ({secondPct}%)
+                          </div>
                         </div>
                         <div className="mt-2 h-2 w-full rounded-full bg-slate-200">
                           <div

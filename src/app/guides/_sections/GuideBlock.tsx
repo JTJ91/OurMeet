@@ -1,12 +1,18 @@
 // app/guides/_sections/GuideBlock.tsx
 import type { GuideSection } from "../_data/mbti/types";
 import { SECTION_ID } from "../_data/mbti/types";
+import { DETAIL_COPY } from "../_systems/mbti/detailI18n";
+import type { GuidesLocale } from "../_systems/mbti/listI18n";
 
 export default function GuideBlock({
   sections,
+  locale = "ko",
 }: {
   sections: GuideSection[];
+  locale?: GuidesLocale;
 }) {
+  const copy = DETAIL_COPY[locale];
+
   return (
     <div className="space-y-8">
       {sections.map((section, idx) => {
@@ -70,7 +76,7 @@ export default function GuideBlock({
                     <p className="mt-1 text-sm text-slate-700">{item.how}</p>
                     {item.example && (
                       <p className="mt-1 text-sm text-slate-500">
-                        예: {item.example}
+                        {copy.examplePrefix} {item.example}
                       </p>
                     )}
                   </div>
@@ -80,10 +86,10 @@ export default function GuideBlock({
                 section.items.map((item, i) => (
                   <div key={i}>
                     <div className="font-extrabold">
-                      상황: {item.situation}
+                      {copy.situationPrefix} {item.situation}
                     </div>
                     <p className="mt-1 text-sm text-slate-700">
-                      이렇게 말해보기: {item.say}
+                      {copy.sayPrefix} {item.say}
                     </p>
                     {item.instead && (
                       <p className="mt-1 text-sm text-red-500">

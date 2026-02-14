@@ -1,0 +1,787 @@
+{
+  "nav": {
+    "home": "홈",
+    "mbti": "MBTI"
+  },
+  "home": {
+    "title": "모임 궁합을 바로 확인해보세요",
+    "description": "성격 유형 기반으로 팀 궁합과 관계 흐름을 분석합니다."
+  },
+  "mbtiTest": {
+    "page": {
+      "backToMbti": "MBTI 홈",
+      "title": "MBTI 정식 검사",
+      "subtitle": "60문항으로 더 정확하게",
+      "descriptionStrong": "인지기능 기반",
+      "description": "에너지 방향과 판단 방식을 분석해 더 정확한 MBTI 결과를 확인합니다.",
+      "quickLink": "간단 검사는 여기에서",
+      "footerNote": "MBTI는 참고 도구이며 상황과 경험에 따라 결과가 달라질 수 있습니다."
+    }
+  },
+  "create": {
+    "page": {
+      "back": "뒤로가기",
+      "title": "모임 만들기",
+      "description1": "모임 이름, 별명, MBTI를 입력하면",
+      "description2": "바로 첫 궁합 순위가 생성됩니다."
+    },
+    "form": {
+      "errors": {
+        "createFailed": "모임 생성 중 문제가 발생했어요."
+      },
+      "groupName": {
+        "label": "모임 이름",
+        "placeholder": "예: 회사 축구 모임"
+      },
+      "nickname": {
+        "label": "내 별명",
+        "placeholder": "예: 태주",
+        "hint": "공백 없이 최대 3글자"
+      },
+      "mbti": {
+        "quickTest": "MBTI 간단 검사",
+        "placeholder": "예: ENFP",
+        "invalid": "MBTI 형식이 올바르지 않아요. 예: ENFP",
+        "hint": "ENFP 형식, 공백 없이 4글자"
+      },
+      "judge": {
+        "legend": "결정 스타일",
+        "help": "모임에서 결론을 내릴 때 무엇을 더 우선하나요",
+        "logic": {
+          "title": "근거와 효율",
+          "desc": "팩트와 논리 중심"
+        },
+        "people": {
+          "title": "공감과 분위기",
+          "desc": "사람과 감정 고려"
+        }
+      },
+      "info": {
+        "legend": "정보 선호",
+        "help": "이야기할 때 어떤 정보가 더 편한가요",
+        "idea": {
+          "title": "아이디어",
+          "desc": "의미와 가능성 중심"
+        },
+        "fact": {
+          "title": "현실과 사실",
+          "desc": "경험과 데이터 선호"
+        }
+      },
+      "submit": {
+        "creating": "생성중...",
+        "create": "모임 만들기"
+      }
+    },
+    "actionErrors": {
+      "required": "모임 이름, 별명, MBTI는 필수예요.",
+      "nicknameLength": "별명은 공백 없이 1~3글자만 가능해요.",
+      "mbtiInvalid": "MBTI 형식이 올바르지 않아요. 예) ENFP",
+      "memberCreateFailed": "멤버 생성에 실패했어요."
+    }
+  },
+  "join": {
+    "page": {
+      "back": "뒤로",
+      "title": "모임 참가",
+      "groupLabel": "모임",
+      "membersNow": "현재 {count}명 참가 중",
+      "maxMembers": "최대 {count}명",
+      "disclaimer": "결과는 참고와 재미를 위한 정보입니다. 관계 판단의 유일한 근거로 사용하지 마세요."
+    },
+    "form": {
+      "errors": {
+        "joinFailed": "참가 중 문제가 발생했어요."
+      },
+      "nickname": {
+        "label": "내 별명",
+        "placeholder": "예: 태주",
+        "hint": "공백 없이 최대 3글자"
+      },
+      "mbti": {
+        "quickTest": "MBTI 간단 검사",
+        "placeholder": "예: ENFP",
+        "invalid": "MBTI 형식이 올바르지 않아요. 예: ENFP",
+        "hint": "ENFP 형식, 공백 없이 4글자"
+      },
+      "judge": {
+        "legend": "결정 스타일",
+        "help": "모임에서 결론을 내릴 때 무엇을 더 우선하나요",
+        "logic": {
+          "title": "근거와 효율",
+          "desc": "팩트와 논리 중심"
+        },
+        "people": {
+          "title": "공감과 분위기",
+          "desc": "사람과 감정 고려"
+        }
+      },
+      "info": {
+        "legend": "정보 선호",
+        "help": "이야기할 때 어떤 정보가 더 편한가요",
+        "idea": {
+          "title": "아이디어",
+          "desc": "의미와 가능성 중심"
+        },
+        "fact": {
+          "title": "현실과 사실",
+          "desc": "경험과 데이터 선호"
+        }
+      },
+      "submit": {
+        "full": "정원이 가득 찼어요",
+        "joining": "참여중...",
+        "join": "모임에 참가하기"
+      }
+    },
+    "actionErrors": {
+      "required": "필수값이 누락되었어요.",
+      "mbtiInvalid": "MBTI 형식이 올바르지 않아요. 예) ENFP",
+      "groupNotFound": "모임이 존재하지 않아요.",
+      "groupFull": "이미 정원이 찼어요."
+    }
+  },
+  "mbti": {
+    "page": {
+      "backHome": "메인으로",
+      "titleLine1": "우리 모임",
+      "titleLine2": "누가 누구랑 잘 맞을까",
+      "descriptionStrong": "MBTI 인지기능 기반",
+      "description": "서로의 생각 방식과 대화 리듬을 비교해 관계 케미를 확인해요.",
+      "cognitiveGuide": "MBTI 인지기능이란",
+      "quickStart": "빠른 시작",
+      "testLabel": "MBTI 검사",
+      "testDesc": "정식 60문항 검사",
+      "guidesLabel": "모임 속 MBTI",
+      "guidesDesc": "상황별 케미 가이드",
+      "usageLabel": "이용 가이드",
+      "usageDesc": "점수 계산 방식 안내"
+    },
+    "egoGraphCanvas": {
+      "levels": {
+        "1": "한계임박",
+        "2": "조율필요",
+        "3": "그럭저럭",
+        "4": "합좋은편",
+        "5": "찰떡궁합"
+      },
+      "scoreUnit": "점",
+      "scoreWithUnit": "{score}점",
+      "avg": {
+        "title": "우리 모임 평균 점수",
+        "minMembers": "참여자 2명부터 표시",
+        "noData": "데이터 없음",
+        "bands": {
+          "high": "상위권",
+          "good": "양호",
+          "normal": "보통",
+          "tune": "조율 필요",
+          "low": "낮음"
+        }
+      },
+      "guide": {
+        "title": "이름을 눌러 관계를 확인해보세요",
+        "subtitle": "카드에서 센터로 보기를 누르면 기준이 바뀌어요"
+      },
+      "center": {
+        "aria": "이 사람을 센터로 보기",
+        "button": "센터로 보기"
+      },
+      "oneLine": {
+        "s76": "이건 거의 <h>찰떡 라인</h>이에요.",
+        "s74": "상위권 케미. <h>같이 있을수록 편해지는 타입</h>이에요.",
+        "s72": "리듬이 자연스러워요. <h>말이 잘 통하는 조합</h>이에요.",
+        "s70": "기본 합이 좋아요. <h>갈등이 오래 가지 않아요</h>.",
+        "s66": "무난하게 잘 맞아요. <h>같이 있어도 부담이 적어요</h>.",
+        "s62": "괜찮은 조합이에요. <h>속도 차이만 조절하면</h> 더 좋아요.",
+        "s58": "나쁘지 않지만 <h>결이 조금 달라요</h>.",
+        "s54": "여기부터는 <h>조율이 관건</h>이에요.",
+        "s50": "서로 다르다는 게 <h>확실히 체감돼요</h>.",
+        "s46": "대화하다가 <h>물음표가 자주 생길 수 있어요</h>.",
+        "s44": "가끔은 <h>왜 이렇게까지 다르지?</h> 싶을 수 있어요.",
+        "s42": "그냥 두면 <h>각자 말만 하게 될 확률</h>이 높아요.",
+        "base": "솔직히 <h>충돌 확률이 높은 조합</h>이에요."
+      },
+      "fnName": {
+        "Se": "현장감(지금)",
+        "Si": "경험/기억",
+        "Ne": "아이디어/확장",
+        "Ni": "의미/흐름",
+        "Te": "결정/정리",
+        "Ti": "논리/분석",
+        "Fe": "분위기/배려",
+        "Fi": "가치/진심"
+      },
+      "bucketSituation": {
+        "AUTO": {
+          "0": "말이 잘 이어지는 날",
+          "1": "설명이 거의 필요 없는 흐름",
+          "2": "대화가 자연스럽게 굴러감"
+        },
+        "HIGH": {
+          "0": "리듬이 잘 맞음",
+          "1": "주고받는 속도가 비슷함",
+          "2": "호흡이 편한 편"
+        },
+        "GOOD": {
+          "0": "무난하게 굴러감",
+          "1": "피로도가 낮은 편",
+          "2": "각자 역할이 잡히기 쉬움"
+        },
+        "OK": {
+          "0": "주제에 따라 체감 차이",
+          "1": "관심 축이 엇갈릴 때 있음",
+          "2": "해석이 달라질 때 있음"
+        },
+        "TUNE": {
+          "0": "전제 공유가 필요",
+          "1": "결정 기준이 다름",
+          "2": "확인 질문이 중요"
+        },
+        "LANG": {
+          "0": "번역이 필요한 구간",
+          "1": "대화 톤이 엇갈릴 수 있음",
+          "2": "속도 조절이 필요"
+        },
+        "HARD": {
+          "0": "오해 방지 모드",
+          "1": "짧고 명확하게 가는 게 안전",
+          "2": "오늘은 힘 빼는 게 좋음"
+        }
+      },
+      "cognitive": {
+        "shared": {
+          "withFn": {
+            "0": "공통분모는 {fn}예요. 포인트만 맞으면 금방 가까워져요.",
+            "1": "{fn} 쪽 합이 좋아서 신뢰가 빨리 쌓여요."
+          },
+          "withoutFn": {
+            "0": "공통분모가 얇아서 초반엔 서로 해석하는 시간이 필요해요.",
+            "1": "처음엔 달라 보여도 패턴이 잡히면 편해질 수 있어요."
+          }
+        },
+        "clash": {
+          "noClash": {
+            "0": "{scene}. 큰 충돌보다 속도와 우선순위를 맞추면 좋아요.",
+            "1": "{scene}. 같은 말도 다르게 들릴 수 있어 해석 확인이 중요해요."
+          },
+          "high": {
+            "0": "{scene}. {axis} 방식이 달라도 오히려 보완이 잘 돼요.",
+            "1": "{scene}. {axis}에서 역할이 나뉘며 팀플처럼 굴러가요."
+          },
+          "low": {
+            "0": "{scene}. {axis}에서 친절의 기준이 달라 서운함이 생기기 쉬워요.",
+            "1": "{scene}. {axis} 축이 갈려 한쪽은 결론, 다른 쪽은 납득을 원할 수 있어요."
+          },
+          "mid": {
+            "0": "{scene}. {axis}에서 방식이 갈라져요. 결론 전에 전제만 맞추면 충돌이 줄어요.",
+            "1": "{scene}. {axis} 조율이 핵심이에요. 한 문장 더 설명하면 체감이 달라져요."
+          }
+        }
+      }
+    }
+  },
+  "cognitive": {
+    "page": {
+      "back": "뒤로가기",
+      "title": "케미 점수는 어떻게 계산되나요?",
+      "intro1": "모임랭크는 MBTI 네 글자를 그대로 비교하지 않아요. 대신, 각 유형이 자주 쓰는 ",
+      "introHighlight": "생각의 습관(인지기능)",
+      "intro1Tail": "이 서로 어떻게 만나느냐를 비교해요.",
+      "intro2": "쉽게 말하면, 우리가 어떻게 보고 생각하고 결정하는지가 잘 이어지는지를 보는 거예요.",
+      "section1": {
+        "title": "인지기능이 뭐예요?",
+        "lead": "사람마다 정보를 보는 방식과 결정하는 방식이 달라요.",
+        "bullets": {
+          "0": "✔ 어떤 사람은 가능성·아이디어를 먼저 보고",
+          "1": "✔ 어떤 사람은 사실·디테일을 먼저 봐요",
+          "2": "✔ 어떤 사람은 논리·효율을 기준으로 판단하고",
+          "3": "✔ 어떤 사람은 가치·감정을 더 중요하게 생각해요"
+        },
+        "tail": "이런 기본적인 사고 습관을 인지기능이라고 불러요."
+      },
+      "section2": {
+        "title": "모임랭크는 이렇게 케미를 봐요",
+        "items": {
+          "0": {
+            "title": "① 주로 쓰는 생각 방식이 충돌하는지",
+            "body": "둘 다 같은 기준을 강하게 밀어붙이면 빠르게 결론은 나지만, 주도권 싸움이 생길 수 있어요."
+          },
+          "1": {
+            "title": "② 서로 보완해주는 구조인지",
+            "body": "한 사람의 강점이 다른 사람의 약한 부분을 채워주면 대화가 자연스럽게 이어져요."
+          },
+          "2": {
+            "title": "③ 생각의 방향이 비슷한지",
+            "body": "큰 그림을 보는 사람끼리, 현실을 보는 사람끼리, 혹은 서로 다른 방향을 균형 있게 채워주는지 봐요."
+          },
+          "3": {
+            "title": "④ 예민한 부분이 겹치는지",
+            "body": "스트레스 받을 때 건드려지는 부분이 비슷하면 갈등이 생길 가능성이 커요."
+          }
+        }
+      },
+      "section3": {
+        "title": "그래서 점수가 달라져요",
+        "lead": "점수는 단순히 성격이 같다/다르다가 아니라,",
+        "bullets": {
+          "0": "✔ 대화 흐름이 자연스러운지",
+          "1": "✔ 역할 분담이 되는지",
+          "2": "✔ 생각이 자주 부딪히는지",
+          "3": "✔ 속도와 기준이 크게 어긋나는지"
+        },
+        "tail": "이런 요소들을 종합해서 계산해요. 그래서 같은 MBTI라도 상황에 따라 체감이 달라질 수 있어요."
+      },
+      "section4": {
+        "title": "케미 등급은 이렇게 읽어요",
+        "items": {
+          "0": {
+            "label": "찰떡궁합",
+            "body": "서로의 강점이 잘 이어지고 대화가 자연스럽게 흐르는 조합이에요."
+          },
+          "1": {
+            "label": "합좋은편",
+            "body": "전반적으로 편안하고 무난한 관계예요."
+          },
+          "2": {
+            "label": "그럭저럭",
+            "body": "상황에 따라 다르게 느껴질 수 있어요."
+          },
+          "3": {
+            "label": "조율필요",
+            "body": "서로 이해하려는 노력이 있으면 더 좋아질 수 있어요."
+          },
+          "4": {
+            "label": "한계임박",
+            "body": "생각 방식이 자주 부딪힐 수 있어요. 거리 조절이나 역할 정리가 중요해요."
+          }
+        }
+      },
+      "section5": {
+        "title": "꼭 기억해 주세요",
+        "p1": "이 결과는 사람을 판단하기 위한 게 아니라, 대화와 협업을 더 잘 이해하기 위한 참고용이에요.",
+        "p2": "점수가 낮다고 안 맞는 사람이라는 뜻은 아니고, 지금 방식 그대로 두면 오해가 생길 수 있다는 의미에 가까워요."
+      }
+    }
+  },
+  "faq": {
+    "mbti": {
+      "page": {
+        "back": "뒤로가기",
+        "title": "자주 묻는 질문",
+        "intro": "MBTI 모임 궁합에서 많이 묻는 핵심 질문을 정리했습니다.",
+        "q1": "이 서비스는 무엇을 제공하나요",
+        "a1": "MBTI를 기반으로 모임 케미, 역할 추천, 대화 성향을 정리해 제공합니다.",
+        "q2": "점수가 높으면 관계가 항상 좋은가요",
+        "a2": "아니요. 소통이 자연스러울 가능성을 보여주는 참고값이며 상황이 중요합니다.",
+        "q3": "나중에 MBTI를 바꿀 수 있나요",
+        "a3": "네. MBTI를 수정하면 결과가 즉시 다시 계산됩니다."
+      }
+    }
+  },
+  "privacy": {
+    "page": {
+      "back": "뒤로가기",
+      "title": "개인정보처리방침",
+      "effectiveDateLabel": "시행일",
+      "effectiveDate": "2026-01-01",
+      "intro": "서비스 제공에 필요한 최소한의 정보만 수집하고 사용합니다.",
+      "section1Title": "수집 항목",
+      "section1Body": "서비스 이용에 필요한 별명, MBTI, 이용 로그를 수집합니다.",
+      "section2Title": "이용 목적",
+      "section2Body": "핵심 기능 제공, 품질 개선, 악용 방지를 위해 사용합니다.",
+      "section3Title": "보관 및 삭제",
+      "section3Body": "필요 기간 동안만 보관하고 정책에 따라 삭제합니다.",
+      "contactLabel": "문의",
+      "contact": "taejuwork@gmail.com"
+    }
+  },
+  "terms": {
+    "page": {
+      "back": "뒤로가기",
+      "title": "이용약관",
+      "effectiveDateLabel": "시행일",
+      "effectiveDate": "2026-01-01",
+      "intro": "서비스 이용에 관한 권리, 의무, 책임 사항을 규정합니다.",
+      "section1Title": "서비스 이용",
+      "section1Body": "이용자는 관련 법령과 본 약관을 준수해야 합니다.",
+      "section2Title": "이용자 책임",
+      "section2Body": "입력 정보와 그에 따른 행위에 대한 책임은 이용자에게 있습니다.",
+      "section3Title": "책임 제한",
+      "section3Body": "서비스 결과는 참고 정보이며 특정 결과를 보장하지 않습니다.",
+      "section4Title": "약관 변경",
+      "section4Body": "약관은 변경될 수 있으며 중요한 변경은 사전 공지합니다."
+    }
+  },
+  "guides": {
+    "system": {
+      "sajuComingSoon": "사주 가이드는 준비 중입니다."
+    },
+    "notFound": {
+      "title": "가이드를 찾을 수 없습니다",
+      "description": "주소가 잘못되었거나 글이 이동되었을 수 있습니다.",
+      "list": "가이드 목록",
+      "home": "메인"
+    }
+  },
+  "landing": {
+    "brandPrefix": "모임",
+    "brandAccent": "랭크",
+    "headline1": "우리 모임 안에서 누가 누구와 잘 맞는지",
+    "headline2": "흐름으로 보여주는 케미 분석",
+    "description1": "단순 궁합을 넘어, 대화 방향과 결정 스타일, 역할 균형을 기준으로 모임의 관계를 정리합니다.",
+    "description2": "링크 하나로 방을 만들고 각자 참여하면 결과가 자동으로 생성됩니다.",
+    "startMbti": "MBTI로 시작하기",
+    "sajuSoon": "사주 (준비중)",
+    "footer": "로그인 없이 사용 가능하며 최근 모임은 이 기기에 저장됩니다"
+  },
+  "groupGraph": {
+    "server": {
+      "title": "관계도",
+      "subtitle": "센터 기준 케미 연결",
+      "emptyMembers": "아직 참여한 멤버가 없어요."
+    },
+    "client": {
+      "centerInfo": "센터 정보",
+      "centerLabel": "{nickname} · {mbti}",
+      "saveGuide": "저장하기를 누르면 {center} 기준으로 최근모임 목록에 기록돼요.",
+      "join": "참여하기",
+      "saveTitle": "현재 센터({center}) 기준으로 저장"
+    }
+  },
+  "groupActions": {
+    "invite": {
+      "shareTitle": "모임 초대",
+      "shareText": "이 링크로 모임에 참여해요",
+      "shareButton": "공유하기",
+      "copiedToast": "링크 복사됨"
+    },
+    "save": {
+      "save": "저장하기",
+      "saved": "저장됨 ✓"
+    }
+  },
+  "groupComponents": {
+    "chemTopWorst": {
+      "title": "케미 순위",
+      "bestHeader": "🔥 최고 TOP 3",
+      "worstHeader": "🥶 최악 WORST 3",
+      "bestTag": "🔥 최고",
+      "worstTag": "🥶 최악",
+      "scoreUnit": "점",
+      "empty": {
+        "oneMember": "지금은 1명이라 케미 조합이 없어요. 한 명만 더 들어오면 TOP/WORST가 바로 생겨요.",
+        "needMbti": "아직 비교할 조합이 없어요. (MBTI가 2명 이상 입력되어야 케미가 계산돼요.)",
+        "noData": "아직 데이터 없음"
+      }
+    },
+    "chemMoreList": {
+      "more": "+{count}조합 더 있음",
+      "collapse": "접기"
+    },
+    "roleMoreList": {
+      "more": "+{count}명 더 있음",
+      "collapse": "접기",
+      "fitTitle": "적합도 {fit}"
+    },
+    "chemReport": {
+      "emptyNeedMembers": "랭킹을 보려면 MBTI를 입력한 멤버가 2명 이상 필요해요.",
+      "overallOutOf": "전체 조합 {count}개 중",
+      "noneType": "아직 이 타입으로 분류되는 조합이 없어요.",
+      "scoreUnit": "점",
+      "groupProfileTitle": "모임 성격",
+      "topType": "주요 타입: {type}",
+      "labels": {
+        "stable": "🌊 안정형",
+        "complement": "🧩 보완형",
+        "spark": "⚡ 스파크형",
+        "explode": "🧨 폭발형"
+      },
+      "comments": {
+        "stable": "대화 템포만 맞추면 오래 편한 조합이 많아요.",
+        "complement": "역할 분배만 되면 팀플처럼 굴러가요.",
+        "spark": "친해지기 빠르지만 전제 차이에서 삐끗할 수 있어요.",
+        "explode": "피곤한 날엔 말투 하나로 분위기가 갈릴 수 있어요."
+      },
+      "profiles": {
+        "explodeHigh": "오해가 쌓이기 쉬운 편이라 기준 정리가 중요한 모임이에요.",
+        "sparkHigh": "텐션이 좋고 빠르게 친해지지만 조율이 필요한 모임이에요.",
+        "stableHigh": "편안하게 오래 가는 조합이 많은 안정형 모임이에요.",
+        "complementHigh": "서로 빈칸을 잘 채우는 보완형 모임이에요.",
+        "mixed": "상황에 따라 분위기 색이 바뀌는 혼합형 모임이에요."
+      },
+      "comboNames": {
+        "steady": "호흡이 맞는 팀플러",
+        "balanced": "다른데 편한 조합",
+        "stable": "안정적인 다름",
+        "fill-gap": "빈칸 메우는 듀오",
+        "role-share": "역할 분담 듀오",
+        "stimulating": "자극 주고받는 듀오",
+        "spark": "텐션 스파크",
+        "risk": "지뢰밭 조합",
+        "caution": "말투 주의 조합"
+      }
+    }
+  },
+  "groupPage": {
+    "back": "뒤로가기",
+    "groupLabel": "모임",
+    "chemRankTitle": "케미 순위",
+    "chemRankSubtitle": "상하위 조합",
+    "distributionTitle": "MBTI 분포",
+    "distributionSubtitle": "우리 모임 성향 비율",
+    "reportTitle": "케미 리포트",
+    "reportSubtitle": "우리 모임 조합 랭킹",
+    "rolesTitle": "모임 역할 추천",
+    "rolesSubtitle": "누가 어떤 역할에 강한지",
+    "footerNote": "결과는 재미를 위한 참고용입니다. 관계 판단과 결정의 근거로 사용하지 마세요.",
+    "membersStatus": "현재 {current}명 참여 중 · 최대 {max}명",
+    "graphLoadingTitle": "관계도 로딩 중",
+    "graphLoadingWait": "잠시만요",
+    "graphLoadingDesc": "그래프를 먼저 준비하고 있어요. 위 콘텐츠는 이미 볼 수 있어요.",
+    "distributionEmpty": "아직 입력된 MBTI가 없어요. 한 명만 입력해도 분포가 잡히기 시작해요.",
+    "rolesEmpty": "MBTI가 들어오면 이 방은 어떤 역할이 강한지 자동으로 정리돼요.",
+    "memberCount": "{count}명",
+    "fitTitle": "적합도 {score}",
+    "scoreUnit": "점",
+    "noTendency": "해당 성향 없음",
+    "countFormat": "{value}/{total} ({percent}%)",
+    "balanceLabel": "균형",
+    "mostlyPrefix": "대체로 {line}",
+    "distribution": {
+      "axisTitles": {
+        "energy": "에너지",
+        "info": "정보",
+        "judgement": "판단",
+        "style": "스타일"
+      },
+      "axisLabels": {
+        "eiE": "E 외향",
+        "eiI": "I 내향",
+        "nsN": "N 직관",
+        "nsS": "S 감각",
+        "tfT": "T 사고",
+        "tfF": "F 감정",
+        "jpJ": "J 판단",
+        "jpP": "P 인식"
+      },
+      "vibeSummaryTitle": "모임 분위기 요약",
+      "cautionPoint": "주의 포인트",
+      "balanceOne": "어느 한쪽도 밀리지 않아서 상황에 따라 톤이 자연스럽게 바뀝니다.",
+      "axisOne": {
+        "ei": {
+          "E": ",   .",
+          "I": ",     ."
+        },
+        "ns": {
+          "N": ".",
+          "S": ",     ."
+        },
+        "tf": {
+          "T": ",   .",
+          "F": ",    ."
+        },
+        "jp": {
+          "J": ".",
+          "P": ",   ."
+        }
+      },
+      "vibe": {
+        "core": {
+          "situational": "",
+          "talkative": "",
+          "quietCore": "",
+          "balanceSense": "",
+          "ideaRush": "",
+          "practicalConclusion": "",
+          "flexibleOps": "",
+          "organizerPresent": "",
+          "impromptuOps": ""
+        },
+        "scene": {
+          "ei": {
+            "tie": ",   .",
+            "talk": "",
+            "talkFirst": "",
+            "ignite": "",
+            "and": ",",
+            "silence": "",
+            "shortOnly": ".",
+            "quiet": "",
+            "quietThen": "",
+            "core": "",
+            "preciseOnly": "."
+          },
+          "ns": {
+            "bigPicture": "",
+            "with": "",
+            "detail": "",
+            "alternate": ".",
+            "topic": "",
+            "sidePath": "",
+            "expand": "",
+            "normal": ".",
+            "offTopic": "",
+            "execution": "",
+            "backToExec": "."
+          },
+          "jp": {
+            "conclusion": "",
+            "openClose": ",  .",
+            "organize": "",
+            "organizerAppears": ".",
+            "laterFirst": ",",
+            "roll": "",
+            "adjust": "."
+          }
+        },
+        "caution": {
+          "direct": "",
+          "directTail": ".",
+          "summary": "",
+          "summaryTail": ".",
+          "conclusionTail": ".",
+          "decideItem": "",
+          "decideTail": ".",
+          "schedule": "",
+          "scheduleTail": ".",
+          "deadline": "",
+          "deadlineTail": ".",
+          "noBigDownside": ",",
+          "clearTopic": "."
+        }
+      },
+      "mostlyPrefix": "{line}"
+    },
+    "roles": {
+      "labels": {
+        "STRATEGY": "전략 담당",
+        "VIBE": "분위기 담당",
+        "EXEC": "실행 담당",
+        "ORGANIZE": "정리결정 담당",
+        "MEDIATOR": "중재조율 담당"
+      },
+      "badges": {
+        "STRATEGY": {
+          "1": "",
+          "2": "",
+          "3": "",
+          "4": ""
+        },
+        "VIBE": {
+          "1": "",
+          "2": "",
+          "3": "",
+          "4": ""
+        },
+        "EXEC": {
+          "1": "",
+          "2": "",
+          "3": "",
+          "4": ""
+        },
+        "ORGANIZE": {
+          "1": "",
+          "2": "",
+          "3": "",
+          "4": ""
+        },
+        "MEDIATOR": {
+          "1": "",
+          "2": "",
+          "3": "",
+          "4": ""
+        }
+      },
+      "desc": {
+        "STRATEGY": ".     .",
+        "VIBE": ".   .",
+        "EXEC": ".   .",
+        "ORGANIZE": ".   .",
+        "MEDIATOR": ".   ."
+      },
+      "empty": {
+        "STRATEGY": ",    .",
+        "VIBE": ",     .",
+        "EXEC": ",    .",
+        "ORGANIZE": "/  ,    .",
+        "MEDIATOR": ",      ."
+      },
+      "summary": {
+        "headline": {
+          "noMembers": ".",
+          "noDistribution": ".   MBTI  .",
+          "default": "{mainRole}  , {secondaryRole}   ."
+        },
+        "tip": {
+          "default": ".    .",
+          "lack": ": {role}  .         ."
+        }
+      }
+    }
+  },
+  "components": {
+    "header": {
+      "brand": "모임랭크",
+      "mbti": "MBTI",
+      "guides": "가이드",
+      "create": "모임 만들기"
+    },
+    "backNav": {
+      "label": "뒤로가기"
+    },
+    "footer": {
+      "mbtiHome": "MBTI ?",
+      "mbtiGuides": "모임 속 MBTI",
+      "cognitive": "인지기능",
+      "terms": "이용 약관",
+      "privacy": "개인정보처리방침",
+      "copyright": "2026 모임랭크. All rights reserved."
+    },
+    "toTop": {
+      "ariaLabel": "맨 위로",
+      "label": "맨 위로"
+    },
+    "bottomCta": {
+      "createGroup": "모임 만들기",
+      "recentGroups": "최근 모임",
+      "recentEmpty": "최근 참여한 모임이 없어요",
+      "recentCount": "최근 참여한 모임 {count}개",
+      "close": "닫기",
+      "recentJoined": "최근 참여한 모임",
+      "tapToOpen": "탭하면 해당 모임으로 이동해요",
+      "noHistory": "아직 저장된 모임이 없어요",
+      "historyHint": "모임을 만들거나 참여하면 여기에 기록됩니다",
+      "remove": "제거"
+    },
+    "headerDrawer": {
+      "navigation": "NAVIGATION",
+      "quickMenu": "빠른 메뉴",
+      "open": "메뉴 열기",
+      "close": "닫기",
+      "remove": "삭제",
+      "recentSavedCount": "저장된 모임 {count}개",
+      "recentNone": "저장된 모임 없음",
+      "recentEmptyHelp": "모임을 만들거나 참여하면 여기에 기록됩니다.",
+      "tipTitle": "팁:",
+      "tipBody": "\"모임 속 MBTI\"에서 모임 유형별 케미 가이드를 한눈에 확인해보세요.",
+      "mbti": {
+        "title": "MBTI",
+        "desc": "인지기능 기반 케미",
+        "home": "MBTI 홈",
+        "test": "MBTI 검사",
+        "guideSection": "가이드",
+        "cognitive": "인지기능",
+        "groupGuide": "모임 속 MBTI",
+        "groupSection": "모임",
+        "create": "방 만들기",
+        "recent": "최근 모임"
+      },
+      "saju": {
+        "title": "사주",
+        "desc": "준비중",
+        "comingSoon": "준비중"
+      }
+    }
+  }
+}

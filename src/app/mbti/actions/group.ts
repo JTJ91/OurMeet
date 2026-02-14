@@ -2,21 +2,17 @@
 
 import { prisma } from "@/app/lib/mbti/prisma";
 import { revalidatePath } from "next/cache"; // ✅ 추가
+import { isNicknameLengthValid, sanitizeNicknameInput } from "@/app/mbti/lib/nickname";
 
 type JudgeStyle = "LOGIC" | "PEOPLE";
 type InfoStyle = "IDEA" | "FACT";
 
-function removeAllSpaces(str: string) {
-  return str.replace(/\s/g, "");
-}
 function normalizeGroupName(name: FormDataEntryValue | null) {
   return String(name ?? "").trim();
 }
 
 function normalizeNickname(nick: FormDataEntryValue | null) {
-  return String(nick ?? "")
-    .replace(/\s/g, "")
-    .slice(0, 3);
+  return sanitizeNicknameInput(String(nick ?? ""));
 }
 
 function normalizeMbti(mbti: FormDataEntryValue | null) {
@@ -52,8 +48,8 @@ export async function createGroupAction(formData: FormData) {
   if (!groupName || !nickname || !mbti) {
     throw new Error("모임 이름/별명/MBTI는 필수예요.");
   }
-  if (nickname.length < 1 || nickname.length > 3) {
-    throw new Error("별명은 공백 없이 1~3글자만 가능해요.");
+  if (!isNicknameLengthValid(nickname)) {
+    throw new Error("별명은 공백 없이 한글/일본어 3자, 영어 6자까지 가능해요.");
   }
   if (!/^[EI][NS][TF][JP]$/.test(mbti)) {
     throw new Error("MBTI 형식이 올바르지 않습니다. 예) ENFP");

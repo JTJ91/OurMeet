@@ -2,6 +2,7 @@
 
 import { prisma } from "@/app/lib/mbti/prisma";
 import { revalidatePath } from "next/cache";
+import { isNicknameLengthValid, sanitizeNicknameInput } from "@/app/mbti/lib/nickname";
 
 function normalizeMbti(s: string) {
   return s.replace(/\s/g, "").toUpperCase();
@@ -19,7 +20,7 @@ function normalizeInfo(v: unknown) {
 
 export async function joinGroupAction(formData: FormData) {
   const groupId = String(formData.get("groupId") || "").trim();
-  const nickname = String(formData.get("nickname") || "").replace(/\s/g, "");
+  const nickname = sanitizeNicknameInput(String(formData.get("nickname") || ""));
   const mbti = normalizeMbti(String(formData.get("mbti") || ""));
 
   // ✅ 추가 입력 2개
@@ -28,6 +29,9 @@ export async function joinGroupAction(formData: FormData) {
 
   if (!groupId || !nickname || !mbti) {
     throw new Error("필수값 누락");
+  }
+  if (!isNicknameLengthValid(nickname)) {
+    throw new Error("별명은 공백 없이 한글/일본어 3자, 영어 6자까지 가능해요.");
   }
 
   const ok = /^[EI][NS][TF][JP]$/.test(mbti);

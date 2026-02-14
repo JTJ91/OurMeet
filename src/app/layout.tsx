@@ -1,12 +1,10 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { getLocale } from "next-intl/server";
+import { headers } from "next/headers";
 import "./globals.css";
-import Link from "next/link";
 import Script from "next/script";
-import FloatingToTop from "@/app/components/FloatingToTop";
-import ClientOverlays from "@/app/components/ClientOverlays";
-import AppHeader from "@/app/components/AppHeader";
-import Footer from "./components/Footer";
+import RootChrome from "@/app/components/RootChrome";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,13 +18,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "moimrank",
-  description: "관계 랭킹 바로 확인!",
+  description: "궁합 점수 바로 확인!",
   icons: {
     icon: "/favicon.png",
   },
   openGraph: {
     type: "website",
-    title: "moimrank - 모임 랭킹",
+    title: "moimrank - 모임 궁합",
     description: "우리 모임에서 누가 제일 잘 맞을까?",
     url: "https://www.moimrank.com/",
     images: [
@@ -39,17 +37,21 @@ export const metadata: Metadata = {
   },
 };
 
-
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const h = await headers();
+  const headerLocale = h.get("x-next-intl-locale");
+  const locale =
+    headerLocale === "ko" || headerLocale === "en" || headerLocale === "ja"
+      ? headerLocale
+      : await getLocale().catch(() => "ko");
+
   return (
-    <html lang="ko">
+    <html lang={locale} className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
-        {/* ✅ Google Analytics (GA4) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-PPW94SF44D"
           strategy="afterInteractive"
@@ -65,18 +67,8 @@ export default function RootLayout({
       </head>
 
       <body className="min-h-screen flex flex-col bg-[#F5F9FF]">
-        <AppHeader />
-        
-        {/* 페이지 내용 */}
-        <div className="flex-1">
-          {children}
-        </div>
-
-        <Footer />   {/* 기본(홈/공통) */}
-
-        <ClientOverlays />
+        <RootChrome>{children}</RootChrome>
       </body>
     </html>
   );
 }
-

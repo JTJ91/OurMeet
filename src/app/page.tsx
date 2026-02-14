@@ -64,6 +64,7 @@ export default function HomePage() {
         <div className="mt-12 flex w-full max-w-[500px] flex-col gap-4 sm:flex-row sm:justify-center">
           <Link
             href="/mbti"
+            target="_self"
             className="inline-flex flex-1 items-center justify-center rounded-full bg-[#1E88E5] px-6 py-3 text-sm font-extrabold text-white transition hover:opacity-95"
           >
             MBTI로 시작하기
