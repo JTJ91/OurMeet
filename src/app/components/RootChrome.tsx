@@ -11,7 +11,11 @@ type Props = {
 
 export default function RootChrome({ children }: Props) {
   const pathname = usePathname() || "/";
-  const isLocalizedRoute = /^\/(ko|en|ja)(?=\/|$)/.test(pathname);
+  const isPrefixedLocaleRoute = /^\/(ko|en|ja)(?=\/|$)/.test(pathname);
+  const isDefaultLocaleManagedRoute =
+    pathname === "/" ||
+    /^\/(mbti(?:\/.*)?|mbti-test(?:\/.*)?|faq\/mbti(?:\/.*)?|guides(?:\/.*)?|privacy(?:\/.*)?|terms(?:\/.*)?)$/.test(pathname);
+  const isLocalizedRoute = isPrefixedLocaleRoute || isDefaultLocaleManagedRoute;
 
   if (isLocalizedRoute) return <div className="flex-1">{children}</div>;
 
