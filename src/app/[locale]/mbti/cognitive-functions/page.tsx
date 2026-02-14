@@ -1,10 +1,19 @@
 ﻿import Link from "next/link";
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
+import { alternatesForPath } from "@/i18n/metadata";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    alternates: alternatesForPath("/mbti/cognitive-functions", locale),
+  };
+}
 
 export default async function LocalizedCognitiveFunctionsPage({ params }: Props) {
   const { locale } = await params;

@@ -1,4 +1,5 @@
 ﻿import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import GuideLayout from "@/app/guides/_components/GuideLayout";
 import GuideHero from "@/app/guides/_sections/GuideHero";
 import GuideTOC from "@/app/guides/_sections/GuideTOC";
@@ -9,6 +10,7 @@ import { GUIDES as MBTI_GUIDES } from "@/app/guides/_data/mbti/guides";
 import { getTranslations } from "next-intl/server";
 import { locales, type Locale } from "@/i18n/config";
 import type { Guide } from "@/app/guides/_data/mbti/types";
+import { alternatesForPath } from "@/i18n/metadata";
 
 export function generateStaticParams() {
   return locales.flatMap((locale) =>
@@ -31,13 +33,19 @@ export async function generateMetadata({
   params
 }: {
   params: Promise<{ locale: string; system: string; slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { locale, system, slug } = await params;
   const t = await getTranslations({ locale, namespace: "guides.notFound" });
   const activeLocale = parseLocale(locale);
+  const path = `/guides/${system}/${slug}`;
 
   const guide = getGuideBySystem(system, slug, activeLocale);
-  if (!guide) return { title: t("title") };
+  if (!guide) {
+    return {
+      title: t("title"),
+      alternates: alternatesForPath(path, locale),
+    };
+  }
 
   const localePrefix = locale === "ko" ? "" : `/${locale}`;
 
@@ -45,6 +53,7 @@ export async function generateMetadata({
     title: `${guide.title} | Moimrank`,
     description: guide.description,
     keywords: guide.keywords ?? [],
+    alternates: alternatesForPath(path, locale),
     openGraph: {
       title: `${guide.title} | Moimrank`,
       description: guide.description,

@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import BackNavButton from "@/app/components/BackNavButton";
+import { alternatesForPath } from "@/i18n/metadata";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "케미 점수는 어떻게 계산되나요? | 모임랭크",
   description:
     "모임랭크는 MBTI 네 글자가 아니라, 인지기능(생각 방식)의 조합을 비교해 케미를 계산합니다.",
+  alternates: alternatesForPath("/mbti/cognitive-functions"),
 };
 
 export default function CognitiveFunctionsGuidePage() {

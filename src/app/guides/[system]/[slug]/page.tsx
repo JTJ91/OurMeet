@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import GuideLayout from "../../_components/GuideLayout";
 
@@ -8,6 +9,7 @@ import RelatedGuides from "../../_sections/RelatedGuides";
 
 import { GUIDES as MBTI_GUIDES } from "../../_data/mbti/guides";
 import { getGuide as getMbtiGuide } from "../../_data/mbti/guides";
+import { alternatesForPath } from "@/i18n/metadata";
 
 /* =========================
    (선택) 정적 파라미터
@@ -35,16 +37,23 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ system: string; slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { system, slug } = await params;
+  const path = `/guides/${system}/${slug}`;
 
   const guide = getGuideBySystem(system, slug);
-  if (!guide) return { title: "가이드 | 모임랭크" };
+  if (!guide) {
+    return {
+      title: "가이드 | 모임랭크",
+      alternates: alternatesForPath(path),
+    };
+  }
 
   return {
     title: `${guide.title} | 모임랭크`,
     description: guide.description,
     keywords: guide.keywords ?? [],
+    alternates: alternatesForPath(path),
     openGraph: {
       title: `${guide.title} | 모임랭크`,
       description: guide.description,

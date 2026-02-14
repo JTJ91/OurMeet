@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createGroupAction } from "@/app/mbti/actions/group";
 import CreateFormClient from "./CreateFormClient";
+import { alternatesForPath } from "@/i18n/metadata";
+
+export const metadata: Metadata = {
+  alternates: alternatesForPath("/mbti/create"),
+};
 
 export default function CreatePage() {
   return (

@@ -1,9 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { hreflangForPath } from "@/i18n/seo";
 
-export const metadata = {
+const homeHreflang = hreflangForPath("/");
+
+export const metadata: Metadata = {
   title: "모임랭킹",
   description:
     "우리 모임 케미를 재밌게 랭킹으로 정리해보세요. 대화 흐름·결정 스타일·역할 분담까지 한 번에.",
+  alternates: {
+    canonical: homeHreflang.canonical,
+    languages: homeHreflang.languages,
+  },
 };
 
 export default function HomePage() {

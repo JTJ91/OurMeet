@@ -1,11 +1,20 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import MbtiGuidesPage from "@/app/guides/_systems/mbti/GuidesPage";
 import { locales, type Locale } from "@/i18n/config";
+import { alternatesForPath } from "@/i18n/metadata";
 
 type Props = {
   params: Promise<{ locale: string; system: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale, system } = await params;
+  return {
+    alternates: alternatesForPath(`/guides/${system}`, locale),
+  };
+}
 
 export default async function LocalizedGuidesSystemPage({ params }: Props) {
   const { locale, system } = await params;

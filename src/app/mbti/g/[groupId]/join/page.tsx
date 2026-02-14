@@ -1,8 +1,21 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/app/lib/mbti/prisma";
 import { notFound } from "next/navigation";
 import { joinGroupAction } from "@/app/mbti/actions/members";
 import JoinFormClient from "./JoinFormClient";
+import { alternatesForPath } from "@/i18n/metadata";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ groupId: string }>;
+}): Promise<Metadata> {
+  const { groupId } = await params;
+  return {
+    alternates: alternatesForPath(`/mbti/g/${groupId}/join`),
+  };
+}
 
 export default async function GroupJoinPage({
   params,

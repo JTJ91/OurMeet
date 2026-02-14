@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import BackNavButton from "@/app/components/BackNavButton";
+import { alternatesForPath } from "@/i18n/metadata";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "자주 묻는 질문 | 모임랭크",
   description:
     "모임랭크를 쓰면서 많이 물어보는 질문들을 한 번에 정리했어요. 케미 점수, 케미 타입, 역할 추천, 개인정보 등.",
+  alternates: alternatesForPath("/faq/mbti"),
 };
 
 export default function FAQPage() {

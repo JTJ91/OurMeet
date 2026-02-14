@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { prisma } from "@/app/lib/mbti/prisma";
 import { notFound } from "next/navigation";
 import InviteActions from "@/app/components/InviteActions";
@@ -15,6 +16,7 @@ import ChemTopWorst from "./components/ChemTopWorst";
 
 import Link from "next/link";
 import { Suspense } from "react";
+import { alternatesForPath } from "@/i18n/metadata";
 
 const isValidMbti = (s?: string | null) => /^[EI][NS][TF][JP]$/i.test((s ?? "").trim());
 
@@ -771,6 +773,17 @@ function SectionCard2({
 }
 
 
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ groupId: string }>;
+}): Promise<Metadata> {
+  const { groupId } = await params;
+  return {
+    alternates: alternatesForPath(`/mbti/g/${groupId}`),
+  };
+}
 
 export default async function GroupPage({
   params,

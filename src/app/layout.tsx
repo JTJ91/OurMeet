@@ -1,7 +1,5 @@
 ﻿import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { getLocale } from "next-intl/server";
-import { headers } from "next/headers";
 import "./globals.css";
 import Script from "next/script";
 import RootChrome from "@/app/components/RootChrome";
@@ -37,20 +35,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const h = await headers();
-  const headerLocale = h.get("x-next-intl-locale");
-  const locale =
-    headerLocale === "ko" || headerLocale === "en" || headerLocale === "ja"
-      ? headerLocale
-      : await getLocale().catch(() => "ko");
-
   return (
-    <html lang={locale} className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="ko" className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-PPW94SF44D"

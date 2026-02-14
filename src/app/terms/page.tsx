@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import BackNavButton from "@/app/components/BackNavButton";
+import { alternatesForPath } from "@/i18n/metadata";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "이용약관 | 모임랭크",
   description:
     "모임랭크(모임 MBTI 케미/랭킹 서비스) 이용약관입니다. 광고/제휴 링크 고지, 면책, 서비스 운영 기준 등을 안내합니다.",
+  alternates: alternatesForPath("/terms"),
 };
 
 export default function TermsPage() {

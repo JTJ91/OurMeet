@@ -1,12 +1,21 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/app/lib/mbti/prisma";
 import JoinFormClientIntl from "./JoinFormClientIntl";
+import { alternatesForPath } from "@/i18n/metadata";
 
 type Props = {
   params: Promise<{ locale: string; groupId: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale, groupId } = await params;
+  return {
+    alternates: alternatesForPath(`/mbti/g/${groupId}/join`, locale),
+  };
+}
 
 function localeBase(locale: string) {
   return locale === "ko" ? "" : `/${locale}`;

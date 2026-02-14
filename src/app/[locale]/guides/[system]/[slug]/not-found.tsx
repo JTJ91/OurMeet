@@ -2,11 +2,11 @@
 import { getTranslations } from "next-intl/server";
 
 type Props = {
-  params: Promise<{ locale: string }>;
+  params?: Promise<{ locale?: string }>;
 };
 
 export default async function LocalizedGuideNotFound({ params }: Props) {
-  const { locale } = await params;
+  const locale = (await params)?.locale ?? "ko";
   const t = await getTranslations({ locale, namespace: "guides.notFound" });
   const base = locale === "ko" ? "" : `/${locale}`;
 

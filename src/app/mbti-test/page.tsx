@@ -1,10 +1,13 @@
 // app/mbti-test/page.tsx
+import type { Metadata } from "next";
 import Link from "next/link";
 import MbtiTestClient from "./MbtiTestClient";
+import { alternatesForPath } from "@/i18n/metadata";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "MBTI 정식 검사 | 모임랭킹",
   description: "60문항으로 MBTI를 더 정확하게 확인해보세요.",
+  alternates: alternatesForPath("/mbti-test"),
 };
 
 export default function MbtiTestPage() {

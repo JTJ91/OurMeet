@@ -1,9 +1,18 @@
 ﻿import Link from "next/link";
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { alternatesForPath } from "@/i18n/metadata";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    alternates: alternatesForPath("/terms", locale),
+  };
+}
 
 export default async function LocalizedTermsPage({ params }: Props) {
   const { locale } = await params;

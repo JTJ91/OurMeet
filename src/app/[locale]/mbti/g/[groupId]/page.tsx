@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { prisma } from "@/app/lib/mbti/prisma";
 import { notFound } from "next/navigation";
 import InviteActionsIntl from "@/app/[locale]/components/InviteActionsIntl";
@@ -16,6 +17,7 @@ import ChemTopWorstIntl from "./components/ChemTopWorstIntl";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
+import { alternatesForPath } from "@/i18n/metadata";
 
 type TranslateFn = (key: string, values?: Record<string, any>) => string;
 
@@ -822,6 +824,17 @@ function SectionCard2({
 }
 
 
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; groupId: string }>;
+}): Promise<Metadata> {
+  const { locale, groupId } = await params;
+  return {
+    alternates: alternatesForPath(`/mbti/g/${groupId}`, locale),
+  };
+}
 
 export default async function GroupPage({
   params,

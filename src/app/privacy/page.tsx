@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import BackNavButton from "@/app/components/BackNavButton";
+import { alternatesForPath } from "@/i18n/metadata";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "개인정보처리방침 | 모임랭크",
   description:
     "모임랭크(이하 '서비스')의 개인정보 처리에 관한 기준과 이용자의 권리를 안내합니다.",
+  alternates: alternatesForPath("/privacy"),
 };
 
 export default function PrivacyPolicyPage() {
