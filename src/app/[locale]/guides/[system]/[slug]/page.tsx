@@ -5,12 +5,17 @@ import GuideTOC from "@/app/guides/_sections/GuideTOC";
 import GuideBlock from "@/app/guides/_sections/GuideBlock";
 import RelatedGuides from "@/app/guides/_sections/RelatedGuides";
 import { getGuideIntl } from "@/app/guides/_data/mbti/guides-intl";
+import { GUIDES as MBTI_GUIDES } from "@/app/guides/_data/mbti/guides";
 import { getTranslations } from "next-intl/server";
 import { locales, type Locale } from "@/i18n/config";
 import type { Guide } from "@/app/guides/_data/mbti/types";
 
 export function generateStaticParams() {
-  return [{ system: "mbti", slug: "__dummy__" }];
+  return locales.flatMap((locale) =>
+    (MBTI_GUIDES ?? [])
+      .filter((guide) => Boolean(guide?.slug))
+      .map((guide) => ({ locale, system: "mbti", slug: guide.slug }))
+  );
 }
 
 function parseLocale(locale: string): Locale {

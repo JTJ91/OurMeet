@@ -2063,7 +2063,13 @@ export const GUIDES: Guide[] = [
 
 ];
 
-const norm = (s: string) => decodeURIComponent(s).trim().toLowerCase();
+const norm = (s: string) => {
+  try {
+    return decodeURIComponent(s).trim().toLowerCase();
+  } catch {
+    return s.trim().toLowerCase();
+  }
+};
 
 export function getGuide(slug: string) {
   const key = norm(slug);

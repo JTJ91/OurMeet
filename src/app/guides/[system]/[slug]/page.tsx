@@ -6,6 +6,7 @@ import GuideTOC from "../../_sections/GuideTOC";
 import GuideBlock from "../../_sections/GuideBlock";
 import RelatedGuides from "../../_sections/RelatedGuides";
 
+import { GUIDES as MBTI_GUIDES } from "../../_data/mbti/guides";
 import { getGuide as getMbtiGuide } from "../../_data/mbti/guides";
 
 /* =========================
@@ -14,10 +15,9 @@ import { getGuide as getMbtiGuide } from "../../_data/mbti/guides";
    - saju 추가 시 동일 패턴으로 확장
 ========================= */
 export function generateStaticParams() {
-  // MBTI만이라도 미리 생성하고 싶으면,
-  // guides.ts에 export된 MBTI_GUIDES 같은 배열이 있다면 그걸 사용해도 됨.
-  // 일단 system만 고정해도 도움이 되므로 최소 형태로 둠.
-  return [{ system: "mbti", slug: "__dummy__" }];
+  return (MBTI_GUIDES ?? [])
+    .filter((guide) => Boolean(guide?.slug))
+    .map((guide) => ({ system: "mbti", slug: guide.slug }));
 }
 
 /* =========================

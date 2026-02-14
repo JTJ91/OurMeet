@@ -10,7 +10,13 @@ const LOCALE_GUIDES: Record<Exclude<GuidesLocale, "ko">, Guide[]> = {
   ja: jaGuides as Guide[],
 };
 
-const norm = (s: string) => decodeURIComponent(s).trim().toLowerCase();
+const norm = (s: string) => {
+  try {
+    return decodeURIComponent(s).trim().toLowerCase();
+  } catch {
+    return s.trim().toLowerCase();
+  }
+};
 
 function pickGuides(locale: GuidesLocale): Guide[] {
   if (locale === "ko") return GUIDES;
