@@ -52,7 +52,7 @@ export default function MbtiTestPage() {
 
         {/* Test Card */}
         <section className="mbti-card mbti-card-frame mt-5 p-5">
-          <MbtiTestClient />
+          <MbtiTestClient locale="ko" />
         </section>
 
         {/* Footer hint */}

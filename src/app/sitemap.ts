@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { GUIDES as MBTI_GUIDES } from "@/app/guides/_data/mbti/guides";
+import { defaultLocale, locales, type Locale } from "@/i18n/config";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") || "https://www.moimrank.com";
@@ -8,29 +9,47 @@ function url(path: string) {
   return `${SITE_URL}${path}`;
 }
 
+function localizePath(path: string, locale: Locale) {
+  if (locale === defaultLocale) return path;
+  return path === "/" ? `/${locale}` : `/${locale}${path}`;
+}
+
+function expandByLocale(
+  path: string,
+  options: Pick<MetadataRoute.Sitemap[number], "changeFrequency" | "priority" | "lastModified">
+): MetadataRoute.Sitemap {
+  return locales.map((locale) => ({
+    url: url(localizePath(path, locale)),
+    lastModified: options.lastModified,
+    changeFrequency: options.changeFrequency,
+    priority: options.priority,
+  }));
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
   const staticUrls: MetadataRoute.Sitemap = [
-    { url: url("/"), lastModified: now, changeFrequency: "daily", priority: 1.0 },
-    { url: url("/mbti"), lastModified: now, changeFrequency: "daily", priority: 0.95 },
-    { url: url("/mbti-test"), lastModified: now, changeFrequency: "weekly", priority: 0.8 },
-    { url: url("/mbti/cognitive-functions"), lastModified: now, changeFrequency: "monthly", priority: 0.75 },
-    { url: url("/faq/mbti"), lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: url("/guides/mbti"), lastModified: now, changeFrequency: "weekly", priority: 0.85 },
-    { url: url("/guides/saju"), lastModified: now, changeFrequency: "monthly", priority: 0.4 },
-    { url: url("/privacy"), lastModified: now, changeFrequency: "yearly", priority: 0.3 },
-    { url: url("/terms"), lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    ...expandByLocale("/", { lastModified: now, changeFrequency: "daily", priority: 1.0 }),
+    ...expandByLocale("/mbti", { lastModified: now, changeFrequency: "daily", priority: 0.95 }),
+    ...expandByLocale("/mbti-test", { lastModified: now, changeFrequency: "weekly", priority: 0.8 }),
+    ...expandByLocale("/mbti/cognitive-functions", { lastModified: now, changeFrequency: "monthly", priority: 0.75 }),
+    ...expandByLocale("/faq/mbti", { lastModified: now, changeFrequency: "monthly", priority: 0.7 }),
+    ...expandByLocale("/guides/mbti", { lastModified: now, changeFrequency: "weekly", priority: 0.85 }),
+    ...expandByLocale("/guides/saju", { lastModified: now, changeFrequency: "monthly", priority: 0.4 }),
+    ...expandByLocale("/privacy", { lastModified: now, changeFrequency: "yearly", priority: 0.3 }),
+    ...expandByLocale("/terms", { lastModified: now, changeFrequency: "yearly", priority: 0.3 }),
   ];
 
   const mbtiGuideUrls: MetadataRoute.Sitemap = (MBTI_GUIDES ?? [])
     .filter((guide) => Boolean(guide?.slug))
-    .map((guide) => ({
-      url: url(`/guides/mbti/${guide.slug}`),
-      lastModified: now,
-      changeFrequency: "monthly" as const,
-      priority: 0.65,
-    }));
+    .flatMap((guide) =>
+      expandByLocale(`/guides/mbti/${guide.slug}`, {
+        lastModified: now,
+        changeFrequency: "monthly",
+        priority: 0.65,
+      })
+    );
 
   return [...staticUrls, ...mbtiGuideUrls];
 }

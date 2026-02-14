@@ -47,7 +47,7 @@ export default async function LocalizedMbtiTestPage({ params }: Props) {
         </header>
 
         <section className="mbti-card mbti-card-frame mt-5 p-5">
-          <MbtiTestClient />
+          <MbtiTestClient locale={locale} />
         </section>
 
         <div className="mt-6 text-center text-[11px] font-bold text-slate-500">{t("footerNote")}</div>
