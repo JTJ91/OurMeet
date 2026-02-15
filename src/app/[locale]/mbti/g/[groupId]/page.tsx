@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import { prisma } from "@/app/lib/mbti/prisma";
+import { prisma } from "@/lib/mbti/prisma";
 import { notFound } from "next/navigation";
-import InviteActionsIntl from "@/app/[locale]/components/InviteActionsIntl";
-import RememberGroupClientIntl from "@/app/[locale]/components/RememberGroupClientIntl";
-import ChemMoreListIntl from "./components/ChemMoreListIntl";
-import RoleMoreListIntl from "./components/RoleMoreListIntl";
-import GraphServerIntl from "./GraphServerIntl";
-import { getCompatScore } from "@/app/lib/mbti/mbtiCompat";
+import InviteActionsIntl from "@/features/mbti/components/InviteActions";
+import RememberGroupClientIntl from "@/components/RememberGroupClient";
+import ChemMoreListIntl from "@/features/mbti/g/[groupId]/components/ChemMoreListIntl";
+import RoleMoreListIntl from "@/features/mbti/g/[groupId]/components/RoleMoreListIntl";
+import GraphServerIntl from "@/features/mbti/g/[groupId]/GraphServerIntl";
+import { getCompatScore } from "@/lib/mbti/mbtiCompat";
 import { unstable_cache } from "next/cache";
-import ChemReportSectionIntl from "./components/ChemReportSectionIntl";
-import TouchSavedGroupClientIntl from "@/app/[locale]/components/TouchSavedGroupClientIntl";
-import SaveGroupClientIntl from "@/app/[locale]/components/SaveGroupClientIntl";
-import ChemTopWorstIntl from "./components/ChemTopWorstIntl";
+import ChemReportSectionIntl from "@/features/mbti/g/[groupId]/components/ChemReportSectionIntl";
+import TouchSavedGroupClientIntl from "@/components/TouchSavedGroupClient";
+import SaveGroupClientIntl from "@/components/SaveGroupClient";
+import ChemTopWorstIntl from "@/features/mbti/g/[groupId]/components/ChemTopWorstIntl";
 
 
 import Link from "next/link";

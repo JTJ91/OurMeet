@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import MbtiTestClient from "./MbtiTestClient";
+import MbtiTestClient from "@/features/mbti/mbti-test/MbtiTestClient";
 import { alternatesForPath } from "@/i18n/metadata";
 
 type Props = {

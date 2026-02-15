@@ -1,5 +1,5 @@
 ﻿import type { Metadata } from "next";
-import MbtiPageIntlClient from "./MbtiPageIntlClient";
+import MbtiPageIntlClient from "@/features/mbti/MbtiPageIntlClient";
 import { alternatesForPath } from "@/i18n/metadata";
 
 type Props = {

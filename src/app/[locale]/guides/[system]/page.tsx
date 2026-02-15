@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import MbtiGuidesPage from "@/app/guides/_systems/mbti/GuidesPage";
+import MbtiGuidesPage from "@/features/guides/systems/mbti/GuidesPage";
 import { locales, type Locale } from "@/i18n/config";
 import { alternatesForPath } from "@/i18n/metadata";
 

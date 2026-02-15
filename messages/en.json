@@ -222,13 +222,41 @@
         "Fi": "Values and sincerity"
       },
       "bucketSituation": {
-        "AUTO": { "0": "Conversation flows naturally", "1": "No heavy explanation needed", "2": "The exchange keeps going" },
-        "HIGH": { "0": "Rhythm matches well", "1": "Back-and-forth speed is similar", "2": "Breathing room feels easy" },
-        "GOOD": { "0": "Mostly smooth", "1": "Low fatigue overall", "2": "Roles settle quickly" },
-        "OK": { "0": "Differences depend on topic", "1": "Attention axes can diverge", "2": "Interpretation can vary" },
-        "TUNE": { "0": "Need to align assumptions", "1": "Decision criteria differ", "2": "Check-back questions matter" },
-        "LANG": { "0": "Some translation is needed", "1": "Conversation tone can cross", "2": "Pace control helps" },
-        "HARD": { "0": "Misunderstanding prevention mode", "1": "Short and explicit is safer", "2": "Better keep it light today" }
+        "AUTO": {
+          "0": "Conversation flows naturally",
+          "1": "No heavy explanation needed",
+          "2": "The exchange keeps going"
+        },
+        "HIGH": {
+          "0": "Rhythm matches well",
+          "1": "Back-and-forth speed is similar",
+          "2": "Breathing room feels easy"
+        },
+        "GOOD": {
+          "0": "Mostly smooth",
+          "1": "Low fatigue overall",
+          "2": "Roles settle quickly"
+        },
+        "OK": {
+          "0": "Differences depend on topic",
+          "1": "Attention axes can diverge",
+          "2": "Interpretation can vary"
+        },
+        "TUNE": {
+          "0": "Need to align assumptions",
+          "1": "Decision criteria differ",
+          "2": "Check-back questions matter"
+        },
+        "LANG": {
+          "0": "Some translation is needed",
+          "1": "Conversation tone can cross",
+          "2": "Pace control helps"
+        },
+        "HARD": {
+          "0": "Misunderstanding prevention mode",
+          "1": "Short and explicit is safer",
+          "2": "Better keep it light today"
+        }
       },
       "cognitive": {
         "shared": {
@@ -350,13 +378,67 @@
       "page": {
         "back": "Back",
         "title": "Frequently Asked Questions",
-        "intro": "Key questions about MBTI group chemistry are summarized below.",
-        "q1": "What does this service provide",
-        "a1": "It organizes group chemistry, role suggestions, and conversation tendencies based on MBTI.",
-        "q2": "Does a high score always mean a good relationship",
-        "a2": "No. It only indicates that communication may flow more naturally. Context still matters.",
-        "q3": "Can I change my MBTI later",
-        "a3": "Yes. If you edit MBTI, results are recalculated immediately."
+        "intro1": "Moimrank is a tool for \"fun + understanding\". We gathered common questions about chemistry scores/types, role suggestions, and interpretation in one place.",
+        "intro2Prefix": "In short,",
+        "intro2Highlight": "it shows whether people's thinking styles connect naturally",
+        "intro2Suffix": "within a group.",
+        "item1": {
+          "title": "Q. What exactly does Moimrank do?",
+          "p1": "Based on members' MBTI, Moimrank organizes the relationship graph, chemistry scores, and role suggestions in an easy-to-read way.",
+          "bullets": {
+            "one": "✔ Who matches well with whom (chemistry ranking)",
+            "two": "✔ What kind of group flow you have (summary/type)",
+            "three": "✔ Who is likely strong at which role (role suggestion)"
+          }
+        },
+        "item2": {
+          "title": "Q. Is chemistry score based only on matching the 4 MBTI letters?",
+          "p1": "No. It does not only compare letters like E/I or N/S. It also references cognitive function combinations (thinking habits).",
+          "p2": "So even with the same MBTI, the experience can feel different by topic, situation, and role.",
+          "link": "See cognitive functions guide →"
+        },
+        "item3": {
+          "title": "Q. If the chemistry score is high, are we automatically best friends?",
+          "p1": "Not necessarily. The score is closer to \"a combination with fewer conflicts and smoother flow\" and is not a direct measure of closeness or preference.",
+          "p2": "Even with a low score, groups can work very well if communication rules, roles, and tone are adjusted."
+        },
+        "item4": {
+          "title": "Q. What determines top/worst pairs in chemistry ranking?",
+          "p1": "All member pairs in the group are generated, then ranked by score. As member count grows, combinations and rankings become richer.",
+          "p2": "\"Worst\" is not blame. It means a pair that may require more coordination points."
+        },
+        "item5": {
+          "title": "Q. What do chemistry types (Stable/Complement/Spark/Explosive) mean?",
+          "stable": "🌊 Stable — Comfortable and sustainable when pace is aligned",
+          "complement": "🧩 Complement — Efficiency rises a lot when roles are divided well",
+          "spark": "⚡ Spark — Fast and exciting, but assumptions/tone can cause misunderstanding",
+          "explosive": "🧨 Explosive — On tiring days, emotional cost can grow without conversation rules",
+          "p2": "Moimrank shows representative pairs by type using scores, so you can quickly see which patterns are common in your group."
+        },
+        "item6": {
+          "title": "Q. How are group role suggestions decided?",
+          "p1": "Using members' MBTI, role tendencies such as strategy, vibe, execution, organization, and mediation are estimated with simple rules.",
+          "p2": "It is less about \"this person must do this role\" and more about who can naturally take each role in this specific group."
+        },
+        "item7": {
+          "title": "Q. What if some members don't enter MBTI?",
+          "p1": "Without MBTI, some analyses (chemistry score/type, distribution) are limited. Chemistry ranking and type classification work when at least two members enter MBTI."
+        },
+        "item8": {
+          "title": "Q. Can I change results if I don't like them?",
+          "p1": "If MBTI is edited, results are recalculated immediately. Also, groups are shaped by people + context, so treat results as reference.",
+          "p2": "In many cases, the ambiguous score zone improves a lot once simple conversation rules are set."
+        },
+        "item9": {
+          "title": "Q. Is personal information safe?",
+          "p1": "Moimrank is designed to work with minimal inputs and recommends using only nickname and MBTI for analysis.",
+          "p2": "We recommend not entering sensitive information such as real name or contact details."
+        },
+        "item10": {
+          "title": "Q. Are these scores/types the final truth?",
+          "p1": "No. The goal is not to judge people, but to quickly identify points that may create misunderstandings and points that help collaboration flow.",
+          "p2": "Even with lower scores, teams can improve a lot by aligning conversation pace, decision criteria, and tone."
+        }
       }
     }
   },
@@ -364,34 +446,153 @@
     "page": {
       "back": "Back",
       "title": "Privacy Policy",
+      "intro": "Moimrank (the “Service”) values your privacy and complies with applicable laws. This policy explains what information is collected and used during service use, and what rights users have.",
       "effectiveDateLabel": "Effective date",
       "effectiveDate": "2026-01-01",
-      "intro": "We collect and use only the minimum information required to provide the service.",
-      "section1Title": "Collected information",
-      "section1Body": "Nickname, MBTI, and usage logs required for service operation.",
-      "section2Title": "Purpose of use",
-      "section2Body": "Provide core features, improve service quality, and prevent abuse.",
-      "section3Title": "Retention and deletion",
-      "section3Body": "Data is retained only as long as needed, then deleted according to policy.",
       "contactLabel": "Contact",
-      "contact": "taejuwork@gmail.com"
+      "contact": "taejuwork@gmail.com",
+      "section1": {
+        "title": "1. Personal information we collect",
+        "p1": "The Service collects only the minimum information required to provide core features.",
+        "required": {
+          "label": "Required (service operation)",
+          "body": "Nickname, MBTI, and group participation identifiers (invite link/group ID and related IDs)"
+        },
+        "logs": {
+          "label": "Automatically collected (logs)",
+          "body": "Access records, IP address, browser/device information, cookies, visit/use records (including error logs)"
+        },
+        "noticeLabel": "Note",
+        "noticeBody": "The Service does not intentionally collect unnecessary data such as national ID numbers or sensitive personal data (health, politics, religion, etc.). Please do not enter such data."
+      },
+      "section2": {
+        "title": "2. Purpose of collection and use",
+        "item1": "Provide core features such as group creation/join, relationship graph, and chemistry reports",
+        "item2": "User identification, abuse prevention, and service stability",
+        "item3": "Respond to inquiries and deliver notices (when contact information is provided)",
+        "item4": "Service improvement and statistical analysis (anonymized/pseudonymized or aggregated)",
+        "item5": "Ad exposure and performance measurement (if AdSense/affiliate programs are introduced)"
+      },
+      "section3": {
+        "title": "3. Retention and use period",
+        "p1Prefix": "As a rule, personal information is",
+        "p1Strong": "deleted without delay once the purpose is fulfilled",
+        "p1Suffix": ". However, when retention is required by law, data may be retained for the legally required period.",
+        "item1": "Group/member data: retained during service use or until user deletion request",
+        "item2": "Access/error logs: retained for a limited period for security/stability, then deleted"
+      },
+      "section4": {
+        "title": "4. Sharing with third parties",
+        "p1": "In principle, the Service does not provide personal information to third parties. Exceptions apply only when required by law or when users have given prior consent.",
+        "adBoxLabel": "About ad partners",
+        "adBoxPrefix": "In the future, external ad/affiliate programs such as Google AdSense or Coupang Partners may be added. In that case, cookies or ad identifiers may be used for ",
+        "adBoxStrong": "ad delivery and performance measurement",
+        "adBoxSuffix": "."
+      },
+      "section5": {
+        "title": "5. Outsourcing of processing",
+        "p1": "To operate the Service stably, some tasks may be outsourced to third-party vendors. When outsourcing, contracts and oversight for personal data protection are applied.",
+        "item1": "Example hosting/infrastructure: Vercel, Cloudflare, DB providers",
+        "item2": "Example analytics: Google Analytics (if introduced)",
+        "item3": "Example ads: Google AdSense, Coupang Partners (if introduced)"
+      },
+      "section6": {
+        "title": "6. Cookies and online identifiers",
+        "p1": "The Service may use cookies and similar technologies to provide a better experience and to measure analytics/ad performance.",
+        "item1": "Essential cookies: login/session, security, etc.",
+        "item2": "Analytics cookies: visit/use statistics and error analysis",
+        "item3": "Advertising cookies: personalized ads and performance measurement (if introduced)",
+        "p2": "Users can refuse or delete cookies in browser settings. Some features may be limited as a result."
+      },
+      "section7": {
+        "title": "7. User rights and how to exercise them",
+        "p1": "Users may request access, correction, deletion, and suspension of processing of their personal information at any time.",
+        "item1": "If supported in-product: process directly in settings/management menu",
+        "item2": "Otherwise: request through the operator contact channel",
+        "p2": "Identity verification may be required, and immediate deletion can be restricted when legal retention obligations apply."
+      },
+      "section8": {
+        "title": "8. Deletion procedure and method",
+        "p1": "When the retention period expires or processing purpose is achieved, data is deleted without delay.",
+        "item1": "Electronic files: permanently deleted using non-recoverable methods",
+        "item2": "Printed materials: shredded or incinerated"
+      },
+      "section9": {
+        "title": "9. Protection measures",
+        "item1": "Minimization of access permissions and access control",
+        "item2": "Security updates and vulnerability checks",
+        "item3": "Encryption where applicable and secure transport (HTTPS)",
+        "item4": "Anomaly monitoring and log management"
+      },
+      "section10": {
+        "title": "10. Children's personal information",
+        "p1": "The Service does not separately collect children’s personal information. Where guardian consent is required, relevant laws are followed."
+      },
+      "section11": {
+        "title": "11. Changes to this policy",
+        "p1": "If this Privacy Policy changes, we will provide prior notice through in-service announcements. Important changes may require additional consent procedures."
+      }
     }
   },
   "terms": {
     "page": {
       "back": "Back",
       "title": "Terms of Service",
-      "effectiveDateLabel": "Effective date",
-      "effectiveDate": "2026-01-01",
-      "intro": "These terms define rights, obligations, and responsibilities for service use.",
-      "section1Title": "Service use",
-      "section1Body": "Users must comply with applicable laws and these terms.",
-      "section2Title": "User responsibility",
-      "section2Body": "Users are responsible for information they enter and resulting actions.",
-      "section3Title": "Limitation of liability",
-      "section3Body": "Service results are reference information and do not guarantee outcomes.",
-      "section4Title": "Changes to terms",
-      "section4Body": "Terms may be updated, and important changes will be announced."
+      "introPrefix": "These Terms govern rights, obligations, and responsibilities between users and the operator regarding use of the",
+      "introBrand": "Moimrank",
+      "introSuffix": "service.",
+      "updatedLabel": "Last updated",
+      "updatedDate": "2026-02-09",
+      "section1": {
+        "title": "1. Service overview",
+        "p1": "Based on MBTI inputs from group members, Moimrank provides relationship/chemistry scores, rankings, distribution, and role suggestions as reference information for fun.",
+        "p2": "Service results are not intended to define or judge a person’s character, relationships, or abilities, and should not be used as the sole basis for real-life decisions."
+      },
+      "section2": {
+        "title": "2. User obligations",
+        "item1": "Do not use content/nicknames that defame others or cause offense.",
+        "item2": "Do not interfere with service operation (e.g., excessive requests, automated abuse).",
+        "item3": "The operator is not responsible for disputes/damages caused by false input."
+      },
+      "section3": {
+        "title": "3. Advertising and affiliate notice",
+        "p1": "To operate the Service, Moimrank may include advertising (e.g., Google AdSense) or affiliate links (e.g., Coupang Partners).",
+        "noticeTitle": "Example disclosure text (recommended)",
+        "noticeBody": "This page may include affiliate links. If a user purchases through those links, the operator may receive a commission.",
+        "p2Prefix": "Under ad policies,",
+        "p2StrongClick": "inducing ad clicks",
+        "p2Middle": "or",
+        "p2StrongFraud": "fraudulent clicks",
+        "p2Suffix": "may be prohibited. Users must not click ads for “support purposes” or request/induce such clicks."
+      },
+      "section4": {
+        "title": "4. External links and third-party services",
+        "p1": "The Service may contain links to websites/services provided by third parties. Content, products/services, policies, and transactions on external links are the provider’s responsibility, and the operator does not guarantee or assume liability for them."
+      },
+      "section5": {
+        "title": "5. Intellectual property",
+        "p1": "Rights to all content in the Service, including UI, text, structure, and logos, belong to the operator or rightful owners. Users may not reproduce/distribute/create derivatives beyond permitted use."
+      },
+      "section6": {
+        "title": "6. Service changes and suspension",
+        "p1": "The operator may change or suspend part/all of the Service for quality improvements, policy changes, or technical needs. Important changes will be announced in a reasonable way."
+      },
+      "section7": {
+        "title": "7. Disclaimer and limitation of liability",
+        "item1": "Service results are for reference only and are not guaranteed for accuracy/fitness.",
+        "item2": "Disputes between users, group conflicts, and decision outcomes are users’ responsibility.",
+        "item3": "The operator is not liable for damages caused by force majeure such as natural disasters, network failures, or third-party outages."
+      },
+      "section8": {
+        "title": "8. Privacy and inquiries",
+        "p1Prefix": "Information about personal data processing is provided in the",
+        "p1Strong": "Privacy Policy",
+        "p1Suffix": ". Inquiries can be submitted through the contact channel announced in the Service."
+      },
+      "section9": {
+        "title": "9. Governing law and jurisdiction",
+        "p1": "These Terms are governed by the laws of the Republic of Korea, and disputes related to service use are brought before courts with jurisdiction under applicable civil procedure law."
+      }
     }
   },
   "guides": {

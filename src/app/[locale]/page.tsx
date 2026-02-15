@@ -1,6 +1,6 @@
 ﻿import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import HomePageIntlClient from "./HomePageIntlClient";
+import HomePageIntlClient from "@/features/locale/HomePageIntlClient";
 import { locales, type Locale } from "@/i18n/config";
 import { canonicalForPath, hreflangForPath } from "@/i18n/seo";
 

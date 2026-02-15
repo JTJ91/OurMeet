@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import CreateFormClientIntl from "./CreateFormClientIntl";
+import CreateFormClientIntl from "@/features/mbti/create/CreateFormClientIntl";
 import { alternatesForPath } from "@/i18n/metadata";
 
 type Props = {

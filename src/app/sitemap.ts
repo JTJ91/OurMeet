@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { GUIDES as MBTI_GUIDES } from "@/app/guides/_data/mbti/guides";
+import { GUIDES as MBTI_GUIDES } from "@/features/guides/data/mbti/guides";
 import { defaultLocale, locales, type Locale } from "@/i18n/config";
 
 const SITE_URL =

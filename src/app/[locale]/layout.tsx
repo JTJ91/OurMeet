@@ -2,9 +2,9 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales } from "@/i18n/config";
-import AppHeader from "@/app/[locale]/components/AppHeader";
-import Footer from "@/app/[locale]/components/Footer";
-import ClientOverlays from "@/app/[locale]/components/ClientOverlays";
+import AppHeader from "@/components/AppHeader";
+import Footer from "@/components/Footer";
+import ClientOverlays from "@/components/ClientOverlays";
 
 type Props = {
   children: React.ReactNode;

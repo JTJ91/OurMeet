@@ -1,15 +1,15 @@
 ﻿import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import GuideLayout from "@/app/guides/_components/GuideLayout";
-import GuideHero from "@/app/guides/_sections/GuideHero";
-import GuideTOC from "@/app/guides/_sections/GuideTOC";
-import GuideBlock from "@/app/guides/_sections/GuideBlock";
-import RelatedGuides from "@/app/guides/_sections/RelatedGuides";
-import { getGuideIntl } from "@/app/guides/_data/mbti/guides-intl";
-import { GUIDES as MBTI_GUIDES } from "@/app/guides/_data/mbti/guides";
+import GuideLayout from "@/features/guides/components/GuideLayout";
+import GuideHero from "@/features/guides/sections/GuideHero";
+import GuideTOC from "@/features/guides/sections/GuideTOC";
+import GuideBlock from "@/features/guides/sections/GuideBlock";
+import RelatedGuides from "@/features/guides/sections/RelatedGuides";
+import { getGuideIntl } from "@/features/guides/data/mbti/guides-intl";
+import { GUIDES as MBTI_GUIDES } from "@/features/guides/data/mbti/guides";
 import { getTranslations } from "next-intl/server";
 import { locales, type Locale } from "@/i18n/config";
-import type { Guide } from "@/app/guides/_data/mbti/types";
+import type { Guide } from "@/features/guides/data/mbti/types";
 import { alternatesForPath } from "@/i18n/metadata";
 
 export function generateStaticParams() {

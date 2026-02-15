@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { prisma } from "@/app/lib/mbti/prisma";
-import JoinFormClientIntl from "./JoinFormClientIntl";
+import { prisma } from "@/lib/mbti/prisma";
+import JoinFormClientIntl from "@/features/mbti/g/[groupId]/join/JoinFormClientIntl";
 import { alternatesForPath } from "@/i18n/metadata";
 
 type Props = {
