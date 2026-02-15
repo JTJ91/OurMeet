@@ -1,16 +1,33 @@
 import type { MetadataRoute } from "next";
 import { GUIDES as MBTI_GUIDES } from "@/features/guides/data/mbti/guides";
-import { defaultLocale, locales, type Locale } from "@/i18n/config";
+import { locales, type Locale } from "@/i18n/config";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") || "https://www.moimrank.com";
+
+type SitemapItemOptions = Pick<
+  MetadataRoute.Sitemap[number],
+  "changeFrequency" | "priority" | "lastModified"
+>;
+
+const STATIC_ROUTES: Array<{ path: string; options: Omit<SitemapItemOptions, "lastModified"> }> = [
+  { path: "/", options: { changeFrequency: "daily", priority: 1.0 } },
+  { path: "/mbti", options: { changeFrequency: "daily", priority: 0.95 } },
+  { path: "/mbti/create", options: { changeFrequency: "weekly", priority: 0.8 } },
+  { path: "/mbti-test", options: { changeFrequency: "weekly", priority: 0.8 } },
+  { path: "/mbti/cognitive-functions", options: { changeFrequency: "monthly", priority: 0.75 } },
+  { path: "/faq/mbti", options: { changeFrequency: "monthly", priority: 0.7 } },
+  { path: "/guides/mbti", options: { changeFrequency: "weekly", priority: 0.85 } },
+  { path: "/guides/saju", options: { changeFrequency: "monthly", priority: 0.4 } },
+  { path: "/privacy", options: { changeFrequency: "yearly", priority: 0.3 } },
+  { path: "/terms", options: { changeFrequency: "yearly", priority: 0.3 } },
+];
 
 function url(path: string) {
   return `${SITE_URL}${path}`;
 }
 
 function localizePath(path: string, locale: Locale) {
-  if (locale === defaultLocale) return path;
   return path === "/" ? `/${locale}` : `/${locale}${path}`;
 }
 
@@ -20,14 +37,11 @@ function languageAlternates(path: string): Record<string, string> {
     return acc;
   }, {} as Record<string, string>);
 
-  languages["x-default"] = url(localizePath(path, defaultLocale));
+  languages["x-default"] = url(localizePath(path, locales[0]));
   return languages;
 }
 
-function expandByLocale(
-  path: string,
-  options: Pick<MetadataRoute.Sitemap[number], "changeFrequency" | "priority" | "lastModified">
-): MetadataRoute.Sitemap {
+function expandByLocale(path: string, options: SitemapItemOptions): MetadataRoute.Sitemap {
   const alternates = languageAlternates(path);
 
   return locales.map((locale) => ({
@@ -44,22 +58,15 @@ function expandByLocale(
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  const staticUrls: MetadataRoute.Sitemap = [
-    ...expandByLocale("/", { lastModified: now, changeFrequency: "daily", priority: 1.0 }),
-    ...expandByLocale("/mbti", { lastModified: now, changeFrequency: "daily", priority: 0.95 }),
-    ...expandByLocale("/mbti-test", { lastModified: now, changeFrequency: "weekly", priority: 0.8 }),
-    ...expandByLocale("/mbti/cognitive-functions", { lastModified: now, changeFrequency: "monthly", priority: 0.75 }),
-    ...expandByLocale("/faq/mbti", { lastModified: now, changeFrequency: "monthly", priority: 0.7 }),
-    ...expandByLocale("/guides/mbti", { lastModified: now, changeFrequency: "weekly", priority: 0.85 }),
-    ...expandByLocale("/guides/saju", { lastModified: now, changeFrequency: "monthly", priority: 0.4 }),
-    ...expandByLocale("/privacy", { lastModified: now, changeFrequency: "yearly", priority: 0.3 }),
-    ...expandByLocale("/terms", { lastModified: now, changeFrequency: "yearly", priority: 0.3 }),
-  ];
+  const staticUrls: MetadataRoute.Sitemap = STATIC_ROUTES.flatMap((route) =>
+    expandByLocale(route.path, { ...route.options, lastModified: now })
+  );
 
-  const mbtiGuideUrls: MetadataRoute.Sitemap = (MBTI_GUIDES ?? [])
-    .filter((guide) => Boolean(guide?.slug))
+  const mbtiGuideUrls: MetadataRoute.Sitemap = Array.from(
+    new Set((MBTI_GUIDES ?? []).map((guide) => guide?.slug).filter(Boolean))
+  )
     .flatMap((guide) =>
-      expandByLocale(`/guides/mbti/${guide.slug}`, {
+      expandByLocale(`/guides/mbti/${guide}`, {
         lastModified: now,
         changeFrequency: "monthly",
         priority: 0.65,
