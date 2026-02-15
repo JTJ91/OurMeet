@@ -1263,16 +1263,6 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
           )}
         </SectionCard2>
 
-        {/* ✅ 케미 리포트 (랭킹 + 타입요약) */}
-        <SectionCard2
-          icon="🔍"
-          title={tt("reportTitle", "케미 리포트")}
-          subtitle={tt("reportSubtitle", "우리모임 조합 랭킹")}
-          tone="violet"
-        >
-          <ChemReportSectionIntl pairs={pairs} />
-        </SectionCard2>
-
         {/* ✅ 2) 역할 추천 */}
         <SectionCard2
           icon="🎭"
@@ -1408,6 +1398,16 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
 
               </>
           )}
+        </SectionCard2>
+
+        {/* ✅ 케미 리포트 (랭킹 + 타입요약) */}
+        <SectionCard2
+          icon="🔍"
+          title={tt("reportTitle", "케미 리포트")}
+          subtitle={tt("reportSubtitle", "우리모임 조합 랭킹")}
+          tone="violet"
+        >
+          <ChemReportSectionIntl pairs={pairs} />
         </SectionCard2>
 
         <section className="mt-6">
