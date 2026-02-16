@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { getCompatScore, axisDiffCount, levelFromScore } from "@/lib/mbti/mbtiCompat";
 import ChemMoreListIntl from "./ChemMoreListIntl";
 import type { MemberPrefs } from "@/lib/mbti/memberPrefs";
@@ -22,6 +22,7 @@ type PairRow = {
 
 type ChemType = "STABLE" | "COMPLEMENT" | "SPARK" | "EXPLODE";
 type Props = { pairs: PairRow[] };
+type UiLocale = "ko" | "en" | "ja";
 
 type Level = 1 | 2 | 3 | 4 | 5;
 
@@ -37,19 +38,58 @@ function scoreColor(score: number) {
   return LEVEL_COLOR[levelFromScore(score)];
 }
 
-function classifyChemType(a: string, b: string, score: number): ChemType {
-  const A = a.trim().toUpperCase();
-  const B = b.trim().toUpperCase();
-  const diff =
-    (A[0] !== B[0] ? 1 : 0) +
-    (A[1] !== B[1] ? 1 : 0) +
-    (A[2] !== B[2] ? 1 : 0) +
-    (A[3] !== B[3] ? 1 : 0);
+function normalizeLocale(locale: string): UiLocale {
+  if (locale === "en" || locale === "ja") return locale;
+  return "ko";
+}
 
-  if (score >= 72) return diff >= 2 ? "COMPLEMENT" : "STABLE";
-  if (score >= 62) return diff >= 3 ? "SPARK" : "STABLE";
-  if (score >= 54) return diff >= 3 ? "SPARK" : "COMPLEMENT";
-  return diff >= 2 ? "EXPLODE" : "SPARK";
+function energyRank(v: MemberPrefs["energy"]) {
+  if (v === "LOW") return 0;
+  if (v === "MID") return 1;
+  return 2;
+}
+
+function pairHintOf(p: PairRow, locale: UiLocale) {
+  const a = p.aPrefs;
+  const b = p.bPrefs;
+  if (!a || !b) return "";
+
+  const text = {
+    ko: {
+      mediate: "한 명이 MEDIATE라 완충되는 조합이에요.",
+      direct: "둘 다 DIRECT라 피드백 속도가 빠를 수 있어요.",
+      burst: "둘 다 BURST라 감정 피로가 커질 수 있어요.",
+      energyGap: "에너지 템포 차가 커서 역할 분리에 유리해요.",
+      lowLow: "둘 다 LOW라 긴 대화 전에 쉬는 타이밍이 중요해요.",
+      highHigh: "둘 다 HIGH라 과열되지 않게 결정 기준을 먼저 맞춰보세요.",
+    },
+    en: {
+      mediate: "One side is MEDIATE, which buffers conflict.",
+      direct: "Both are DIRECT, so feedback pace can become very fast.",
+      burst: "Both are BURST, so emotional fatigue can rise quickly.",
+      energyGap: "Large energy gap can work well with clear role split.",
+      lowLow: "Both are LOW, so short breaks help sustain discussion.",
+      highHigh: "Both are HIGH, so align decision rules to avoid overheating.",
+    },
+    ja: {
+      mediate: "どちらかがMEDIATEで、衝突を緩衝しやすい組み合わせです。",
+      direct: "両者ともDIRECTで、フィードバック速度が速くなりやすいです。",
+      burst: "両者ともBURSTで、感情的な消耗が大きくなる可能性があります。",
+      energyGap: "エネルギー差が大きく、役割分担が機能しやすいです。",
+      lowLow: "両者ともLOWなので、会話の合間に休憩を入れると安定します。",
+      highHigh: "両者ともHIGHなので、過熱防止に判断基準の先合わせが有効です。",
+    },
+  }[locale];
+
+  if (a.conflictStyle === "MEDIATE" || b.conflictStyle === "MEDIATE") return text.mediate;
+  if (a.conflictStyle === "BURST" && b.conflictStyle === "BURST") return text.burst;
+  if (a.conflictStyle === "DIRECT" && b.conflictStyle === "DIRECT") return text.direct;
+
+  const diff = Math.abs(energyRank(a.energy) - energyRank(b.energy));
+  if (diff >= 2) return text.energyGap;
+  if (a.energy === "LOW" && b.energy === "LOW") return text.lowLow;
+  if (a.energy === "HIGH" && b.energy === "HIGH") return text.highHigh;
+  return "";
 }
 
 function chemComboTitle(type: ChemType, a: string, b: string, score: number) {
@@ -114,13 +154,14 @@ function top5RankSlots(list: PairRow[], type: ChemType) {
 
 export default function ChemReportSectionIntl({ pairs }: Props) {
   const t = useTranslations("groupComponents.chemReport");
+  const activeLocale = normalizeLocale(useLocale());
 
   const dist: Record<ChemType, number> = { STABLE: 0, COMPLEMENT: 0, SPARK: 0, EXPLODE: 0 };
   const byType: Record<ChemType, PairRow[]> = { STABLE: [], COMPLEMENT: [], SPARK: [], EXPLODE: [] };
 
   for (const p of pairs) {
     const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti, p.aPrefs, p.bPrefs);
-    const type = classifyChemType(p.aMbti, p.bMbti, r.scoreInt);
+    const type = r.type;
     dist[type]++;
     byType[type].push(p);
   }
@@ -211,6 +252,12 @@ export default function ChemReportSectionIntl({ pairs }: Props) {
                   <ul className="overflow-hidden rounded-xl border border-slate-200/70 bg-white/88">
                     {rankSlots.map((slot, rankIdx) => (
                       <li key={`${type}-rank-${rankIdx}-${slot.scoreInt}`} className="border-b border-black/5 px-3 py-2 last:border-b-0">
+                        {pairHintOf(slot.items[0], activeLocale) ? (
+                          <div className="mb-1 text-[11px] leading-relaxed text-slate-500">
+                            {pairHintOf(slot.items[0], activeLocale)}
+                          </div>
+                        ) : null}
+
                         <div className="flex items-center justify-between gap-2">
                           <div className="min-w-0 flex items-center gap-2">
                             <span className="w-4 shrink-0 text-center text-[11px] font-extrabold text-slate-400">{rankIdx + 1}</span>
