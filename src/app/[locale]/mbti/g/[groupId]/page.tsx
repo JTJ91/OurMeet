@@ -670,7 +670,7 @@ const getRankings = (groupId: string) =>
           const a = membersForRank[i];
           const b = membersForRank[j];
 
-          const score = getCompatScore(a.id, a.mbti, b.id, b.mbti).score;
+          const score = getCompatScore(a.id, a.mbti, b.id, b.mbti, a.prefs, b.prefs).score;
 
           pairs.push({
             aId: a.id,

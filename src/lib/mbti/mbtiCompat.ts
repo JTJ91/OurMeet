@@ -1,5 +1,6 @@
 // lib/mbtiCompat.ts
 // ✅ 캔버스/리포트 점수 "완전 동일" 단일 소스 버전 (복붙)
+import { normalizeMemberPrefs, type MemberPrefs } from "@/lib/mbti/memberPrefs";
 
 // -----------------------------
 // Types
@@ -21,6 +22,8 @@ export type CompatScore = {
   level: Level;       // 1~5 (캔버스 범례/색 통일)
   type: ChemType;     // 안정/보완/스파크/폭발
 };
+
+type MaybePrefs = MemberPrefs | null | undefined;
 
 // -----------------------------
 // Utils
@@ -169,10 +172,14 @@ function internalCompat(
   leftId: string,
   leftMbti: string,
   rightId: string,
-  rightMbti: string
+  rightMbti: string,
+  leftPrefs?: MaybePrefs,
+  rightPrefs?: MaybePrefs
 ): CompatScore {
   const scoreInt = calcCompatScore(leftMbti, rightMbti); // ✅ 이제 pairTiebreak가 대칭이면 안정
-  const score = microFromBase(leftId, leftMbti, rightId, rightMbti, scoreInt);
+  const micro = microFromBase(leftId, leftMbti, rightId, rightMbti, scoreInt);
+  const adjust = totalPrefsAdjust(micro, leftPrefs, rightPrefs);
+  const score = Number(Math.max(0, Math.min(100, micro + adjust)).toFixed(2));
 
   const level = levelFromScore(score);
   const type = classifyChemType(leftMbti, rightMbti, score);
@@ -263,6 +270,127 @@ function microFromBase(
   return Math.max(0, Math.min(100, rounded));
 }
 
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
+
+function sim(x: number, y: number) {
+  return 1 - Math.abs(x - y) / 100;
+}
+
+function comp(x: number, y: number) {
+  return 1 - Math.abs((x + y) - 100) / 100;
+}
+
+function rawStrengthScore(a: MemberPrefs, b: MemberPrefs) {
+  const judgePair =
+    0.55 * sim(a.logicStrength, b.logicStrength) +
+    0.45 * comp(a.logicStrength, b.peopleStrength) +
+    0.45 * comp(a.peopleStrength, b.logicStrength) -
+    0.35 * sim(a.peopleStrength, b.peopleStrength);
+
+  const infoPair =
+    0.55 * sim(a.ideaStrength, b.ideaStrength) +
+    0.45 * comp(a.ideaStrength, b.factStrength) +
+    0.45 * comp(a.factStrength, b.ideaStrength) -
+    0.35 * sim(a.factStrength, b.factStrength);
+
+  return judgePair * 1.2 + infoPair * 1.0;
+}
+
+const STRENGTH_BASELINE = rawStrengthScore(
+  normalizeMemberPrefs({
+    ideaStrength: 50,
+    factStrength: 50,
+    logicStrength: 50,
+    peopleStrength: 50,
+    conflictStyle: "MEDIATE",
+    energy: "MID",
+  }),
+  normalizeMemberPrefs({
+    ideaStrength: 50,
+    factStrength: 50,
+    logicStrength: 50,
+    peopleStrength: 50,
+    conflictStyle: "MEDIATE",
+    energy: "MID",
+  })
+);
+
+function strengthAdjust(aPrefs: MaybePrefs, bPrefs: MaybePrefs) {
+  if (!aPrefs || !bPrefs) return 0;
+
+  const a = normalizeMemberPrefs(aPrefs);
+  const b = normalizeMemberPrefs(bPrefs);
+  const score = rawStrengthScore(a, b);
+  const scale = 4.8;
+  return clamp((score - STRENGTH_BASELINE) * scale, -5.5, 5.5);
+}
+
+const CONFLICT_MATRIX: Record<string, number> = {
+  "DIRECT|DIRECT": -2.0,
+  "DIRECT|AVOID": -1.2,
+  "DIRECT|MEDIATE": 0.8,
+  "DIRECT|BURST": -1.8,
+  "AVOID|AVOID": -0.6,
+  "AVOID|MEDIATE": 0.6,
+  "AVOID|BURST": -1.0,
+  "MEDIATE|MEDIATE": 1.0,
+  "MEDIATE|BURST": 0.4,
+  "BURST|BURST": -2.2,
+};
+
+function conflictAdjust(aPrefs: MaybePrefs, bPrefs: MaybePrefs) {
+  if (!aPrefs || !bPrefs) return 0;
+  const a = normalizeMemberPrefs(aPrefs);
+  const b = normalizeMemberPrefs(bPrefs);
+  const key =
+    a.conflictStyle < b.conflictStyle
+      ? `${a.conflictStyle}|${b.conflictStyle}`
+      : `${b.conflictStyle}|${a.conflictStyle}`;
+  return CONFLICT_MATRIX[key] ?? 0;
+}
+
+function energyRank(v: MemberPrefs["energy"]) {
+  if (v === "LOW") return 0;
+  if (v === "MID") return 1;
+  return 2;
+}
+
+function energyAdjust(baseMicroScore: number, aPrefs: MaybePrefs, bPrefs: MaybePrefs) {
+  if (!aPrefs || !bPrefs) return 0;
+
+  const a = normalizeMemberPrefs(aPrefs);
+  const b = normalizeMemberPrefs(bPrefs);
+  const ra = energyRank(a.energy);
+  const rb = energyRank(b.energy);
+
+  const diff = Math.abs(ra - rb);
+  let base = 0;
+
+  if (diff === 0) {
+    if (ra === 0) base = -0.6;
+    else if (ra === 1) base = 0.2;
+    else base = 0;
+  } else if (diff === 1) {
+    base = 0.4;
+  } else {
+    base = 0.8;
+  }
+
+  if (baseMicroScore <= 50 && base > 0) return base * 0.5;
+  return base;
+}
+
+function totalPrefsAdjust(baseMicroScore: number, aPrefs: MaybePrefs, bPrefs: MaybePrefs) {
+  if (!aPrefs || !bPrefs) return 0;
+  const sum =
+    strengthAdjust(aPrefs, bPrefs) +
+    conflictAdjust(aPrefs, bPrefs) +
+    energyAdjust(baseMicroScore, aPrefs, bPrefs);
+  return clamp(sum, -8, 8);
+}
+
 
 
 // -----------------------------
@@ -292,13 +420,15 @@ export function getCompatScore(
   aId: string,
   aMbti: string,
   bId: string,
-  bMbti: string
+  bMbti: string,
+  aPrefs?: MaybePrefs,
+  bPrefs?: MaybePrefs
 ): CompatScore {
   const A = `${aId}|${norm(aMbti)}`;
   const B = `${bId}|${norm(bMbti)}`;
 
-  if (A < B) return internalCompat(aId, aMbti, bId, bMbti);
-  return internalCompat(bId, bMbti, aId, aMbti);
+  if (A < B) return internalCompat(aId, aMbti, bId, bMbti, aPrefs, bPrefs);
+  return internalCompat(bId, bMbti, aId, aMbti, bPrefs, aPrefs);
 }
 
 

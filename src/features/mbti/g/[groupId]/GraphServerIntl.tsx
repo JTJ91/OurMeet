@@ -2,6 +2,7 @@
 import GraphClientIntl from "./GraphClientIntl";
 import { getCompatScore } from "@/lib/mbti/mbtiCompat";
 import { getTranslations } from "next-intl/server";
+import { normalizeMemberPrefs } from "@/lib/mbti/memberPrefs";
 
 type GraphLocale = "ko" | "en" | "ja";
 
@@ -69,6 +70,14 @@ export default async function GraphServerIntl({
     id: m.id,
     nickname: m.nickname,
     mbti: (m.mbti || "").toUpperCase(),
+    prefs: normalizeMemberPrefs({
+      ideaStrength: m.ideaStrength,
+      factStrength: m.factStrength,
+      logicStrength: m.logicStrength,
+      peopleStrength: m.peopleStrength,
+      conflictStyle: m.conflictStyle,
+      energy: m.energy,
+    }),
   }));
 
   if (members.length === 0) {
@@ -84,7 +93,7 @@ export default async function GraphServerIntl({
   const nodes = members
     .filter((m) => m.id !== center.id)
     .map((m) => {
-      const compat = getCompatScore(center.id, center.mbti, m.id, m.mbti);
+      const compat = getCompatScore(center.id, center.mbti, m.id, m.mbti, center.prefs, m.prefs);
 
       return {
         id: m.id,
@@ -100,7 +109,7 @@ export default async function GraphServerIntl({
     for (let j = i + 1; j < members.length; j++) {
       const a = members[i];
       const b = members[j];
-      const compat = getCompatScore(a.id, a.mbti, b.id, b.mbti);
+      const compat = getCompatScore(a.id, a.mbti, b.id, b.mbti, a.prefs, b.prefs);
       if (Number.isFinite(compat.score)) pairScores.push(compat.score);
     }
   }

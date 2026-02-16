@@ -4,6 +4,7 @@ import React from "react";
 import { useTranslations } from "next-intl";
 import { getCompatScore, axisDiffCount, levelFromScore } from "@/lib/mbti/mbtiCompat";
 import ChemMoreListIntl from "./ChemMoreListIntl";
+import type { MemberPrefs } from "@/lib/mbti/memberPrefs";
 
 type JudgeStyle = "LOGIC" | "PEOPLE";
 type InfoStyle = "IDEA" | "FACT";
@@ -15,6 +16,8 @@ type PairRow = {
   micro?: number;
   aJudge?: JudgeStyle; aInfo?: InfoStyle;
   bJudge?: JudgeStyle; bInfo?: InfoStyle;
+  aPrefs?: MemberPrefs;
+  bPrefs?: MemberPrefs;
 };
 
 type ChemType = "STABLE" | "COMPLEMENT" | "SPARK" | "EXPLODE";
@@ -69,8 +72,8 @@ function chemComboTitle(type: ChemType, a: string, b: string, score: number) {
 }
 
 function top5RankSlots(list: PairRow[], type: ChemType) {
-  const withScore = list.map((p) => {
-    const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti);
+  const withScore: Array<PairRow & { scoreInt: number; micro: number }> = list.map((p) => {
+    const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti, p.aPrefs, p.bPrefs);
     return {
       ...p,
       scoreInt: r.scoreInt,
@@ -79,8 +82,8 @@ function top5RankSlots(list: PairRow[], type: ChemType) {
   });
 
   const sorted = [...withScore].sort((a, b) => {
-    const aInt = (a as any).scoreInt ?? a.score;
-    const bInt = (b as any).scoreInt ?? b.score;
+    const aInt = a.scoreInt;
+    const bInt = b.scoreInt;
     const aMicro = a.micro ?? aInt;
     const bMicro = b.micro ?? bInt;
 
@@ -95,7 +98,7 @@ function top5RankSlots(list: PairRow[], type: ChemType) {
   const EPS = 0.01;
   const slots: Array<{ scoreInt: number; microKey: number; items: PairRow[] }> = [];
   for (const p of sorted) {
-    const pInt = (p as any).scoreInt ?? p.score;
+    const pInt = p.scoreInt;
     const mk = p.micro ?? pInt;
 
     const last = slots[slots.length - 1];
@@ -116,7 +119,7 @@ export default function ChemReportSectionIntl({ pairs }: Props) {
   const byType: Record<ChemType, PairRow[]> = { STABLE: [], COMPLEMENT: [], SPARK: [], EXPLODE: [] };
 
   for (const p of pairs) {
-    const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti);
+    const r = getCompatScore(p.aId, p.aMbti, p.bId, p.bMbti, p.aPrefs, p.bPrefs);
     const type = classifyChemType(p.aMbti, p.bMbti, r.scoreInt);
     dist[type]++;
     byType[type].push(p);
