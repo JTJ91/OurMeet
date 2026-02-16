@@ -7,6 +7,11 @@ import ko from "../../../../messages/ko.json";
 import en from "../../../../messages/en.json";
 import ja from "../../../../messages/ja.json";
 import { isNicknameLengthValid, sanitizeNicknameInput } from "@/features/mbti/lib/nickname";
+import {
+  clampStrength,
+  normalizeConflictStyle,
+  normalizeEnergyLevel,
+} from "@/lib/mbti/memberPrefs";
 
 type ActionErrors = {
   required: string;
@@ -55,6 +60,12 @@ export async function joinGroupAction(formData: FormData) {
   const mbti = normalizeMbti(String(formData.get("mbti") || ""));
   const judge = normalizeJudge(formData.get("judge"));
   const info = normalizeInfo(formData.get("info"));
+  const ideaStrength = clampStrength(formData.get("ideaStrength"));
+  const factStrength = clampStrength(formData.get("factStrength"));
+  const logicStrength = clampStrength(formData.get("logicStrength"));
+  const peopleStrength = clampStrength(formData.get("peopleStrength"));
+  const conflictStyle = normalizeConflictStyle(formData.get("conflictStyle"));
+  const energy = normalizeEnergyLevel(formData.get("energy"));
 
   if (!groupId || !nickname || !mbti) {
     throw new Error(err.required);
@@ -84,6 +95,12 @@ export async function joinGroupAction(formData: FormData) {
       mbti,
       judgeStyle: judge,
       infoStyle: info,
+      ideaStrength,
+      factStrength,
+      logicStrength,
+      peopleStrength,
+      conflictStyle,
+      energy,
     },
     select: { id: true },
   });

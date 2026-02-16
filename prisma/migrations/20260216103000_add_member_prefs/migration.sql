@@ -1,0 +1,14 @@
+-- CreateEnum
+CREATE TYPE "ConflictStyle" AS ENUM ('DIRECT', 'AVOID', 'MEDIATE', 'BURST');
+
+-- CreateEnum
+CREATE TYPE "EnergyLevel" AS ENUM ('LOW', 'MID', 'HIGH');
+
+-- AlterTable
+ALTER TABLE "Member"
+ADD COLUMN "ideaStrength" INTEGER NOT NULL DEFAULT 50,
+ADD COLUMN "factStrength" INTEGER NOT NULL DEFAULT 50,
+ADD COLUMN "logicStrength" INTEGER NOT NULL DEFAULT 50,
+ADD COLUMN "peopleStrength" INTEGER NOT NULL DEFAULT 50,
+ADD COLUMN "conflictStyle" "ConflictStyle" NOT NULL DEFAULT 'MEDIATE',
+ADD COLUMN "energy" "EnergyLevel" NOT NULL DEFAULT 'MID';

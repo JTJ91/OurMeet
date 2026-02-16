@@ -7,6 +7,11 @@ import ko from "../../../../messages/ko.json";
 import en from "../../../../messages/en.json";
 import ja from "../../../../messages/ja.json";
 import { isNicknameLengthValid, sanitizeNicknameInput } from "@/features/mbti/lib/nickname";
+import {
+  clampStrength,
+  normalizeConflictStyle,
+  normalizeEnergyLevel,
+} from "@/lib/mbti/memberPrefs";
 
 type JudgeStyle = "LOGIC" | "PEOPLE";
 type InfoStyle = "IDEA" | "FACT";
@@ -64,6 +69,12 @@ export async function createGroupAction(formData: FormData) {
   const mbti = normalizeMbti(formData.get("mbti"));
   const judgeStyle = normalizeJudgeStyle(formData.get("judge"));
   const infoStyle = normalizeInfoStyle(formData.get("info"));
+  const ideaStrength = clampStrength(formData.get("ideaStrength"));
+  const factStrength = clampStrength(formData.get("factStrength"));
+  const logicStrength = clampStrength(formData.get("logicStrength"));
+  const peopleStrength = clampStrength(formData.get("peopleStrength"));
+  const conflictStyle = normalizeConflictStyle(formData.get("conflictStyle"));
+  const energy = normalizeEnergyLevel(formData.get("energy"));
 
   if (!groupName || !nickname || !mbti) {
     throw new Error(err.required);
@@ -86,6 +97,12 @@ export async function createGroupAction(formData: FormData) {
           isOwner: true,
           judgeStyle,
           infoStyle,
+          ideaStrength,
+          factStrength,
+          logicStrength,
+          peopleStrength,
+          conflictStyle,
+          energy,
         },
       },
     },

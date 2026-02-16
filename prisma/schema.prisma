@@ -7,6 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ConflictStyle {
+  DIRECT
+  AVOID
+  MEDIATE
+  BURST
+}
+
+enum EnergyLevel {
+  LOW
+  MID
+  HIGH
+}
+
 model Group {
   id         String   @id @default(cuid())
   name       String
@@ -19,6 +32,13 @@ model Member {
   id        String   @id @default(cuid())
   nickname  String
   mbti      String
+
+  ideaStrength   Int @default(50)
+  factStrength   Int @default(50)
+  logicStrength  Int @default(50)
+  peopleStrength Int @default(50)
+  conflictStyle  ConflictStyle @default(MEDIATE)
+  energy         EnergyLevel   @default(MID)
 
   judgeStyle String @default("LOGIC") // LOGIC | PEOPLE
   infoStyle  String @default("IDEA")  // IDEA | FACT

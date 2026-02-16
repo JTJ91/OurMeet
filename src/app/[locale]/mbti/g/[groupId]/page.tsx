@@ -12,6 +12,7 @@ import ChemReportSectionIntl from "@/features/mbti/g/[groupId]/components/ChemRe
 import TouchSavedGroupClientIntl from "@/components/TouchSavedGroupClient";
 import SaveGroupClientIntl from "@/components/SaveGroupClient";
 import ChemTopWorstIntl from "@/features/mbti/g/[groupId]/components/ChemTopWorstIntl";
+import { normalizeMemberPrefs, type MemberPrefs } from "@/lib/mbti/memberPrefs";
 
 
 import Link from "next/link";
@@ -50,6 +51,8 @@ type PairRow = {
   // ✅ 추가 (인지기능 보정용)
   aJudge?: JudgeStyle; aInfo?: InfoStyle;
   bJudge?: JudgeStyle; bInfo?: InfoStyle;
+  aPrefs?: MemberPrefs;
+  bPrefs?: MemberPrefs;
 };
 
 type AxisKey = "EI" | "NS" | "TF" | "JP" | "BAL";
@@ -650,6 +653,14 @@ const getRankings = (groupId: string) =>
           mbti: (m.mbti ?? "").trim().toUpperCase(),
           judgeStyle: (m.judgeStyle ?? "LOGIC") as JudgeStyle,
           infoStyle: (m.infoStyle ?? "IDEA") as InfoStyle,
+          prefs: normalizeMemberPrefs({
+            ideaStrength: m.ideaStrength,
+            factStrength: m.factStrength,
+            logicStrength: m.logicStrength,
+            peopleStrength: m.peopleStrength,
+            conflictStyle: m.conflictStyle,
+            energy: m.energy,
+          }),
         }));
 
       const pairs: PairRow[] = [];
@@ -669,6 +680,8 @@ const getRankings = (groupId: string) =>
             bName: b.nickname,
             bMbti: b.mbti,
             score,
+            aPrefs: a.prefs,
+            bPrefs: b.prefs,
           });
         }
       }
