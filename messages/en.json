@@ -10,15 +10,35 @@
   "mbtiTest": {
     "page": {
       "backToMbti": "MBTI Home",
-      "title": "MBTI Full Test",
-      "subtitle": "More accurate with 60 questions",
-      "descriptionLead": "Cognitive function based",
+      "title": "Free MBTI Personality Test",
+      "subtitle": "Accurate 60-question MBTI assessment",
+      "descriptionLead": "Take a cognitive-function MBTI test",
       "descriptionLeadSuffix": "",
-      "descriptionPrefix": "We analyze your",
-      "descriptionEmphasis": "energy direction and judgment style",
-      "descriptionSuffix": " for a more precise MBTI result.",
-      "quickLink": "Go to quick test →",
+      "descriptionPrefix": "to analyze your",
+      "descriptionEmphasis": "E/I, N/S, T/F, and J/P preferences",
+      "descriptionSuffix": " and get a precise personality type result.",
+      "quickLink": "Try the 8-question quick MBTI test →",
+      "metaTitle": "Free MBTI Personality Test | 60-Question Assessment",
+      "metaDescription": "Take a cognitive-function based 60-question MBTI personality test. Analyze E/I, N/S, T/F, and J/P preferences and get your MBTI type.",
+      "metaKeywords": "MBTI test, free MBTI test, personality type test, 60-question MBTI, cognitive function MBTI",
       "footerNote": "MBTI is a reference tool. Results may vary by context and experience."
+    }
+  },
+  "mbtiQuickTest": {
+    "page": {
+      "backToMbti": "MBTI Home",
+      "title": "Free Quick MBTI Test",
+      "subtitle": "8-question fast MBTI check",
+      "descriptionLead": "With 8 core questions,",
+      "descriptionLeadSuffix": "",
+      "descriptionPrefix": "you can quickly check",
+      "descriptionEmphasis": "your core E/I, N/S, T/F, J/P preferences",
+      "descriptionSuffix": ".",
+      "fullLink": "Go to the 60-question full test →",
+      "metaTitle": "Free Quick MBTI Test | 8-Question Version",
+      "metaDescription": "Take a free 8-question quick MBTI test for a fast personality check. Continue to the 60-question full test for deeper analysis.",
+      "metaKeywords": "quick MBTI test, MBTI 8 questions, free MBTI quiz, fast personality test",
+      "footerNote": "This quick test is for fast reference. Use the 60-question full test for more accuracy."
     }
   },
   "create": {
@@ -44,10 +64,35 @@
         "hint": "Up to 3 characters, no spaces"
       },
       "mbti": {
-        "quickTest": "Quick MBTI Test",
+        "quickTest": "MBTI Test",
         "placeholder": "e.g. ENFP",
         "invalid": "Invalid MBTI format. Example: ENFP",
         "hint": "Use ENFP format, 4 letters with no spaces"
+      },
+      "prefs": {
+        "strength": {
+          "legend": "4-Axis Strength",
+          "help": "Each axis is independent and can be adjusted from 0 to 100.",
+          "idea": "IDEA Strength",
+          "fact": "FACT Strength",
+          "logic": "LOGIC Strength",
+          "people": "PEOPLE Strength"
+        },
+        "conflict": {
+          "legend": "Conflict Style",
+          "help": "Choose your common response pattern in conflict.",
+          "direct": { "title": "DIRECT", "desc": "Speak directly" },
+          "avoid": { "title": "AVOID", "desc": "Avoid conflict" },
+          "mediate": { "title": "MEDIATE", "desc": "Mediate in the middle" },
+          "burst": { "title": "BURST", "desc": "Hold then burst" }
+        },
+        "energy": {
+          "legend": "Energy Endurance",
+          "help": "How long your social energy tends to last.",
+          "low": "LOW",
+          "mid": "MID",
+          "high": "HIGH"
+        }
       },
       "judge": {
         "legend": "Decision Style",
@@ -105,10 +150,35 @@
         "hint": "Up to 3 characters, no spaces"
       },
       "mbti": {
-        "quickTest": "Quick MBTI Test",
+        "quickTest": "MBTI Test",
         "placeholder": "e.g. ENFP",
         "invalid": "Invalid MBTI format. Example: ENFP",
         "hint": "Use ENFP format, 4 letters with no spaces"
+      },
+      "prefs": {
+        "strength": {
+          "legend": "4-Axis Strength",
+          "help": "Each axis is independent and can be adjusted from 0 to 100.",
+          "idea": "IDEA Strength",
+          "fact": "FACT Strength",
+          "logic": "LOGIC Strength",
+          "people": "PEOPLE Strength"
+        },
+        "conflict": {
+          "legend": "Conflict Style",
+          "help": "Choose your common response pattern in conflict.",
+          "direct": { "title": "DIRECT", "desc": "Speak directly" },
+          "avoid": { "title": "AVOID", "desc": "Avoid conflict" },
+          "mediate": { "title": "MEDIATE", "desc": "Mediate in the middle" },
+          "burst": { "title": "BURST", "desc": "Hold then burst" }
+        },
+        "energy": {
+          "legend": "Energy Endurance",
+          "help": "How long your social energy tends to last.",
+          "low": "LOW",
+          "mid": "MID",
+          "high": "HIGH"
+        }
       },
       "judge": {
         "legend": "Decision Style",
@@ -159,8 +229,12 @@
       "descriptionSuffix": " to check relationship chemistry.",
       "cognitiveGuide": "What are MBTI cognitive functions",
       "quickStart": "Quick Start",
-      "testLabel": "MBTI Test",
-      "testDesc": "Official 60-question test",
+      "tabTests": "MBTI Tests",
+      "tabGuides": "Guides",
+      "testQuickLabel": "MBTI Quick Test",
+      "testQuickDesc": "Fast 8-question test",
+      "testFullLabel": "MBTI Full Test",
+      "testFullDesc": "Official 60-question test",
       "guidesLabel": "MBTI in Groups",
       "guidesDesc": "Situation-based chemistry guide",
       "usageLabel": "Usage Guide",
@@ -962,7 +1036,9 @@
         "title": "MBTI",
         "desc": "Cognitive function based chemistry",
         "home": "MBTI Home",
-        "test": "MBTI Test",
+        "testSection": "MBTI Test",
+        "testFull": "Full Test (60 Qs)",
+        "testQuick": "Quick Test (8 Qs)",
         "guideSection": "Guides",
         "cognitive": "Cognitive Functions",
         "groupGuide": "MBTI in Groups",

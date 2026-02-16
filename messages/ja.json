@@ -10,15 +10,35 @@
   "mbtiTest": {
     "page": {
       "backToMbti": "MBTIホーム",
-      "title": "MBTI正式テスト",
-      "subtitle": "60問でより正確に",
-      "descriptionLead": "認知機能ベース",
-      "descriptionLeadSuffix": "で",
-      "descriptionPrefix": "あなたの",
-      "descriptionEmphasis": "エネルギー方向と判断スタイル",
-      "descriptionSuffix": "を分析し、より精密なMBTI結果を確認します。",
-      "quickLink": "簡単テストはこちら →",
+      "title": "無料MBTI性格タイプ診断",
+      "subtitle": "60問の高精度MBTIテスト",
+      "descriptionLead": "認知機能ベースのMBTI診断で",
+      "descriptionLeadSuffix": "",
+      "descriptionPrefix": "外向/内向・直観/感覚・思考/感情・判断/知覚の",
+      "descriptionEmphasis": "4指標",
+      "descriptionSuffix": "を分析し、あなたの性格タイプ結果を確認できます。",
+      "quickLink": "8問の簡単MBTIテストはこちら →",
+      "metaTitle": "無料MBTI性格タイプ診断 | 60問の高精度テスト",
+      "metaDescription": "認知機能ベースの60問MBTI性格タイプ診断。外向/内向・直観/感覚・思考/感情・判断/知覚の指標を分析し、あなたのMBTIタイプを確認できます。",
+      "metaKeywords": "MBTI診断, 無料MBTIテスト, 性格タイプ診断, 60問MBTI, 認知機能MBTI",
       "footerNote": "MBTIは参考ツールです。状況や経験により結果は変わることがあります。"
+    }
+  },
+  "mbtiQuickTest": {
+    "page": {
+      "backToMbti": "MBTIホーム",
+      "title": "無料MBTI簡単診断",
+      "subtitle": "8問でできるクイックテスト",
+      "descriptionLead": "8つの核心質問で",
+      "descriptionLeadSuffix": "",
+      "descriptionPrefix": "外向/内向・直観/感覚・思考/感情・判断/知覚の",
+      "descriptionEmphasis": "基本傾向",
+      "descriptionSuffix": "を素早く確認できます。",
+      "fullLink": "60問の精密テストはこちら →",
+      "metaTitle": "無料MBTI簡単診断 | 8問クイックテスト",
+      "metaDescription": "8問で素早く確認できる無料MBTI簡単診断。さらに詳しく知りたい場合は60問の精密テストをご利用ください。",
+      "metaKeywords": "MBTI簡単診断, MBTI 8問, 無料MBTIテスト, クイックMBTI",
+      "footerNote": "簡単診断は素早い参考用です。より正確な結果は60問の精密テストをご利用ください。"
     }
   },
   "create": {
@@ -44,10 +64,35 @@
         "hint": "空白なしで最大3文字"
       },
       "mbti": {
-        "quickTest": "MBTI簡単テスト",
+        "quickTest": "MBTI診断",
         "placeholder": "例: ENFP",
         "invalid": "MBTI形式が正しくありません。例: ENFP",
         "hint": "ENFP形式、空白なし4文字"
+      },
+      "prefs": {
+        "strength": {
+          "legend": "4軸の強度",
+          "help": "各軸は独立しており、0〜100で調整できます。",
+          "idea": "IDEA強度",
+          "fact": "FACT強度",
+          "logic": "LOGIC強度",
+          "people": "PEOPLE強度"
+        },
+        "conflict": {
+          "legend": "衝突スタイル",
+          "help": "衝突時によく出る反応を選択してください。",
+          "direct": { "title": "DIRECT", "desc": "率直に伝える" },
+          "avoid": { "title": "AVOID", "desc": "衝突を避ける" },
+          "mediate": { "title": "MEDIATE", "desc": "間に立って調整" },
+          "burst": { "title": "BURST", "desc": "ためて一気に爆発" }
+        },
+        "energy": {
+          "legend": "エネルギー持続力",
+          "help": "集まりでエネルギーが続く度合いを選択してください。",
+          "low": "LOW",
+          "mid": "MID",
+          "high": "HIGH"
+        }
       },
       "judge": {
         "legend": "判断スタイル",
@@ -105,10 +150,35 @@
         "hint": "空白なしで最大3文字"
       },
       "mbti": {
-        "quickTest": "MBTI簡単テスト",
+        "quickTest": "MBTI診断",
         "placeholder": "例: ENFP",
         "invalid": "MBTI形式が正しくありません。例: ENFP",
         "hint": "ENFP形式、空白なし4文字"
+      },
+      "prefs": {
+        "strength": {
+          "legend": "4軸の強度",
+          "help": "各軸は独立しており、0〜100で調整できます。",
+          "idea": "IDEA強度",
+          "fact": "FACT強度",
+          "logic": "LOGIC強度",
+          "people": "PEOPLE強度"
+        },
+        "conflict": {
+          "legend": "衝突スタイル",
+          "help": "衝突時によく出る反応を選択してください。",
+          "direct": { "title": "DIRECT", "desc": "率直に伝える" },
+          "avoid": { "title": "AVOID", "desc": "衝突を避ける" },
+          "mediate": { "title": "MEDIATE", "desc": "間に立って調整" },
+          "burst": { "title": "BURST", "desc": "ためて一気に爆発" }
+        },
+        "energy": {
+          "legend": "エネルギー持続力",
+          "help": "集まりでエネルギーが続く度合いを選択してください。",
+          "low": "LOW",
+          "mid": "MID",
+          "high": "HIGH"
+        }
       },
       "judge": {
         "legend": "判断スタイル",
@@ -159,8 +229,12 @@
       "descriptionSuffix": "を比較して、関係のケミを確認します。",
       "cognitiveGuide": "MBTI認知機能とは？",
       "quickStart": "クイックスタート",
-      "testLabel": "MBTIテスト",
-      "testDesc": "正式60問テスト",
+      "tabTests": "MBTI検査",
+      "tabGuides": "ガイド",
+      "testQuickLabel": "MBTI簡易検査",
+      "testQuickDesc": "8問でわかるクイック版",
+      "testFullLabel": "MBTI精密検査",
+      "testFullDesc": "正式60問テスト",
       "guidesLabel": "グループ内MBTI",
       "guidesDesc": "状況別ケミガイド",
       "usageLabel": "利用ガイド",
@@ -962,7 +1036,9 @@
         "title": "MBTI",
         "desc": "認知機能ベースの相性",
         "home": "MBTIホーム",
-        "test": "MBTI検査",
+        "testSection": "MBTI検査",
+        "testFull": "精密検査 (60問)",
+        "testQuick": "簡易検査 (8問)",
         "guideSection": "ガイド",
         "cognitive": "認知機能",
         "groupGuide": "グループ内MBTI",

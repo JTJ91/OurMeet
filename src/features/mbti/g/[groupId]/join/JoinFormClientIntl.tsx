@@ -5,8 +5,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { joinGroupAction } from "@/features/mbti/actions/members";
 import { upsertSavedGroup } from "@/lib/mbti/groupHistory";
-import MbtiTestModal from "@/features/mbti/components/MbtiTestModal8";
+import MbtiTestSelectModal from "@/features/mbti/components/MbtiTestSelectModal";
 import { sanitizeNicknameInput } from "@/features/mbti/lib/nickname";
+import {
+  DEFAULT_MEMBER_STRENGTHS,
+  clampStrength,
+  normalizeConflictStyle,
+  normalizeEnergyLevel,
+  prefillStrengthsFromMbti,
+  toLegacyInfoStyle,
+  toLegacyJudgeStyle,
+  type ConflictStyle,
+  type EnergyLevel,
+  type MemberStrengths,
+} from "@/lib/mbti/memberPrefs";
 
 type Props = {
   locale: string;
@@ -32,7 +44,7 @@ export default function JoinFormClientIntl({ locale, groupId, isFull }: Props) {
   const t = useTranslations("join.form");
   const [mbtiError, setMbtiError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [testOpen, setTestOpen] = useState(false);
+  const [testSelectOpen, setTestSelectOpen] = useState(false);
 
   const mbtiInputRef = useRef<HTMLInputElement | null>(null);
   const lockedRef = useRef(false);
@@ -41,6 +53,26 @@ export default function JoinFormClientIntl({ locale, groupId, isFull }: Props) {
   const mbtiFromTest = (sp.get("mbti") ?? "").trim().toUpperCase();
   const base = localeBase(locale);
   const nicknameHint = nicknameHintByLocale(locale);
+  const [strengths, setStrengths] = useState<MemberStrengths>(() =>
+    isValidMbti(mbtiFromTest) ? prefillStrengthsFromMbti(mbtiFromTest) : { ...DEFAULT_MEMBER_STRENGTHS }
+  );
+  const [strengthTouched, setStrengthTouched] = useState(false);
+  const [conflictStyle, setConflictStyle] = useState<ConflictStyle>("MEDIATE");
+  const [energy, setEnergy] = useState<EnergyLevel>("MID");
+
+  const legacyJudgeStyle = toLegacyJudgeStyle(strengths);
+  const legacyInfoStyle = toLegacyInfoStyle(strengths);
+
+  function moveToTest(kind: "quick" | "full") {
+    setTestSelectOpen(false);
+    const targetPath = kind === "quick" ? "/mbti-test/quick" : "/mbti-test";
+    const qs = new URLSearchParams({
+      from: "join",
+      groupId,
+      returnTo: `${base}/mbti/g/${encodeURIComponent(groupId)}/join`,
+    });
+    router.push(`${base}${targetPath}?${qs.toString()}`);
+  }
 
   return (
     <form
@@ -56,8 +88,12 @@ export default function JoinFormClientIntl({ locale, groupId, isFull }: Props) {
           });
           router.replace(`${base}/mbti/g/${result.groupId}?center=${result.memberId}`);
           router.refresh();
-        } catch (err: any) {
-          alert(err?.message ?? t("errors.joinFailed"));
+        } catch (err: unknown) {
+          const message =
+            typeof err === "object" && err !== null && "message" in err
+              ? String((err as { message?: unknown }).message ?? t("errors.joinFailed"))
+              : t("errors.joinFailed");
+          alert(message);
           lockedRef.current = false;
           setIsSubmitting(false);
         }
@@ -128,7 +164,7 @@ export default function JoinFormClientIntl({ locale, groupId, isFull }: Props) {
           <button
             type="button"
             disabled={isFull || isSubmitting}
-            onClick={() => setTestOpen(true)}
+            onClick={() => setTestSelectOpen(true)}
             className="mbti-primary-btn inline-flex items-center justify-center rounded-full px-4 py-2 text-[12px] font-black text-white ring-1 ring-[#1E88E5]/20 transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t("mbti.quickTest")}
@@ -158,6 +194,9 @@ export default function JoinFormClientIntl({ locale, groupId, isFull }: Props) {
               .replace(/[^EINSFTJP]/g, "")
               .slice(0, 4);
             e.currentTarget.value = v;
+            if (v.length === 4 && isValidMbti(v) && !strengthTouched) {
+              setStrengths(prefillStrengthsFromMbti(v));
+            }
             if (v.length === 4) setMbtiError(isValidMbti(v) ? null : t("mbti.invalid"));
             else setMbtiError(null);
           }}
@@ -175,60 +214,107 @@ export default function JoinFormClientIntl({ locale, groupId, isFull }: Props) {
       </label>
 
       <fieldset className="block">
-        <legend className="text-sm font-bold text-slate-800">{t("judge.legend")}</legend>
-        <p className="mt-1 text-[11px] text-slate-500">{t("judge.help")}</p>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          <label className="cursor-pointer">
-            <input type="radio" name="judge" value="LOGIC" defaultChecked className="peer sr-only" />
-            <div className="h-14 rounded-2xl bg-white px-4 ring-1 ring-black/10 flex flex-col items-center justify-center gap-0.5 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
-              <div className="text-[13px] font-extrabold text-slate-800">
-                <span aria-hidden="true">🔍 </span>
-                {t("judge.logic.title")}
-              </div>
-              <div className="text-[11px] text-slate-500">{t("judge.logic.desc")}</div>
-            </div>
-          </label>
+        <legend className="text-sm font-bold text-slate-800">{t("prefs.strength.legend")}</legend>
+        <p className="mt-1 text-[11px] text-slate-500">{t("prefs.strength.help")}</p>
 
-          <label className="cursor-pointer">
-            <input type="radio" name="judge" value="PEOPLE" className="peer sr-only" />
-            <div className="h-14 rounded-2xl bg-white px-4 ring-1 ring-black/10 flex flex-col items-center justify-center gap-0.5 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
-              <div className="text-[13px] font-extrabold text-slate-800">
-                <span aria-hidden="true">🤝 </span>
-                {t("judge.people.title")}
+        <div className="mt-2 space-y-3 rounded-2xl border border-black/10 bg-white p-3">
+          {(
+            [
+              { key: "ideaStrength", label: t("prefs.strength.idea"), color: "bg-violet-500" },
+              { key: "factStrength", label: t("prefs.strength.fact"), color: "bg-emerald-500" },
+              { key: "logicStrength", label: t("prefs.strength.logic"), color: "bg-amber-500" },
+              { key: "peopleStrength", label: t("prefs.strength.people"), color: "bg-rose-500" },
+            ] as const
+          ).map((row) => (
+            <label key={row.key} className="block">
+              <div className="mb-1 flex items-center justify-between text-[12px] font-bold text-slate-700">
+                <span>{row.label}</span>
+                <span>{strengths[row.key]}%</span>
               </div>
-              <div className="text-[11px] text-slate-500">{t("judge.people.desc")}</div>
-            </div>
-          </label>
+              <input
+                type="range"
+                name={row.key}
+                min={0}
+                max={100}
+                step={1}
+                value={strengths[row.key]}
+                onChange={(e) => {
+                  const nextValue = clampStrength(e.currentTarget.value);
+                  setStrengthTouched(true);
+                  setStrengths((prev) => ({ ...prev, [row.key]: nextValue }));
+                }}
+                className="h-2.5 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-[#1E88E5]"
+              />
+              <div className="mt-1 h-1.5 w-full rounded-full bg-slate-100">
+                <div className={`h-1.5 rounded-full ${row.color}`} style={{ width: `${strengths[row.key]}%` }} />
+              </div>
+            </label>
+          ))}
         </div>
       </fieldset>
 
       <fieldset className="block">
-        <legend className="text-sm font-bold text-slate-800">{t("info.legend")}</legend>
-        <p className="mt-1 text-[11px] text-slate-500">{t("info.help")}</p>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          <label className="cursor-pointer">
-            <input type="radio" name="info" value="IDEA" defaultChecked className="peer sr-only" />
-            <div className="h-14 rounded-2xl bg-white px-4 ring-1 ring-black/10 flex flex-col items-center justify-center gap-0.5 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
-              <div className="text-[13px] font-extrabold text-slate-800">
-                <span aria-hidden="true">💡 </span>
-                {t("info.idea.title")}
-              </div>
-              <div className="text-[11px] text-slate-500">{t("info.idea.desc")}</div>
-            </div>
-          </label>
+        <legend className="text-sm font-bold text-slate-800">{t("prefs.conflict.legend")}</legend>
+        <p className="mt-1 text-[11px] text-slate-500">{t("prefs.conflict.help")}</p>
 
-          <label className="cursor-pointer">
-            <input type="radio" name="info" value="FACT" className="peer sr-only" />
-            <div className="h-14 rounded-2xl bg-white px-4 ring-1 ring-black/10 flex flex-col items-center justify-center gap-0.5 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
-              <div className="text-[13px] font-extrabold text-slate-800">
-                <span aria-hidden="true">📌 </span>
-                {t("info.fact.title")}
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          {(
+            [
+              { value: "DIRECT", title: t("prefs.conflict.direct.title"), desc: t("prefs.conflict.direct.desc") },
+              { value: "AVOID", title: t("prefs.conflict.avoid.title"), desc: t("prefs.conflict.avoid.desc") },
+              { value: "MEDIATE", title: t("prefs.conflict.mediate.title"), desc: t("prefs.conflict.mediate.desc") },
+              { value: "BURST", title: t("prefs.conflict.burst.title"), desc: t("prefs.conflict.burst.desc") },
+            ] as const
+          ).map((opt) => (
+            <label key={opt.value} className="cursor-pointer">
+              <input
+                type="radio"
+                name="conflictStyle"
+                value={opt.value}
+                checked={conflictStyle === opt.value}
+                onChange={(e) => setConflictStyle(normalizeConflictStyle(e.currentTarget.value))}
+                className="peer sr-only"
+              />
+              <div className="min-h-14 rounded-2xl bg-white px-3 py-2 ring-1 ring-black/10 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
+                <div className="text-[12px] font-extrabold text-slate-800">{opt.title}</div>
+                <div className="mt-0.5 text-[11px] leading-snug text-slate-500">{opt.desc}</div>
               </div>
-              <div className="text-[11px] text-slate-500">{t("info.fact.desc")}</div>
-            </div>
-          </label>
+            </label>
+          ))}
         </div>
       </fieldset>
+
+      <fieldset className="block">
+        <legend className="text-sm font-bold text-slate-800">{t("prefs.energy.legend")}</legend>
+        <p className="mt-1 text-[11px] text-slate-500">{t("prefs.energy.help")}</p>
+
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          {(
+            [
+              { value: "LOW", label: t("prefs.energy.low") },
+              { value: "MID", label: t("prefs.energy.mid") },
+              { value: "HIGH", label: t("prefs.energy.high") },
+            ] as const
+          ).map((opt) => (
+            <label key={opt.value} className="cursor-pointer">
+              <input
+                type="radio"
+                name="energy"
+                value={opt.value}
+                checked={energy === opt.value}
+                onChange={(e) => setEnergy(normalizeEnergyLevel(e.currentTarget.value))}
+                className="peer sr-only"
+              />
+              <div className="h-11 rounded-2xl bg-white px-3 ring-1 ring-black/10 text-[12px] font-extrabold text-slate-700 flex items-center justify-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
+                {opt.label}
+              </div>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <input type="hidden" name="judge" value={legacyJudgeStyle} />
+      <input type="hidden" name="info" value={legacyInfoStyle} />
 
       <button
         type="submit"
@@ -241,22 +327,12 @@ export default function JoinFormClientIntl({ locale, groupId, isFull }: Props) {
         {isFull ? t("submit.full") : isSubmitting ? t("submit.joining") : `🫶 ${t("submit.join")}`}
       </button>
 
-      <MbtiTestModal
-        open={testOpen}
-        onClose={() => setTestOpen(false)}
-        onComplete={(r) => {
-          const v = (r.type || "").toUpperCase();
-          if (mbtiInputRef.current) {
-            mbtiInputRef.current.value = v;
-            mbtiInputRef.current.focus();
-          }
-          setMbtiError(isValidMbti(v) ? null : t("mbti.invalid"));
-          setTestOpen(false);
-        }}
+      <MbtiTestSelectModal
+        open={testSelectOpen}
         locale={locale}
-        context="join"
-        groupId={groupId}
-        returnTo={`${base}/mbti/g/${encodeURIComponent(groupId)}/join`}
+        onClose={() => setTestSelectOpen(false)}
+        onSelectQuick={() => moveToTest("quick")}
+        onSelectFull={() => moveToTest("full")}
       />
     </form>
   );

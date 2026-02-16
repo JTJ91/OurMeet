@@ -10,15 +10,35 @@
   "mbtiTest": {
     "page": {
       "backToMbti": "MBTI 홈",
-      "title": "MBTI 정식 검사",
-      "subtitle": "60문항으로 더 정확하게",
-      "descriptionLead": "인지기능 기반",
-      "descriptionLeadSuffix": "으로",
-      "descriptionPrefix": "당신의",
-      "descriptionEmphasis": "에너지 방향과 판단 방식",
-      "descriptionSuffix": "을 분석해 더 정밀한 MBTI 결과를 확인해요.",
-      "quickLink": "간단 검사는 여기에서 →",
+      "title": "무료 MBTI 성격유형 검사",
+      "subtitle": "60문항 정밀 MBTI 테스트",
+      "descriptionLead": "인지기능 기반 MBTI 검사로",
+      "descriptionLeadSuffix": "",
+      "descriptionPrefix": "외향/내향, 직관/감각, 사고/감정, 판단/인식",
+      "descriptionEmphasis": "4가지 성향 지표",
+      "descriptionSuffix": "를 분석해 내 성격유형 결과를 확인해보세요.",
+      "quickLink": "8문항 간단 MBTI 검사는 여기 →",
+      "metaTitle": "무료 MBTI 성격유형 검사 | 60문항 정밀 테스트",
+      "metaDescription": "인지기능 기반 60문항 MBTI 성격유형 검사. 외향/내향, 직관/감각, 사고/감정, 판단/인식 지표를 분석해 내 MBTI 결과를 확인하세요.",
+      "metaKeywords": "MBTI 검사, MBTI 테스트, 무료 MBTI, 성격유형 검사, 60문항 MBTI",
       "footerNote": "※ MBTI는 참고용이며, 상황·경험에 따라 결과가 달라질 수 있습니다."
+    }
+  },
+  "mbtiQuickTest": {
+    "page": {
+      "backToMbti": "MBTI 홈",
+      "title": "무료 MBTI 간단 검사",
+      "subtitle": "8문항 빠른 MBTI 테스트",
+      "descriptionLead": "핵심 8문항으로",
+      "descriptionLeadSuffix": "",
+      "descriptionPrefix": "외향/내향, 직관/감각, 사고/감정, 판단/인식의",
+      "descriptionEmphasis": "기본 성향",
+      "descriptionSuffix": "을 빠르게 확인해보세요.",
+      "fullLink": "60문항 정밀 검사는 여기 →",
+      "metaTitle": "무료 MBTI 간단 검사 | 8문항 빠른 테스트",
+      "metaDescription": "8문항으로 빠르게 확인하는 무료 MBTI 간단 검사. 성향을 빠르게 파악하고 필요하면 60문항 정밀 검사로 이어서 확인하세요.",
+      "metaKeywords": "MBTI 간단검사, MBTI 8문항, 무료 MBTI 테스트, 빠른 MBTI 검사",
+      "footerNote": "※ 간단 검사는 빠른 참고용이에요. 더 정확한 결과는 60문항 정밀 검사를 이용하세요."
     }
   },
   "create": {
@@ -44,10 +64,35 @@
         "hint": "공백 없이 최대 3글자"
       },
       "mbti": {
-        "quickTest": "MBTI 간단 검사",
+        "quickTest": "MBTI 검사",
         "placeholder": "예: ENFP",
         "invalid": "MBTI 형식이 올바르지 않아요. 예: ENFP",
         "hint": "ENFP 형식, 공백 없이 4글자"
+      },
+      "prefs": {
+        "strength": {
+          "legend": "4축 강도",
+          "help": "각 축 강도는 0~100 사이에서 독립적으로 조절됩니다.",
+          "idea": "IDEA 강도",
+          "fact": "FACT 강도",
+          "logic": "LOGIC 강도",
+          "people": "PEOPLE 강도"
+        },
+        "conflict": {
+          "legend": "갈등 스타일",
+          "help": "갈등 상황에서 주로 보이는 반응을 선택하세요.",
+          "direct": { "title": "DIRECT", "desc": "바로 말하는 편" },
+          "avoid": { "title": "AVOID", "desc": "갈등을 피하는 편" },
+          "mediate": { "title": "MEDIATE", "desc": "중간에서 조율" },
+          "burst": { "title": "BURST", "desc": "참다가 한 번에 터짐" }
+        },
+        "energy": {
+          "legend": "에너지 지속력",
+          "help": "모임에서 에너지가 유지되는 정도를 선택하세요.",
+          "low": "LOW",
+          "mid": "MID",
+          "high": "HIGH"
+        }
       },
       "judge": {
         "legend": "결정 스타일",
@@ -105,10 +150,35 @@
         "hint": "공백 없이 최대 3글자"
       },
       "mbti": {
-        "quickTest": "MBTI 간단 검사",
+        "quickTest": "MBTI 검사",
         "placeholder": "예: ENFP",
         "invalid": "MBTI 형식이 올바르지 않아요. 예: ENFP",
         "hint": "ENFP 형식, 공백 없이 4글자"
+      },
+      "prefs": {
+        "strength": {
+          "legend": "4축 강도",
+          "help": "각 축 강도는 0~100 사이에서 독립적으로 조절됩니다.",
+          "idea": "IDEA 강도",
+          "fact": "FACT 강도",
+          "logic": "LOGIC 강도",
+          "people": "PEOPLE 강도"
+        },
+        "conflict": {
+          "legend": "갈등 스타일",
+          "help": "갈등 상황에서 주로 보이는 반응을 선택하세요.",
+          "direct": { "title": "DIRECT", "desc": "바로 말하는 편" },
+          "avoid": { "title": "AVOID", "desc": "갈등을 피하는 편" },
+          "mediate": { "title": "MEDIATE", "desc": "중간에서 조율" },
+          "burst": { "title": "BURST", "desc": "참다가 한 번에 터짐" }
+        },
+        "energy": {
+          "legend": "에너지 지속력",
+          "help": "모임에서 에너지가 유지되는 정도를 선택하세요.",
+          "low": "LOW",
+          "mid": "MID",
+          "high": "HIGH"
+        }
       },
       "judge": {
         "legend": "결정 스타일",
@@ -159,8 +229,12 @@
       "descriptionSuffix": "을 비교해 관계 케미를 확인해요.",
       "cognitiveGuide": "MBTI 인지기능이란?",
       "quickStart": "빠른 시작",
-      "testLabel": "MBTI 검사",
-      "testDesc": "정식 60문항 검사",
+      "tabTests": "MBTI 검사",
+      "tabGuides": "가이드",
+      "testQuickLabel": "MBTI 간단 검사",
+      "testQuickDesc": "빠른 8문항 검사",
+      "testFullLabel": "MBTI 정밀 검사",
+      "testFullDesc": "정식 60문항 검사",
       "guidesLabel": "모임 속 MBTI",
       "guidesDesc": "상황별 케미 가이드",
       "usageLabel": "이용 가이드",
@@ -962,7 +1036,9 @@
         "title": "MBTI",
         "desc": "인지기능 기반 케미",
         "home": "MBTI 홈",
-        "test": "MBTI 검사",
+        "testSection": "MBTI 검사",
+        "testFull": "정밀 검사 (60문항)",
+        "testQuick": "간단 검사 (8문항)",
         "guideSection": "가이드",
         "cognitive": "인지기능",
         "groupGuide": "모임 속 MBTI",
