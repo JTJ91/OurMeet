@@ -226,7 +226,7 @@ const MBTI_ANIMAL_META: Record<string, AnimalMeta> = {
   },
   ESTJ: {
     emoji: "🦬",
-    name: { ko: "바이슨", en: "Bison", ja: "バイソン" },
+    name: { ko: "들소", en: "Bison", ja: "バイソン" },
     reason: {
       ko: "현실적 기준으로 빠르게 실행하고 강하게 추진하는 힘이 커요.",
       en: "A practical, structured style that executes quickly and pushes results.",
@@ -608,7 +608,12 @@ export default function MbtiTestQuickClient({ locale }: Props) {
         </div>
 
         {animal ? (
-          <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/80 p-3 ring-1 ring-black/5">
+          <div
+            className={[
+              "mt-4 rounded-2xl p-3",
+              isCapturing ? "border border-slate-300 bg-white" : "border border-slate-200/80 bg-white/80 ring-1 ring-black/5",
+            ].join(" ")}
+          >
             <div className="flex items-center gap-3">
               <img
                 key={`${type}-animal`}
