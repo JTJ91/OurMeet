@@ -571,12 +571,20 @@ export default function MbtiTestClient({ locale }: Props) {
     );
   }
 
+  function captureSize(root: HTMLElement) {
+    return {
+      width: Math.max(1, Math.ceil(root.scrollWidth)),
+      height: Math.max(1, Math.ceil(root.scrollHeight)),
+    };
+  }
+
   async function shareResult(type: string) {
     if (typeof window === "undefined") return;
     if (!resultCaptureRef.current) return;
 
+    const shareUrl = `${window.location.origin}${base}/mbti-test`;
     const title = `${ui.resultTitle}: ${type}`;
-    const text = `${ui.shareTextPrefix}: ${type}`;
+    const text = shareUrl;
 
     try {
       setIsCapturing(true);
@@ -584,10 +592,13 @@ export default function MbtiTestClient({ locale }: Props) {
         requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
       });
       await waitForCaptureAssets(resultCaptureRef.current);
+      const size = captureSize(resultCaptureRef.current);
 
       const { toBlob } = await import("html-to-image");
       const blob = await toBlob(resultCaptureRef.current, {
-        pixelRatio: 2,
+        width: size.width,
+        height: size.height,
+        pixelRatio: 1,
         cacheBust: true,
         backgroundColor: "#ffffff",
       });
