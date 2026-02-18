@@ -27,6 +27,7 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
   const [groups, setGroups] = useState<SavedGroup[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   function formatRelativeTime(ts: number, now: number) {
     const diff = Math.max(0, now - ts);
@@ -73,6 +74,11 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
     const timer = window.setInterval(() => setNowTs(Date.now()), 30_000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsNavigating(false), 0);
+    return () => window.clearTimeout(timer);
+  }, [pathname]);
 
   const hasAny = groups.length > 0;
   const subtitle = useMemo(() => {
@@ -175,6 +181,7 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
                             href={href}
                             onMouseEnter={() => router.prefetch(href)}
                             onTouchStart={() => router.prefetch(href)}
+                            onClick={() => setIsNavigating(true)}
                             className="block w-full rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 hover:bg-white"
                           >
                             <div className="flex items-center justify-between gap-3">
@@ -209,6 +216,17 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
                   </ul>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isNavigating && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-white/80 backdrop-blur-[1px]">
+          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 text-sm font-extrabold text-slate-700">
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-[#1E88E5]" />
+              <span>{t("loading")}</span>
             </div>
           </div>
         </div>

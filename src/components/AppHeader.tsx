@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -104,11 +104,15 @@ export default function AppHeader() {
   const [openKey, setOpenKey] = useState<"mbti" | "saju" | null>("mbti");
   const [recentOpen, setRecentOpen] = useState(false);
   const [groups, setGroups] = useState<SavedGroup[]>([]);
+  const [isNavigating, setIsNavigating] = useState(false);
 
-  const toLocalePath = (href: string) => {
-    const normalized = href.startsWith("/") ? href : `/${href}`;
-    return locale === "ko" ? normalized : normalized === "/" ? `/${locale}` : `/${locale}${normalized}`;
-  };
+  const toLocalePath = useCallback(
+    (href: string) => {
+      const normalized = href.startsWith("/") ? href : `/${href}`;
+      return locale === "ko" ? normalized : normalized === "/" ? `/${locale}` : `/${locale}${normalized}`;
+    },
+    [locale]
+  );
 
   const tree: TreeGroup[] = useMemo(
     () => [
@@ -184,12 +188,13 @@ export default function AppHeader() {
       const href = gr.myMemberId ? `/mbti/g/${gr.id}?center=${gr.myMemberId}` : `/mbti/g/${gr.id}`;
       router.prefetch(toLocalePath(href));
     }
-  }, [groups, open, recentOpen, router]);
+  }, [groups, open, recentOpen, router, toLocalePath]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setOpen(false);
       setRecentOpen(false);
+      setIsNavigating(false);
     }, 0);
     return () => window.clearTimeout(timer);
   }, [pathname]);
@@ -410,7 +415,10 @@ export default function AppHeader() {
                                                         href={toLocalePath(href)}
                                                         onMouseEnter={() => router.prefetch(toLocalePath(href))}
                                                         onTouchStart={() => router.prefetch(toLocalePath(href))}
-                                                        onClick={closeDrawer}
+                                                        onClick={() => {
+                                                          setIsNavigating(true);
+                                                          closeDrawer();
+                                                        }}
                                                         className="group flex-1 rounded-2xl border border-slate-200/70 bg-white/85 px-3 py-2 hover:bg-white transition"
                                                       >
                                                         <div className="flex items-start justify-between gap-2">
@@ -474,6 +482,17 @@ export default function AppHeader() {
           </div>
         </aside>
       </div>
+
+      {isNavigating ? (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-white/80 backdrop-blur-[1px]">
+          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 text-sm font-extrabold text-slate-700">
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-[#1E88E5]" />
+              <span>{d("loading")}</span>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }
