@@ -787,7 +787,10 @@ function AxisRow({
   const rightFill = leanLeft ? 0 : halfFill;
 
   return (
-    <div className={["mbti-card-soft rounded-3xl p-4 ring-1 ring-black/10", captureMode ? "shadow-none" : ""].join(" ")}>
+    <div
+      className="mbti-card-soft rounded-3xl p-4 ring-1 ring-black/10"
+      style={captureMode ? { boxShadow: "none", backgroundColor: "#ffffff" } : undefined}
+    >
       <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
         <div className="min-w-0 text-left">
           <div className="inline-flex items-end gap-1.5">
