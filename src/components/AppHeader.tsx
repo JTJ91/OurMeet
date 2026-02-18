@@ -222,9 +222,6 @@ export default function AppHeader() {
               {hasAccent ? brand.slice(0, accentStart) : brand}
               {hasAccent ? <span className="text-[#1E88E5]">{brand.slice(accentStart)}</span> : null}
             </span>
-            <span className="rounded-full bg-[#1E88E5]/12 px-2 py-0.5 text-[11px] font-extrabold text-[#1E88E5] ring-1 ring-[#1E88E5]/20">
-              beta
-            </span>
           </Link>
 
           <div className="ml-auto flex shrink-0 items-center gap-2">

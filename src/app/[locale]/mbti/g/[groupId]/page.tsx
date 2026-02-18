@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/mbti/prisma";
 import { notFound } from "next/navigation";
 import InviteActionsIntl from "@/features/mbti/components/InviteActions";
-import GraphServerIntl from "@/features/mbti/g/[groupId]/GraphServerIntl";
+import GraphClientIntl from "@/features/mbti/g/[groupId]/GraphClientIntl";
 import {
   getCompatScore,
   type ChemType,
@@ -10,7 +10,6 @@ import {
   type CompatReason,
   type Level,
 } from "@/lib/mbti/mbtiCompat";
-import { unstable_cache } from "next/cache";
 import TouchSavedGroupClientIntl from "@/components/TouchSavedGroupClient";
 import ChemTopWorstIntl from "@/features/mbti/g/[groupId]/components/ChemTopWorstIntl";
 import { normalizeMemberPrefs, type MemberPrefs } from "@/lib/mbti/memberPrefs";
@@ -25,7 +24,6 @@ import {
 
 
 import Link from "next/link";
-import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { alternatesForPath } from "@/i18n/metadata";
 import { Compass, Sparkles, Zap, ListChecks, Handshake } from "lucide-react";
@@ -64,55 +62,6 @@ function stablePairHash(input: string) {
   return h;
 }
 
-async function getGroupRankingsCacheSeed(groupId: string) {
-  const snapshot = await prisma.group.findUnique({
-    where: { id: groupId },
-    select: {
-      name: true,
-      maxMembers: true,
-      createdAt: true,
-      members: {
-        select: {
-          id: true,
-          nickname: true,
-          mbti: true,
-          ideaStrength: true,
-          factStrength: true,
-          logicStrength: true,
-          peopleStrength: true,
-          conflictStyle: true,
-          energy: true,
-        },
-      },
-    },
-  });
-
-  if (!snapshot) return null;
-
-  const membersKey = snapshot.members
-    .map(
-      (member) =>
-        [
-          member.id,
-          member.nickname,
-          member.mbti ?? "",
-          member.ideaStrength ?? "",
-          member.factStrength ?? "",
-          member.logicStrength ?? "",
-          member.peopleStrength ?? "",
-          member.conflictStyle ?? "",
-          member.energy ?? "",
-        ].join(":")
-    )
-    .sort()
-    .join("|");
-  const membersHash = stablePairHash(membersKey);
-
-  return `${snapshot.createdAt.getTime()}-${snapshot.maxMembers}-${snapshot.name}-${membersHash}`;
-}
-
-type JudgeStyle = "LOGIC" | "PEOPLE";
-type InfoStyle = "IDEA" | "FACT";
 type PairRow = {
   aId: string; aName: string; aMbti: string;
   bId: string; bName: string; bMbti: string;
@@ -124,10 +73,6 @@ type PairRow = {
   adjustTotal?: number;
   adjustBreakdown?: CompatAdjustBreakdown;
   reason?: CompatReason;
-
-  // ✅ 추가 (인지기능 보정용)
-  aJudge?: JudgeStyle; aInfo?: InfoStyle;
-  bJudge?: JudgeStyle; bInfo?: InfoStyle;
   aPrefs?: MemberPrefs;
   bPrefs?: MemberPrefs;
 };
@@ -598,92 +543,88 @@ function pickRolesForGroup(members: RoleMemberSource[]) {
 }
 
 /** ✅ 3) 케미 타입 분류 (점수 기반 + 약간의 위트) */
+type MemberCompatSource = {
+  id: string;
+  nickname: string;
+  mbti: string;
+  prefs: MemberPrefs;
+};
 
-//** ✅ cached rankings (groupId 별 캐시 분리 + best/worst 안정 계산) */
-const getRankings = (groupId: string, cacheSeed: string) =>
-  unstable_cache(
-    async () => {
-      const group = await prisma.group.findUnique({
-        where: { id: groupId },
-        include: { members: true },
+async function getRankings(groupId: string) {
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    include: { members: true },
+  });
+  if (!group) return null;
+
+  const membersForCalc: MemberCompatSource[] = group.members.map((member) => ({
+    id: member.id,
+    nickname: member.nickname,
+    mbti: (member.mbti ?? "").trim().toUpperCase(),
+    prefs: normalizeMemberPrefs({
+      ideaStrength: member.ideaStrength,
+      factStrength: member.factStrength,
+      logicStrength: member.logicStrength,
+      peopleStrength: member.peopleStrength,
+      conflictStyle: member.conflictStyle,
+      energy: member.energy,
+    }),
+  }));
+
+  const allPairs: PairRow[] = [];
+  for (let i = 0; i < membersForCalc.length; i++) {
+    for (let j = i + 1; j < membersForCalc.length; j++) {
+      const a = membersForCalc[i];
+      const b = membersForCalc[j];
+      const compat = getCompatScore(a.id, a.mbti, b.id, b.mbti, a.prefs, b.prefs);
+
+      allPairs.push({
+        aId: a.id,
+        aName: a.nickname,
+        aMbti: a.mbti,
+        bId: b.id,
+        bName: b.nickname,
+        bMbti: b.mbti,
+        scoreInt: compat.scoreInt,
+        micro: compat.micro,
+        score: compat.score,
+        type: compat.type,
+        level: compat.level,
+        adjustTotal: compat.adjustTotal,
+        adjustBreakdown: compat.adjustBreakdown,
+        reason: compat.reason,
+        aPrefs: a.prefs,
+        bPrefs: b.prefs,
       });
-      if (!group) return null;
-
-      const membersForRank = group.members
-        .filter((m) => isValidMbti(m.mbti))
-        .map((m) => ({
-          id: m.id,
-          nickname: m.nickname,
-          mbti: (m.mbti ?? "").trim().toUpperCase(),
-          judgeStyle: (m.judgeStyle ?? "LOGIC") as JudgeStyle,
-          infoStyle: (m.infoStyle ?? "IDEA") as InfoStyle,
-          prefs: normalizeMemberPrefs({
-            ideaStrength: m.ideaStrength,
-            factStrength: m.factStrength,
-            logicStrength: m.logicStrength,
-            peopleStrength: m.peopleStrength,
-            conflictStyle: m.conflictStyle,
-            energy: m.energy,
-          }),
-        }));
-
-      const pairs: PairRow[] = [];
-
-      for (let i = 0; i < membersForRank.length; i++) {
-        for (let j = i + 1; j < membersForRank.length; j++) {
-          const a = membersForRank[i];
-          const b = membersForRank[j];
-
-          const compat = getCompatScore(a.id, a.mbti, b.id, b.mbti, a.prefs, b.prefs);
-
-          pairs.push({
-            aId: a.id,
-            aName: a.nickname,
-            aMbti: a.mbti,
-            bId: b.id,
-            bName: b.nickname,
-            bMbti: b.mbti,
-            scoreInt: compat.scoreInt,
-            micro: compat.micro,
-            score: compat.score,
-            type: compat.type,
-            level: compat.level,
-            adjustTotal: compat.adjustTotal,
-            adjustBreakdown: compat.adjustBreakdown,
-            reason: compat.reason,
-            aPrefs: a.prefs,
-            bPrefs: b.prefs,
-          });
-        }
-      }
-
-      // ✅ 안정 정렬(점수 동률일 때 aId/bId로 고정)
-      const sortedDesc = [...pairs].sort((x, y) => {
-        if (y.score !== x.score) return y.score - x.score;
-        const hx = stablePairHash(pairStableKey(x.aId, x.bId));
-        const hy = stablePairHash(pairStableKey(y.aId, y.bId));
-        return hx - hy;
-      });
-
-      const sortedAsc = [...pairs].sort((x, y) => {
-        if (x.score !== y.score) return x.score - y.score;
-        const hx = stablePairHash(pairStableKey(x.aId, x.bId));
-        const hy = stablePairHash(pairStableKey(y.aId, y.bId));
-        return hx - hy;
-      });
-
-      const best3 = sortedDesc.slice(0, 3);
-      const worst3 = sortedAsc.slice(0, 3);
-
-      return { group, best3, worst3 };
-    },
-    // ✅ groupId를 캐시 키에 포함 (그룹별 캐시 완전 분리)
-    ["group-rankings", groupId, cacheSeed],
-    {
-      revalidate: 60,
-      tags: [`group-rankings:${groupId}`],
     }
-  )();
+  }
+
+  const validIds = new Set(membersForCalc.filter((m) => isValidMbti(m.mbti)).map((m) => m.id));
+  const rankingPairs = allPairs.filter((pair) => validIds.has(pair.aId) && validIds.has(pair.bId));
+
+  // ✅ 안정 정렬(점수 동률일 때 aId/bId로 고정)
+  const sortedDesc = [...rankingPairs].sort((x, y) => {
+    if (y.score !== x.score) return y.score - x.score;
+    const hx = stablePairHash(pairStableKey(x.aId, x.bId));
+    const hy = stablePairHash(pairStableKey(y.aId, y.bId));
+    return hx - hy;
+  });
+
+  const sortedAsc = [...rankingPairs].sort((x, y) => {
+    if (x.score !== y.score) return x.score - y.score;
+    const hx = stablePairHash(pairStableKey(x.aId, x.bId));
+    const hy = stablePairHash(pairStableKey(y.aId, y.bId));
+    return hx - hy;
+  });
+
+  return {
+    group,
+    best3: sortedDesc.slice(0, 3),
+    worst3: sortedAsc.slice(0, 3),
+    allPairs,
+    membersForCalc,
+  };
+}
 
 
 function SectionCard2({
@@ -779,18 +720,47 @@ export default async function GroupPage({
   const sp = (await searchParams) ?? {};
   const centerId = sp.center;
   const base = locale === "ko" ? "" : `/${locale}`;
+  const graphLocale = locale === "en" || locale === "ja" ? locale : "ko";
+  const tg = await getTranslations({ locale, namespace: "groupGraph.server" });
 
-  const cacheSeed = await getGroupRankingsCacheSeed(groupId);
-  if (!cacheSeed) return notFound();
-
-  const cached = await getRankings(groupId, cacheSeed);
+  const cached = await getRankings(groupId);
   if (!cached) return notFound();
 
-  const { group, best3, worst3 } = cached;
+  const { group, best3, worst3, allPairs, membersForCalc } = cached;
 
   const count = group.members.length;
   const max = group.maxMembers;
   const ratio = max > 0 ? Math.min(100, Math.round((count / max) * 100)) : 0;
+
+  const centerMember = (centerId ? membersForCalc.find((member) => member.id === centerId) : null) ?? membersForCalc[0] ?? null;
+  const pairByKey = new Map(allPairs.map((pair) => [pairStableKey(pair.aId, pair.bId), pair]));
+  const graphNodes = centerMember
+    ? membersForCalc
+        .filter((member) => member.id !== centerMember.id)
+        .map((member) => {
+          const pair = pairByKey.get(pairStableKey(centerMember.id, member.id));
+          if (pair) {
+            return {
+              id: member.id,
+              name: member.nickname,
+              mbti: member.mbti,
+              score: pair.score,
+              level: pair.level,
+            };
+          }
+
+          const compat = getCompatScore(centerMember.id, centerMember.mbti, member.id, member.mbti, centerMember.prefs, member.prefs);
+          return {
+            id: member.id,
+            name: member.nickname,
+            mbti: member.mbti,
+            score: compat.score,
+            level: compat.level,
+          };
+        })
+    : [];
+  const graphAverageScore =
+    allPairs.length > 0 ? allPairs.reduce((sum, pair) => sum + pair.score, 0) / allPairs.length : null;
 
   // ✅ 추가 콘텐츠 계산(서버에서 한번만)
   const validMbtis = group.members
@@ -985,25 +955,39 @@ export default async function GroupPage({
           </div>
         </section>
 
-        <Suspense
-          fallback={
-            <section className="mt-6">
-              <div className="mbti-card-frame rounded-3xl border border-slate-200/70 bg-white/85 p-4 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
-                <div className="flex items-center justify-between">
-                      <div className="text-sm font-extrabold">{tt("graphLoadingTitle", "🧭 관계도 로딩 중")}</div>
-                  <div className="text-[11px] text-slate-500">{tt("graphLoadingWait", "잠시만요")}</div>
+        <section className="mt-6">
+          <div className="mbti-card-frame overflow-hidden rounded-3xl border border-slate-200/70 bg-white/85 shadow-[0_10px_28px_rgba(15,23,42,0.06)] backdrop-blur-sm">
+            <div className="border-b border-slate-200/60 bg-[#1E88E5]/[0.05] px-4 py-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-[#1E88E5]/10 px-2.5 py-1 text-[11px] font-extrabold text-[#1E88E5]">
+                      <span aria-hidden className="mr-1">🧭</span>
+                      {tg("title")}
+                    </span>
+                    <span className="text-[11px] font-bold text-slate-500">{tg("subtitle")}</span>
+                  </div>
                 </div>
-
-                <div className="mt-3 h-[360px] w-full rounded-2xl border border-slate-200/70 bg-white/88 animate-pulse" />
-                <p className="mt-2 text-xs text-slate-500">
-                  {tt("graphLoadingDesc", "그래프 먼저 준비하고 있어요. 위 콘텐츠는 이미 볼 수 있어요.")}
-                </p>
               </div>
-            </section>
-          }
-        >
-          <GraphServerIntl locale={locale} groupId={groupId} centerId={centerId} />
-        </Suspense>
+            </div>
+
+            {centerMember ? (
+              <GraphClientIntl
+                locale={graphLocale}
+                groupId={groupId}
+                groupName={group.name}
+                center={{ id: centerMember.id, nickname: centerMember.nickname, mbti: centerMember.mbti }}
+                nodes={graphNodes}
+                memberCount={membersForCalc.length}
+                pairAverageScore={graphAverageScore}
+              />
+            ) : (
+              <section className="p-5">
+                <p className="text-sm text-slate-500">{tg("emptyMembers")}</p>
+              </section>
+            )}
+          </div>
+        </section>
 
         {/* ✅ 최고 / 최악 */}
         <SectionCard2

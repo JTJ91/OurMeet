@@ -407,7 +407,6 @@ export default function JoinFormClientIntl({ locale, groupId, isFull }: Props) {
               alt={`${mbtiValue} ${selectedAnimal.name[activeLocale]}`}
               width={56}
               height={56}
-              unoptimized
               className="h-14 w-14 shrink-0 rounded-xl border border-slate-200/80 bg-white object-cover"
             />
             <div className="min-w-0">
