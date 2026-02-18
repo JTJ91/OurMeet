@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { readSavedGroups, removeSavedGroup, SavedGroup } from "@/lib/mbti/groupHistory";
 import LocaleSwitcher from "@/features/locale/components/LocaleSwitcher";
@@ -84,6 +84,7 @@ function MenuIcon({ open }: { open: boolean }) {
 
 export default function AppHeader() {
   const pathname = usePathname() || "/";
+  const router = useRouter();
   const locale = detectLocale(pathname);
   const barePath = stripLocale(pathname);
   const isRootPage = barePath === "/";
@@ -176,6 +177,14 @@ export default function AppHeader() {
     const timer = window.setInterval(() => setNowTs(Date.now()), 30_000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (!open || !recentOpen || groups.length === 0) return;
+    for (const gr of groups.slice(0, 8)) {
+      const href = gr.myMemberId ? `/mbti/g/${gr.id}?center=${gr.myMemberId}` : `/mbti/g/${gr.id}`;
+      router.prefetch(toLocalePath(href));
+    }
+  }, [groups, open, recentOpen, router]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -399,6 +408,8 @@ export default function AppHeader() {
                                                     <li key={gr.id} className="flex items-center gap-2">
                                                       <Link
                                                         href={toLocalePath(href)}
+                                                        onMouseEnter={() => router.prefetch(toLocalePath(href))}
+                                                        onTouchStart={() => router.prefetch(toLocalePath(href))}
                                                         onClick={closeDrawer}
                                                         className="group flex-1 rounded-2xl border border-slate-200/70 bg-white/85 px-3 py-2 hover:bg-white transition"
                                                       >

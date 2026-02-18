@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { readSavedGroups, removeSavedGroup, SavedGroup } from "@/lib/mbti/groupHistory";
 
@@ -19,6 +19,7 @@ function toLocalePath(locale: "ko" | "en" | "ja", href: string) {
 
 export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: boolean }) {
   const pathname = usePathname() || "/";
+  const router = useRouter();
   const locale = detectLocale(pathname);
   const t = useTranslations("components.bottomCta");
 
@@ -78,6 +79,16 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
     if (!hasAny) return t("recentEmpty");
     return t("recentCount", { count: groups.length });
   }, [hasAny, groups.length, t]);
+
+  useEffect(() => {
+    if (!sheetOpen || groups.length === 0) return;
+    for (const g of groups.slice(0, 8)) {
+      const href = g.myMemberId
+        ? toLocalePath(locale, `/mbti/g/${g.id}?center=${g.myMemberId}`)
+        : toLocalePath(locale, `/mbti/g/${g.id}`);
+      router.prefetch(href);
+    }
+  }, [groups, locale, router, sheetOpen]);
 
   return (
     <div
@@ -160,7 +171,12 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
 
                       return (
                         <li key={g.id} className="flex items-center gap-2">
-                          <Link href={href} className="block w-full rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 hover:bg-white">
+                          <Link
+                            href={href}
+                            onMouseEnter={() => router.prefetch(href)}
+                            onTouchStart={() => router.prefetch(href)}
+                            className="block w-full rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 hover:bg-white"
+                          >
                             <div className="flex items-center justify-between gap-3">
                               <div className="min-w-0">
                                 <div className="truncate text-sm font-extrabold text-slate-800">{g.name}</div>
