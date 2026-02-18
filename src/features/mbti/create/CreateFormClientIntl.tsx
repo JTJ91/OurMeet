@@ -550,7 +550,7 @@ export default function CreateFormClientIntl({ locale }: Props) {
                     type="range"
                     min={0}
                     max={100}
-                    step={10}
+                    step={1}
                     value={value}
                     onChange={(e) => {
                       const next = clampStrength(e.currentTarget.value);

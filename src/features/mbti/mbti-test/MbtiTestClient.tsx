@@ -430,10 +430,6 @@ function traitColor(k: string) {
   return TRAIT_COLOR[k] ?? "#1E88E5";
 }
 
-function roundToTens(value: number) {
-  return Math.max(0, Math.min(100, Math.round(value / 10) * 10));
-}
-
 export default function MbtiTestClient({ locale }: Props) {
   const total = QUESTIONS.length;
   const activeLocale = normalizeLocale(locale);
@@ -667,22 +663,6 @@ export default function MbtiTestClient({ locale }: Props) {
 
   if (done && result) {
     const { type, axes } = result;
-    const displayAxes = {
-      E: roundToTens(axes.E),
-      N: roundToTens(axes.N),
-      T: roundToTens(axes.T),
-      J: roundToTens(axes.J),
-    };
-    const roundedAxes = {
-      E: displayAxes.E,
-      I: 100 - displayAxes.E,
-      N: displayAxes.N,
-      S: 100 - displayAxes.N,
-      T: displayAxes.T,
-      F: 100 - displayAxes.T,
-      J: displayAxes.J,
-      P: 100 - displayAxes.J,
-    };
     const animal = animalMetaOf(type);
 
     return (
@@ -760,10 +740,10 @@ export default function MbtiTestClient({ locale }: Props) {
         ) : null}
 
         <div className="mt-5 grid gap-2">
-          <AxisRow left="E" right="I" leftPct={roundedAxes.E} rightPct={roundedAxes.I} locale={activeLocale} captureMode={isCapturing} />
-          <AxisRow left="N" right="S" leftPct={roundedAxes.N} rightPct={roundedAxes.S} locale={activeLocale} captureMode={isCapturing} />
-          <AxisRow left="T" right="F" leftPct={roundedAxes.T} rightPct={roundedAxes.F} locale={activeLocale} captureMode={isCapturing} />
-          <AxisRow left="J" right="P" leftPct={roundedAxes.J} rightPct={roundedAxes.P} locale={activeLocale} captureMode={isCapturing} />
+          <AxisRow left="E" right="I" leftPct={axes.E} rightPct={axes.I} locale={activeLocale} captureMode={isCapturing} />
+          <AxisRow left="N" right="S" leftPct={axes.N} rightPct={axes.S} locale={activeLocale} captureMode={isCapturing} />
+          <AxisRow left="T" right="F" leftPct={axes.T} rightPct={axes.F} locale={activeLocale} captureMode={isCapturing} />
+          <AxisRow left="J" right="P" leftPct={axes.J} rightPct={axes.P} locale={activeLocale} captureMode={isCapturing} />
         </div>
 
         {!isCapturing ? (
@@ -779,7 +759,7 @@ export default function MbtiTestClient({ locale }: Props) {
             {isFromForm ? (
               <button
                 type="button"
-                onClick={() => goBackWithMbti(type, roundedAxes)}
+                onClick={() => goBackWithMbti(type, axes)}
                 className="
                   mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white
                   transition-all duration-200 active:scale-[0.97]
@@ -790,7 +770,7 @@ export default function MbtiTestClient({ locale }: Props) {
             ) : (
               <button
                 type="button"
-                onClick={() => router.push(`${base}/mbti/create?${queryFromResult(type, roundedAxes)}`)}
+                onClick={() => router.push(`${base}/mbti/create?${queryFromResult(type, axes)}`)}
                 className="
                   mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white
                   transition-all duration-200 active:scale-[0.97]

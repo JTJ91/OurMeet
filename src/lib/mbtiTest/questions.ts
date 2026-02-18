@@ -37,10 +37,10 @@ export const QUESTIONS: Question[] = [
   // =========================
   // NS (15)
   // =========================
-  { id: "q16", axis: "NS", pole: "N", text: "설명을 들으면 큰 그림부터 본다." },
-  { id: "q17", axis: "NS", pole: "S", text: "설명을 들으면 순서와 방법부터 본다." },
-  { id: "q18", axis: "NS", pole: "N", text: "한 가지를 보면 다른 가능성이 떠오른다." },
-  { id: "q19", axis: "NS", pole: "S", text: "한 가지를 보면 바로 쓸 수 있는 점을 본다." },
+  { id: "q16", axis: "NS", pole: "N", text: "가만히 있어도 여러 상상이나 망상이 계속 떠오른다." },
+  { id: "q17", axis: "NS", pole: "S", text: "가만히 있을 때는 상상보다 지금 할 일 생각이 더 많다." },
+  { id: "q18", axis: "NS", pole: "N", text: "한 생각이 끝나기 전에 다른 생각이 이어져, 머릿속이 자주 시끄럽다." },
+  { id: "q19", axis: "NS", pole: "S", text: "생각이 꼬리를 물기보다, 한 가지씩 차분히 정리해서 생각하는 편이다." },
   { id: "q20", axis: "NS", pole: "N", text: "새 일을 시작하면 아이디어가 먼저 나온다." },
   { id: "q21", axis: "NS", pole: "S", text: "새 일을 시작하면 필요한 자료부터 찾는다." },
   { id: "q22", axis: "NS", pole: "N", text: "말 속의 숨은 뜻을 자주 생각한다.", checkPair: "c2", checkKind: "OPPOSITE" },

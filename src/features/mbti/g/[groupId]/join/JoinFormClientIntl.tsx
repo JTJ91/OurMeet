@@ -539,7 +539,7 @@ export default function JoinFormClientIntl({ locale, groupId, isFull }: Props) {
                     type="range"
                     min={0}
                     max={100}
-                    step={10}
+                    step={1}
                     value={value}
                     disabled={isFull || isSubmitting}
                     onChange={(e) => {
