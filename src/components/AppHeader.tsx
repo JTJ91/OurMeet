@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { readSavedGroups, removeSavedGroup, SavedGroup } from "@/lib/mbti/groupHistory";
 import LocaleSwitcher from "@/features/locale/components/LocaleSwitcher";
@@ -84,7 +84,6 @@ function MenuIcon({ open }: { open: boolean }) {
 
 export default function AppHeader() {
   const pathname = usePathname() || "/";
-  const router = useRouter();
   const locale = detectLocale(pathname);
   const barePath = stripLocale(pathname);
   const isRootPage = barePath === "/";
@@ -104,7 +103,6 @@ export default function AppHeader() {
   const [openKey, setOpenKey] = useState<"mbti" | "saju" | null>("mbti");
   const [recentOpen, setRecentOpen] = useState(false);
   const [groups, setGroups] = useState<SavedGroup[]>([]);
-  const [isNavigating, setIsNavigating] = useState(false);
 
   const toLocalePath = useCallback(
     (href: string) => {
@@ -183,18 +181,9 @@ export default function AppHeader() {
   }, []);
 
   useEffect(() => {
-    if (!open || !recentOpen || groups.length === 0) return;
-    for (const gr of groups.slice(0, 8)) {
-      const href = gr.myMemberId ? `/mbti/g/${gr.id}?center=${gr.myMemberId}` : `/mbti/g/${gr.id}`;
-      router.prefetch(toLocalePath(href));
-    }
-  }, [groups, open, recentOpen, router, toLocalePath]);
-
-  useEffect(() => {
     const timer = window.setTimeout(() => {
       setOpen(false);
       setRecentOpen(false);
-      setIsNavigating(false);
     }, 0);
     return () => window.clearTimeout(timer);
   }, [pathname]);
@@ -413,12 +402,8 @@ export default function AppHeader() {
                                                     <li key={gr.id} className="flex items-center gap-2">
                                                       <Link
                                                         href={toLocalePath(href)}
-                                                        onMouseEnter={() => router.prefetch(toLocalePath(href))}
-                                                        onTouchStart={() => router.prefetch(toLocalePath(href))}
-                                                        onClick={() => {
-                                                          setIsNavigating(true);
-                                                          closeDrawer();
-                                                        }}
+                                                        prefetch={false}
+                                                        onClick={closeDrawer}
                                                         className="group flex-1 rounded-2xl border border-slate-200/70 bg-white/85 px-3 py-2 hover:bg-white transition"
                                                       >
                                                         <div className="flex items-start justify-between gap-2">
@@ -482,17 +467,6 @@ export default function AppHeader() {
           </div>
         </aside>
       </div>
-
-      {isNavigating ? (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-white/80 backdrop-blur-[1px]">
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-sm font-extrabold text-slate-700">
-              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-[#1E88E5]" />
-              <span>{d("loading")}</span>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </>
   );
 }
