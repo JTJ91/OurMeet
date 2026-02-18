@@ -22,7 +22,6 @@ const UI_TEXT: Record<
     createWithResult: string;
     useResult: string;
     reset: string;
-    accuracy: string;
     autoNextHint: string;
     shareResult: string;
     copied: string;
@@ -43,7 +42,6 @@ const UI_TEXT: Record<
     createWithResult: "이 검사결과로 방 만들기",
     useResult: "이 검사결과 사용하기",
     reset: "초기화",
-    accuracy: "정확도",
     autoNextHint: "※ 답을 누르면 자동으로 다음 문항으로 이동합니다.",
     shareResult: "결과 공유",
     copied: "복사됨",
@@ -63,7 +61,6 @@ const UI_TEXT: Record<
     createWithResult: "Create group with this result",
     useResult: "Use this result",
     reset: "Reset",
-    accuracy: "Confidence",
     autoNextHint: "* Selecting an answer automatically moves to the next question.",
     shareResult: "Share Result",
     copied: "Copied",
@@ -83,7 +80,6 @@ const UI_TEXT: Record<
     createWithResult: "この結果でグループ作成",
     useResult: "この結果を使う",
     reset: "リセット",
-    accuracy: "信頼度",
     autoNextHint: "※ 回答を選ぶと自動で次の質問に進みます。",
     shareResult: "結果を共有",
     copied: "コピー完了",
@@ -670,7 +666,7 @@ export default function MbtiTestClient({ locale }: Props) {
   }
 
   if (done && result) {
-    const { type, axes, axisConfidence } = result;
+    const { type, axes } = result;
     const displayAxes = {
       E: roundToTens(axes.E),
       N: roundToTens(axes.N),
@@ -764,10 +760,10 @@ export default function MbtiTestClient({ locale }: Props) {
         ) : null}
 
         <div className="mt-5 grid gap-2">
-          <AxisRow left="E" right="I" leftPct={roundedAxes.E} rightPct={roundedAxes.I} conf={axisConfidence.EI} locale={activeLocale} accuracyLabel={ui.accuracy} captureMode={isCapturing} />
-          <AxisRow left="N" right="S" leftPct={roundedAxes.N} rightPct={roundedAxes.S} conf={axisConfidence.NS} locale={activeLocale} accuracyLabel={ui.accuracy} captureMode={isCapturing} />
-          <AxisRow left="T" right="F" leftPct={roundedAxes.T} rightPct={roundedAxes.F} conf={axisConfidence.TF} locale={activeLocale} accuracyLabel={ui.accuracy} captureMode={isCapturing} />
-          <AxisRow left="J" right="P" leftPct={roundedAxes.J} rightPct={roundedAxes.P} conf={axisConfidence.JP} locale={activeLocale} accuracyLabel={ui.accuracy} captureMode={isCapturing} />
+          <AxisRow left="E" right="I" leftPct={roundedAxes.E} rightPct={roundedAxes.I} locale={activeLocale} captureMode={isCapturing} />
+          <AxisRow left="N" right="S" leftPct={roundedAxes.N} rightPct={roundedAxes.S} locale={activeLocale} captureMode={isCapturing} />
+          <AxisRow left="T" right="F" leftPct={roundedAxes.T} rightPct={roundedAxes.F} locale={activeLocale} captureMode={isCapturing} />
+          <AxisRow left="J" right="P" leftPct={roundedAxes.J} rightPct={roundedAxes.P} locale={activeLocale} captureMode={isCapturing} />
         </div>
 
         {!isCapturing ? (
@@ -883,18 +879,14 @@ function AxisRow({
   right,
   leftPct,
   rightPct,
-  conf,
   locale,
-  accuracyLabel,
   captureMode = false,
 }: {
   left: string;
   right: string;
   leftPct: number;
   rightPct: number;
-  conf: number;
   locale: Locale;
-  accuracyLabel: string;
   captureMode?: boolean;
 }) {
   const delta = leftPct - 50;
@@ -915,7 +907,7 @@ function AxisRow({
       className="mbti-card-soft rounded-3xl p-4 ring-1 ring-black/10"
       style={captureMode ? { boxShadow: "none", backgroundColor: "#ffffff" } : undefined}
     >
-      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-2">
         <div className="min-w-0 text-left">
           <div className="inline-flex items-end gap-1.5">
             <span
@@ -936,12 +928,6 @@ function AxisRow({
               {leftPct}%
             </span>
           </div>
-        </div>
-
-        <div className="flex justify-center">
-          <span className="inline-flex min-w-[106px] items-center justify-center rounded-full bg-slate-900/5 px-3 py-1 text-center text-[11px] font-black text-slate-700 ring-1 ring-black/5 tabular-nums whitespace-nowrap">
-            {accuracyLabel} {conf}%
-          </span>
         </div>
 
         <div className="min-w-0 text-right">

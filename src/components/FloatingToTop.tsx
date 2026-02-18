@@ -10,10 +10,25 @@ export default function FloatingToTop() {
   const t = useTranslations("components.toTop");
 
   useEffect(() => {
-    const onScroll = () => setShow(window.scrollY > 300);
-    onScroll();
+    let rafId = 0;
+
+    const update = () => {
+      rafId = 0;
+      const next = window.scrollY > 300;
+      setShow((prev) => (prev === next ? prev : next));
+    };
+
+    const onScroll = () => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(update);
+    };
+
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -27,24 +42,36 @@ export default function FloatingToTop() {
   }, []);
 
   useEffect(() => {
-    const checkCTA = () => {
+    let observedEl: Element | null = null;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        const next = !!entry?.isIntersecting;
+        setCtaVisible((prev) => (prev === next ? prev : next));
+      },
+      { threshold: 0.01 }
+    );
+
+    const bindTarget = () => {
       const el = document.querySelector("[data-bottom-cta]");
-      if (!el) {
+      if (el === observedEl) return;
+      if (observedEl) io.unobserve(observedEl);
+      observedEl = el;
+      if (observedEl) {
+        io.observe(observedEl);
+      } else {
         setCtaVisible(false);
-        return;
       }
-      const rect = (el as HTMLElement).getBoundingClientRect();
-      const visible = rect.bottom > 0 && rect.top < window.innerHeight;
-      setCtaVisible(visible);
     };
 
-    checkCTA();
-    window.addEventListener("scroll", checkCTA);
-    window.addEventListener("resize", checkCTA);
+    bindTarget();
+
+    const mo = new MutationObserver(bindTarget);
+    mo.observe(document.body, { childList: true, subtree: true });
 
     return () => {
-      window.removeEventListener("scroll", checkCTA);
-      window.removeEventListener("resize", checkCTA);
+      mo.disconnect();
+      io.disconnect();
     };
   }, []);
 
@@ -55,7 +82,7 @@ export default function FloatingToTop() {
       type="button"
       aria-label={t("ariaLabel")}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed right-4 z-[55] rounded-full border border-slate-200/70 bg-white/92 px-4 py-3 text-xs font-extrabold text-slate-800 shadow-[0_10px_24px_rgba(15,23,42,0.14)] backdrop-blur-sm hover:bg-white active:scale-[0.98]"
+      className="fixed right-4 z-[55] rounded-full border border-slate-200/70 bg-white/92 px-4 py-3 text-xs font-extrabold text-slate-800 shadow-[0_10px_24px_rgba(15,23,42,0.14)] hover:bg-white active:scale-[0.98]"
       style={{ bottom: "calc(var(--bottom-cta-h, 0px) + 16px + env(safe-area-inset-bottom))" }}
     >
       {t("label")}

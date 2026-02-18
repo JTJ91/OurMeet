@@ -22,7 +22,6 @@ const UI_TEXT: Record<
     reset: string;
     resultTitle: string;
     retry: string;
-    accuracy: string;
     useResult: string;
     createWithResult: string;
     fullTestLead: string;
@@ -39,7 +38,6 @@ const UI_TEXT: Record<
     reset: "초기화",
     resultTitle: "검사 결과",
     retry: "다시하기",
-    accuracy: "정확도",
     useResult: "이 검사결과 사용하기",
     createWithResult: "이 검사결과로 방 만들기",
     fullTestLead: "더 자세한 분석은 ",
@@ -55,7 +53,6 @@ const UI_TEXT: Record<
     reset: "Reset",
     resultTitle: "Test Result",
     retry: "Retake",
-    accuracy: "Confidence",
     useResult: "Use this result",
     createWithResult: "Create group with this result",
     fullTestLead: "For a deeper analysis, try the ",
@@ -71,7 +68,6 @@ const UI_TEXT: Record<
     reset: "リセット",
     resultTitle: "診断結果",
     retry: "もう一度",
-    accuracy: "信頼度",
     useResult: "この結果を使う",
     createWithResult: "この結果でグループ作成",
     fullTestLead: "より詳しい分析は",
@@ -562,7 +558,7 @@ export default function MbtiTestQuickClient({ locale }: Props) {
   }
 
   if (done && result) {
-    const { type, axes, axisConfidence } = result;
+    const { type, axes } = result;
     const animal = animalMetaOf(type);
 
     return (
@@ -636,10 +632,10 @@ export default function MbtiTestQuickClient({ locale }: Props) {
         ) : null}
 
         <div className="mt-5 grid gap-2">
-          <AxisRow left="E" right="I" leftPct={axes.E} rightPct={axes.I} conf={axisConfidence.EI} locale={activeLocale} accuracyLabel={ui.accuracy} captureMode={isCapturing} />
-          <AxisRow left="N" right="S" leftPct={axes.N} rightPct={axes.S} conf={axisConfidence.NS} locale={activeLocale} accuracyLabel={ui.accuracy} captureMode={isCapturing} />
-          <AxisRow left="T" right="F" leftPct={axes.T} rightPct={axes.F} conf={axisConfidence.TF} locale={activeLocale} accuracyLabel={ui.accuracy} captureMode={isCapturing} />
-          <AxisRow left="J" right="P" leftPct={axes.J} rightPct={axes.P} conf={axisConfidence.JP} locale={activeLocale} accuracyLabel={ui.accuracy} captureMode={isCapturing} />
+          <AxisRow left="E" right="I" leftPct={axes.E} rightPct={axes.I} locale={activeLocale} captureMode={isCapturing} />
+          <AxisRow left="N" right="S" leftPct={axes.N} rightPct={axes.S} locale={activeLocale} captureMode={isCapturing} />
+          <AxisRow left="T" right="F" leftPct={axes.T} rightPct={axes.F} locale={activeLocale} captureMode={isCapturing} />
+          <AxisRow left="J" right="P" leftPct={axes.J} rightPct={axes.P} locale={activeLocale} captureMode={isCapturing} />
         </div>
 
         {!isCapturing ? (
@@ -764,18 +760,14 @@ function AxisRow({
   right,
   leftPct,
   rightPct,
-  conf,
   locale,
-  accuracyLabel,
   captureMode = false,
 }: {
   left: string;
   right: string;
   leftPct: number;
   rightPct: number;
-  conf: number;
   locale: Locale;
-  accuracyLabel: string;
   captureMode?: boolean;
 }) {
   const delta = leftPct - 50;
@@ -796,7 +788,7 @@ function AxisRow({
       className="mbti-card-soft rounded-3xl p-4 ring-1 ring-black/10"
       style={captureMode ? { boxShadow: "none", backgroundColor: "#ffffff" } : undefined}
     >
-      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-2">
         <div className="min-w-0 text-left">
           <div className="inline-flex items-end gap-1.5">
             <span
@@ -812,12 +804,6 @@ function AxisRow({
               {leftPct}%
             </span>
           </div>
-        </div>
-
-        <div className="flex justify-center">
-          <span className="inline-flex min-w-[106px] items-center justify-center rounded-full bg-slate-900/5 px-3 py-1 text-center text-[11px] font-black tabular-nums text-slate-700 ring-1 ring-black/5 whitespace-nowrap">
-            {accuracyLabel} {conf}%
-          </span>
         </div>
 
         <div className="min-w-0 text-right">
