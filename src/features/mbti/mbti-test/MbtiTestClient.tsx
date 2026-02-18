@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
 import { QUESTIONS } from "@/lib/mbtiTest/questions";
 import { scoreMbti, type Answers, type MbtiTestResult } from "@/lib/mbtiTest/score";
@@ -576,10 +575,8 @@ export default function MbtiTestClient({ locale }: Props) {
     if (typeof window === "undefined") return;
     if (!resultCaptureRef.current) return;
 
-    const shareUrl = `${window.location.origin}${base}/mbti-test`;
     const title = `${ui.resultTitle}: ${type}`;
     const text = `${ui.shareTextPrefix}: ${type}`;
-    const textWithUrl = `${text}\n${shareUrl}`;
 
     try {
       setIsCapturing(true);
@@ -590,8 +587,9 @@ export default function MbtiTestClient({ locale }: Props) {
 
       const { toBlob } = await import("html-to-image");
       const blob = await toBlob(resultCaptureRef.current, {
-        pixelRatio: Math.max(2, window.devicePixelRatio || 1),
+        pixelRatio: 2,
         cacheBust: true,
+        backgroundColor: "#ffffff",
       });
 
       setIsCapturing(false);
@@ -599,14 +597,12 @@ export default function MbtiTestClient({ locale }: Props) {
 
       const file = new File([blob], `mbti-result-${type}.png`, { type: "image/png" });
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        // Some targets (e.g., KakaoTalk) may ignore the `url` field when files are attached.
-        // Include the link in `text` so image + link are delivered together.
-        await navigator.share({ title, text: textWithUrl, files: [file] });
+        await navigator.share({ title, text, files: [file] });
         return;
       }
 
       if (navigator.share) {
-        await navigator.share({ title, text: textWithUrl, url: shareUrl });
+        await navigator.share({ title, text });
         return;
       }
 
@@ -616,7 +612,7 @@ export default function MbtiTestClient({ locale }: Props) {
       setIsCapturing(false);
       if (error instanceof DOMException && error.name === "AbortError") return;
       try {
-        await copyTextFallback(`${title}\n${textWithUrl}`);
+        await copyTextFallback(`${title}\n${text}`);
         setCopiedFeedback();
       } catch {
         // Ignore share/copy errors in unsupported environments.
@@ -675,7 +671,7 @@ export default function MbtiTestClient({ locale }: Props) {
     const animal = animalMetaOf(type);
 
     return (
-      <div ref={resultCaptureRef} className="relative">
+      <div ref={resultCaptureRef} className="relative rounded-3xl bg-white p-1">
         <div className="flex items-start justify-between gap-3">
           <div>
             <div className="text-sm font-extrabold text-slate-500">{ui.resultTitle}</div>
@@ -720,14 +716,14 @@ export default function MbtiTestClient({ locale }: Props) {
         {animal ? (
           <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/80 p-3 ring-1 ring-black/5">
             <div className="flex items-center gap-3">
-              <Image
+              <img
                 key={`${type}-animal`}
                 src={animal.imageSrc}
                 alt={`${type} ${animal.name[activeLocale]}`}
                 width={64}
                 height={64}
-                unoptimized
-                priority
+                loading="eager"
+                decoding="sync"
                 className="h-16 w-16 shrink-0 rounded-xl border border-slate-200/80 bg-white object-cover"
               />
               <div className="min-w-0">
