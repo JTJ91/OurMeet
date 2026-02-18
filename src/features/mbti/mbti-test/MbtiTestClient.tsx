@@ -759,10 +759,10 @@ export default function MbtiTestClient({ locale }: Props) {
         ) : null}
 
         <div className="mt-5 grid gap-2">
-          <AxisRow left="E" right="I" leftPct={roundedAxes.E} rightPct={roundedAxes.I} conf={axisConfidence.EI} locale={activeLocale} accuracyLabel={ui.accuracy} />
-          <AxisRow left="N" right="S" leftPct={roundedAxes.N} rightPct={roundedAxes.S} conf={axisConfidence.NS} locale={activeLocale} accuracyLabel={ui.accuracy} />
-          <AxisRow left="T" right="F" leftPct={roundedAxes.T} rightPct={roundedAxes.F} conf={axisConfidence.TF} locale={activeLocale} accuracyLabel={ui.accuracy} />
-          <AxisRow left="J" right="P" leftPct={roundedAxes.J} rightPct={roundedAxes.P} conf={axisConfidence.JP} locale={activeLocale} accuracyLabel={ui.accuracy} />
+          <AxisRow left="E" right="I" leftPct={roundedAxes.E} rightPct={roundedAxes.I} conf={axisConfidence.EI} locale={activeLocale} accuracyLabel={ui.accuracy} captureMode={isCapturing} />
+          <AxisRow left="N" right="S" leftPct={roundedAxes.N} rightPct={roundedAxes.S} conf={axisConfidence.NS} locale={activeLocale} accuracyLabel={ui.accuracy} captureMode={isCapturing} />
+          <AxisRow left="T" right="F" leftPct={roundedAxes.T} rightPct={roundedAxes.F} conf={axisConfidence.TF} locale={activeLocale} accuracyLabel={ui.accuracy} captureMode={isCapturing} />
+          <AxisRow left="J" right="P" leftPct={roundedAxes.J} rightPct={roundedAxes.P} conf={axisConfidence.JP} locale={activeLocale} accuracyLabel={ui.accuracy} captureMode={isCapturing} />
         </div>
 
         {!isCapturing ? (
@@ -881,6 +881,7 @@ function AxisRow({
   conf,
   locale,
   accuracyLabel,
+  captureMode = false,
 }: {
   left: string;
   right: string;
@@ -889,6 +890,7 @@ function AxisRow({
   conf: number;
   locale: Locale;
   accuracyLabel: string;
+  captureMode?: boolean;
 }) {
   const delta = leftPct - 50;
   const leanLeft = delta >= 0;
@@ -904,7 +906,7 @@ function AxisRow({
   const rightFill = leanLeft ? 0 : halfFill;
 
   return (
-    <div className="mbti-card-soft rounded-3xl p-4 ring-1 ring-black/10">
+    <div className={["mbti-card-soft rounded-3xl p-4 ring-1 ring-black/10", captureMode ? "shadow-none" : ""].join(" ")}>
       <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
         <div className="min-w-0 text-left">
           <div className="inline-flex items-end gap-1.5">
@@ -929,7 +931,7 @@ function AxisRow({
         </div>
 
         <div className="flex justify-center">
-          <span className="inline-flex w-[96px] items-center justify-center rounded-full bg-slate-900/5 px-2.5 py-1 text-center text-[11px] font-black text-slate-700 ring-1 ring-black/5 tabular-nums whitespace-nowrap">
+          <span className="inline-flex min-w-[106px] items-center justify-center rounded-full bg-slate-900/5 px-3 py-1 text-center text-[11px] font-black text-slate-700 ring-1 ring-black/5 tabular-nums whitespace-nowrap">
             {accuracyLabel} {conf}%
           </span>
         </div>
