@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import EgoGraphCanvasResponsiveIntl, { EgoNode } from "@/features/mbti/components/EgoGraphCanvasResponsive";
 import SaveGroupClientIntl from "@/components/SaveGroupClient";
@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 type GraphLocale = "ko" | "en" | "ja";
+const subscribeNoop = () => () => {};
 
 export default function GraphClientIntl({
   locale,
@@ -33,11 +34,11 @@ export default function GraphClientIntl({
   const router = useRouter();
   const sp = useSearchParams();
 
-  const [slotEl, setSlotEl] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    setSlotEl(document.getElementById("group-actions-slot"));
-  }, []);
+  const slotEl = useSyncExternalStore(
+    subscribeNoop,
+    () => document.getElementById("group-actions-slot"),
+    () => null
+  );
 
   const actions = useMemo(() => {
     const centerLabel = t("centerLabel", { nickname: center.nickname, mbti: center.mbti });

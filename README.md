@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## our-meet
+
+MBTI 기반 모임 케미 분석 서비스입니다. Next.js(App Router) + Prisma를 사용합니다.
 
 ## Getting Started
 
@@ -28,6 +30,18 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy
+
+운영 배포 순서:
+
+1. `npx prisma migrate deploy`
+2. `npm run build` (내부적으로 `prisma generate && next build`)
+3. 배포 진행
+
+개발 마이그레이션:
+
+- `npx prisma migrate dev`
 
 ## Deploy on Vercel
 

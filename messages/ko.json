@@ -67,12 +67,13 @@
         "quickTest": "MBTI 검사",
         "placeholder": "예: ENFP",
         "invalid": "MBTI 형식이 올바르지 않아요. 예: ENFP",
-        "hint": "ENFP 형식, 공백 없이 4글자"
+        "hint": "ENFP 형식, 공백 없이 4글자",
+        "testPrefillHint": "MBTI 검사를 완료하면 퍼센트 값이 자동 입력돼요."
       },
       "prefs": {
         "strength": {
-          "legend": "4축 강도",
-          "help": "각 축 강도는 0~100 사이에서 독립적으로 조절됩니다.",
+          "legend": "대화 스타일 (선택)",
+          "help": "고급 설정에서 정보/결정 스타일을 가볍게 조절할 수 있어요.",
           "idea": "IDEA 강도",
           "fact": "FACT 강도",
           "logic": "LOGIC 강도",
@@ -80,18 +81,74 @@
         },
         "conflict": {
           "legend": "갈등 스타일",
-          "help": "갈등 상황에서 주로 보이는 반응을 선택하세요.",
-          "direct": { "title": "DIRECT", "desc": "바로 말하는 편" },
-          "avoid": { "title": "AVOID", "desc": "갈등을 피하는 편" },
-          "mediate": { "title": "MEDIATE", "desc": "중간에서 조율" },
-          "burst": { "title": "BURST", "desc": "참다가 한 번에 터짐" }
+          "help": "갈등 상황에서 내 반응에 가까운 유형을 골라보세요.",
+          "direct": {
+            "title": "바로 말함",
+            "desc": "바로 말하는 편",
+            "selectedSummary": "말이 빠르고 분명해 오해를 줄이지만, 강하게 들릴 수 있어요."
+          },
+          "avoid": {
+            "title": "피하는 편",
+            "desc": "갈등을 피하는 편",
+            "selectedSummary": "즉각 충돌은 줄이지만, 이슈가 뒤로 밀릴 수 있어요."
+          },
+          "mediate": {
+            "title": "조율형",
+            "desc": "중간에서 조율",
+            "selectedSummary": "다툼이 나면 분위기를 완충해요."
+          },
+          "burst": {
+            "title": "참다 터짐",
+            "desc": "참다가 한 번에 터짐",
+            "selectedSummary": "평소엔 조용하지만 누적되면 강하게 반응할 수 있어요."
+          },
+          "selected": "선택됨: {title} — {summary}"
         },
         "energy": {
           "legend": "에너지 지속력",
-          "help": "모임에서 에너지가 유지되는 정도를 선택하세요.",
-          "low": "LOW",
-          "mid": "MID",
-          "high": "HIGH"
+          "help": "모임에서 에너지가 얼마나 오래 가는지 선택해보세요.",
+          "low": "금방 지쳐요",
+          "mid": "보통 유지해요",
+          "high": "끝까지 유지돼요",
+          "lowSelectedSummary": "짧은 모임이나 휴식이 있는 일정에 잘 맞아요.",
+          "midSelectedSummary": "보통 길이의 모임에 잘 맞아요.",
+          "highSelectedSummary": "길고 밀도 높은 모임에서도 페이스를 유지해요.",
+          "selected": "선택됨: {level} — {summary}"
+        },
+        "advanced": {
+          "title": "정확도 올리기 (선택)",
+          "open": "펼치기",
+          "fold": "접기",
+          "help": "점수 정확도가 올라가요."
+        },
+        "style": {
+          "legend": "대화 스타일 (선택)",
+          "help": "정보를 나누는 방식과 결정을 내리는 성향을 설정해보세요.",
+          "info": {
+            "title": "정보 스타일",
+            "left": "아이디어",
+            "right": "현실/사실"
+          },
+          "decision": {
+            "title": "결정 스타일",
+            "left": "공감/분위기",
+            "right": "근거/효율"
+          },
+          "band": {
+            "veryLeft": "매우 왼쪽",
+            "slightlyLeft": "약간 왼쪽",
+            "balanced": "균형",
+            "slightlyRight": "약간 오른쪽",
+            "veryRight": "매우 오른쪽"
+          },
+          "summary": {
+            "withSide": "{side}형({band}) {value}%",
+            "balanced": "균형형({band}) {value}%"
+          }
+        },
+        "behavior": {
+          "legend": "갈등/에너지",
+          "help": "갈등 대응 방식과 모임 페이스를 함께 설정해요."
         }
       },
       "judge": {
@@ -121,6 +178,84 @@
       "submit": {
         "creating": "생성중...",
         "create": "모임 만들기"
+      },
+      "why": {
+        "title": "왜 입력하나요?",
+        "body": "MBTI가 같아도 대화 스타일이 달라서 케미/역할이 달라질 수 있어요. (선택 입력)"
+      },
+      "percent": {
+        "title": "MBTI 성향 퍼센트 설정",
+        "desc": "검사 결과에 나온 퍼센트를 그대로 입력하세요. (필수)",
+        "testPrefillHint": "게이지를 놓는 순간 MBTI가 자동으로 반영돼요.",
+        "energy": "에너지",
+        "info": "정보",
+        "judge": "판단",
+        "style": "스타일",
+        "preview": "자동 추정 MBTI: {mbti}",
+        "applyPreview": "이 값으로 MBTI 적용",
+        "mismatch": "MBTI와 퍼센트가 다를 수 있어요. 계산은 퍼센트 기준으로 진행돼요.",
+        "alignMbtiToPercent": "MBTI를 퍼센트에 맞추기",
+        "alignPercentToMbti": "퍼센트를 MBTI에 맞추기"
+      },
+      "optional": {
+        "title": "갈등/에너지(선택)",
+        "desc": "추가로 입력하면 케미 점수/역할 추천 정확도가 올라가요. (선택)",
+        "open": "펼치기",
+        "fold": "접기",
+        "conflict": {
+          "title": "갈등 스타일",
+          "help": "선택하면 관계 해석에 반영돼요.",
+          "none": "선택 안 함 (기본값으로 저장)",
+          "selected": "선택됨: {label} — {desc}",
+          "interpret": {
+            "direct": "핵심을 빠르게 짚어 정리가 빨라지지만, 말이 강하게 들릴 수 있어요.",
+            "avoid": "당장 분위기는 부드럽지만, 이슈가 뒤로 밀릴 수 있어요.",
+            "mediate": "서로의 온도 차를 완충해 대화 흐름을 안정시키는 편이에요.",
+            "burst": "평소엔 참다가 누적되면 강하게 반응할 수 있어요."
+          },
+          "direct": {
+            "label": "DIRECT",
+            "desc": "바로 말하는 편"
+          },
+          "avoid": {
+            "label": "AVOID",
+            "desc": "갈등을 피하는 편"
+          },
+          "mediate": {
+            "label": "MEDIATE",
+            "desc": "중간에서 조율"
+          },
+          "burst": {
+            "label": "BURST",
+            "desc": "참다가 한 번에 터짐"
+          }
+        },
+        "energy": {
+          "title": "에너지 지속력",
+          "help": "선택하면 모임 템포 해석에 반영돼요.",
+          "none": "선택 안 함 (기본값으로 저장)",
+          "selected": "선택됨: {label} — {desc}",
+          "interpret": {
+            "low": "짧고 가벼운 모임에서 컨디션을 유지하기 쉬워요.",
+            "mid": "대부분의 모임 길이에서 안정적으로 페이스를 유지해요.",
+            "high": "긴 모임이나 활동량이 많은 자리에서도 에너지가 잘 유지돼요."
+          },
+          "low": {
+            "label": "금방 지쳐요",
+            "time": "약 1~2시간",
+            "desc": "짧은 모임이나 쉬는 시간이 필요해요."
+          },
+          "mid": {
+            "label": "보통 유지해요",
+            "time": "약 2~4시간",
+            "desc": "보통 길이의 모임 페이스를 유지해요."
+          },
+          "high": {
+            "label": "끝까지 유지돼요",
+            "time": "약 4시간+",
+            "desc": "긴 모임에서도 에너지가 비교적 유지돼요."
+          }
+        }
       }
     },
     "actionErrors": {
@@ -167,10 +302,22 @@
         "conflict": {
           "legend": "갈등 스타일",
           "help": "갈등 상황에서 주로 보이는 반응을 선택하세요.",
-          "direct": { "title": "DIRECT", "desc": "바로 말하는 편" },
-          "avoid": { "title": "AVOID", "desc": "갈등을 피하는 편" },
-          "mediate": { "title": "MEDIATE", "desc": "중간에서 조율" },
-          "burst": { "title": "BURST", "desc": "참다가 한 번에 터짐" }
+          "direct": {
+            "title": "DIRECT",
+            "desc": "바로 말하는 편"
+          },
+          "avoid": {
+            "title": "AVOID",
+            "desc": "갈등을 피하는 편"
+          },
+          "mediate": {
+            "title": "MEDIATE",
+            "desc": "중간에서 조율"
+          },
+          "burst": {
+            "title": "BURST",
+            "desc": "참다가 한 번에 터짐"
+          }
         },
         "energy": {
           "legend": "에너지 지속력",
@@ -228,6 +375,7 @@
       "descriptionEmphasis": "생각 방식과 대화 리듬",
       "descriptionSuffix": "을 비교해 관계 케미를 확인해요.",
       "cognitiveGuide": "MBTI 인지기능이란?",
+      "tryTest": "MBTI 검사해보기",
       "quickStart": "빠른 시작",
       "tabTests": "MBTI 검사",
       "tabGuides": "가이드",
@@ -831,6 +979,7 @@
         "jpJ": "J 판단",
         "jpP": "P 인식"
       },
+      "percentAverageFormat": "{key} {percent}% 평균",
       "vibeSummaryTitle": "모임 분위기 요약",
       "cautionPoint": "주의 포인트",
       "balanceOne": "어느 한쪽도 밀리지 않아서 상황에 따라 톤이 자연스럽게 바뀝니다.",
@@ -915,6 +1064,88 @@
           "deadlineTail": "만 하나 잡아두면 편해요.",
           "noBigDownside": "큰 단점은 없고, ",
           "clearTopic": "만 명확하면 더 잘 굴러가요."
+        },
+        "summaryTitle": "핵심 운영 요약",
+        "tokens": {
+          "SCENE_EI_TIE": "발언 기회가 비교적 고르게 돌아가고, 진행자가 흐름을 정리하면 안정적으로 굴러갑니다.",
+          "SCENE_EI_E_MILD": "대화가 먼저 열리고 의견 교환이 빠르게 시작됩니다.",
+          "SCENE_EI_E_STRONG": "대화 템포가 빠르고, 짧은 간격으로 의견이 연속해서 나옵니다.",
+          "SCENE_EI_E_EXTREME": "말이 끊기지 않고 동시다발로 의견이 나오는 편이라 발언 순서 정리가 중요합니다.",
+          "SCENE_EI_I_MILD": "생각을 정리한 뒤 발언하는 패턴이 보여 핵심 의견 밀도가 높습니다.",
+          "SCENE_EI_I_STRONG": "충분히 듣고 정리한 뒤 말해 회의 중반 이후 결정 품질이 올라갑니다.",
+          "SCENE_EI_I_EXTREME": "초반 발언은 적지만 핵심 쟁점이 선별돼, 말이 나올 때 결론 기여도가 큽니다.",
+          "SCENE_NS_TIE": "아이디어 탐색과 현실 점검이 번갈아 나와 논의의 균형이 안정적입니다.",
+          "SCENE_NS_N_MILD": "기존 안을 바탕으로 확장 아이디어가 자연스럽게 붙습니다.",
+          "SCENE_NS_N_STRONG": "주제가 확장되며 대안이 빠르게 늘어나는 구조라 선택 기준 정리가 필요합니다.",
+          "SCENE_NS_N_EXTREME": "아이디어가 연쇄적으로 확장돼 범위가 쉽게 커지므로 우선순위 고정이 핵심입니다.",
+          "SCENE_NS_S_MILD": "현실 조건과 실행 가능성을 빨리 확인하며 대화가 수렴합니다.",
+          "SCENE_NS_S_STRONG": "논의가 실행 항목 중심으로 빨리 모여 액션 정의가 선명합니다.",
+          "SCENE_NS_S_EXTREME": "아이디어보다 실행 검증이 강하게 앞서, 결정 속도는 빠르지만 탐색 폭은 좁아질 수 있습니다.",
+          "SCENE_JP_TIE": "탐색과 결론 고정의 균형이 좋아 상황에 맞게 운영 모드를 전환하기 쉽습니다.",
+          "SCENE_JP_J_MILD": "결론을 미루지 않고 단계별로 닫아가며 회의가 정리됩니다.",
+          "SCENE_JP_J_STRONG": "결정 지점을 명확히 잡아 회의 종료 시 실행 항목이 분명하게 남습니다.",
+          "SCENE_JP_J_EXTREME": "결론 고정 속도가 매우 빨라 진행은 빠르지만 초기 아이디어 탐색 시간이 부족할 수 있습니다.",
+          "SCENE_JP_P_MILD": "결론을 열어두고 진행해 변화 대응이 빠른 편입니다.",
+          "SCENE_JP_P_STRONG": "굴리면서 맞추는 운영이 강해 중간 수정은 유연하지만 결정 시점 관리가 필요합니다.",
+          "SCENE_JP_P_EXTREME": "진행 중 범위와 우선순위가 자주 재설정될 수 있어 마감/완료 기준 합의가 중요합니다.",
+          "SUMMARY_ENP_A1": "아이디어가 빠르게 확장되고, 대화가 여러 갈래로 뻗는 흐름입니다.",
+          "SUMMARY_ENP_A2": "탐색 효율은 높지만 결론 고정 시점이 뒤로 밀릴 수 있어요.",
+          "SUMMARY_ENP_B1": "브레인스토밍 에너지가 높아 새 제안이 연속해서 붙습니다.",
+          "SUMMARY_ENP_B2": "먼저 실험하고 나중에 정리하는 방식이 잘 맞는 조합입니다.",
+          "SUMMARY_ENJ_A1": "아이디어를 빠르게 모으고, 실행 순서로 바로 정리하는 운영입니다.",
+          "SUMMARY_ENJ_A2": "회의가 짧게 끝나고 다음 액션이 바로 확정될 가능성이 높습니다.",
+          "SUMMARY_ENJ_B1": "발산 후 수렴 전환이 빨라 실무 결정으로 연결되는 속도가 빠릅니다.",
+          "SUMMARY_ENJ_B2": "논의가 길어지기 전에 우선순위와 담당이 정리되는 패턴입니다.",
+          "SUMMARY_ESP_A1": "현장 이슈를 즉시 공유하고 상황에 맞게 빠르게 조정하는 스타일입니다.",
+          "SUMMARY_ESP_A2": "속도는 빠르지만 중간 변경이 잦아 범위 관리가 성패를 가릅니다.",
+          "SUMMARY_ESP_B1": "실행 중심 대화가 끊기지 않고 이어져 추진력은 강한 편입니다.",
+          "SUMMARY_ESP_B2": "정해진 틀보다 당장 효과적인 선택을 우선하는 경향이 큽니다.",
+          "SUMMARY_ESJ_A1": "필요 정보를 빠르게 모은 뒤 실행/정리로 수렴하는 구조입니다.",
+          "SUMMARY_ESJ_A2": "결정 이후 역할과 마감이 분명해 흔들림이 적습니다.",
+          "SUMMARY_ESJ_B1": "대화량은 많지만 결론은 구조적으로 고정되는 편입니다.",
+          "SUMMARY_ESJ_B2": "회의 종료 시점에 할 일과 담당자가 명확히 남습니다.",
+          "SUMMARY_INP_A1": "충분히 생각한 뒤 핵심 아이디어를 내고, 결론은 유연하게 유지합니다.",
+          "SUMMARY_INP_A2": "탐색의 질은 높지만 최종 확정 시점은 늦어질 수 있습니다.",
+          "SUMMARY_INP_B1": "조용히 정리된 관점이 중후반에 힘을 발휘하는 패턴입니다.",
+          "SUMMARY_INP_B2": "확정 전 검토 루프를 여러 번 도는 운영에 가깝습니다.",
+          "SUMMARY_INJ_A1": "정리된 관점으로 논점을 좁히고, 결론을 단계적으로 고정하는 흐름입니다.",
+          "SUMMARY_INJ_A2": "말수는 많지 않아도 결정의 밀도와 일관성이 높은 편입니다.",
+          "SUMMARY_INJ_B1": "초반 탐색은 신중하지만 의사결정 구간에서 속도가 붙습니다.",
+          "SUMMARY_INJ_B2": "핵심 기준이 잡히면 회의가 빠르게 수렴합니다.",
+          "SUMMARY_ISP_A1": "조용하게 상황을 파악한 뒤 필요한 실행을 유연하게 조정합니다.",
+          "SUMMARY_ISP_A2": "집중도는 높지만 일정/범위가 수시로 바뀔 수 있습니다.",
+          "SUMMARY_ISP_B1": "말수는 적어도 실행 판단은 빠르게 내려지는 편입니다.",
+          "SUMMARY_ISP_B2": "고정된 틀보다 현장 맞춤 대응에 강한 운영입니다.",
+          "SUMMARY_ISJ_A1": "필요한 말만 하고 실행·정리로 빠르게 수렴하는 구조입니다.",
+          "SUMMARY_ISJ_A2": "결론이 빨리 고정돼 역할 분담과 후속 실행이 명확합니다.",
+          "SUMMARY_ISJ_B1": "검토는 차분하게, 결정은 단단하게 마무리되는 패턴입니다.",
+          "SUMMARY_ISJ_B2": "회의 후반에 체크리스트 형태로 결론이 정리됩니다.",
+          "SUMMARY_FB_EINS_E_N": "대화 주도권은 빠르게 열리고, 논의는 아이디어 확장 쪽으로 기울기 쉽습니다.",
+          "SUMMARY_FB_EINS_E_S": "대화는 활발하지만 실행 가능성 점검으로 비교적 빨리 수렴합니다.",
+          "SUMMARY_FB_EINS_E_X": "대화 템포는 빠른 편이고, 논점 확장과 수렴이 상황에 따라 오갑니다.",
+          "SUMMARY_FB_EINS_I_N": "신중한 발언 위에서 확장 아이디어가 붙어 중후반 논의 밀도가 높습니다.",
+          "SUMMARY_FB_EINS_I_S": "필요한 말만 오가며 현실 점검 중심으로 안정적으로 굴러갑니다.",
+          "SUMMARY_FB_EINS_I_X": "신중한 발언 패턴 속에서 탐색과 점검이 균형 있게 이어집니다.",
+          "SUMMARY_FB_EINS_X_N": "발언 스타일은 균형적이고, 논의 초점은 새로운 대안 탐색으로 향합니다.",
+          "SUMMARY_FB_EINS_X_S": "발언 스타일은 균형적이고, 논의는 실행/검증 중심으로 모입니다.",
+          "SUMMARY_FB_EINS_X_X": "발언과 논의 초점이 모두 균형적이라 운영 모드 전환이 유연합니다.",
+          "SUMMARY_FB_NSJP_N_J": "아이디어 발산 후 결정 고정으로 전환되면 실행력이 크게 올라갑니다.",
+          "SUMMARY_FB_NSJP_N_P": "아이디어 탐색을 오래 가져가며 결론은 유연하게 유지되는 흐름입니다.",
+          "SUMMARY_FB_NSJP_N_X": "아이디어 탐색 비중이 높고, 결론 속도는 상황에 따라 달라집니다.",
+          "SUMMARY_FB_NSJP_S_J": "현실 검증 후 결론을 빠르게 닫아 실행 단계로 넘어가기 좋습니다.",
+          "SUMMARY_FB_NSJP_S_P": "현실 중심으로 움직이되 중간 조정이 잦아 범위 관리가 필요합니다.",
+          "SUMMARY_FB_NSJP_S_X": "실행 점검 비중이 높고 결론 고정 강도는 상황 영향을 크게 받습니다.",
+          "SUMMARY_FB_NSJP_X_J": "탐색/검증은 균형적이고, 결론은 비교적 빠르게 닫히는 편입니다.",
+          "SUMMARY_FB_NSJP_X_P": "탐색/검증은 균형적이고, 결론은 열어두며 조정하는 편입니다.",
+          "SUMMARY_FB_NSJP_X_X": "탐색과 결론 모두 균형적이라 회의 운영 유연성이 높습니다.",
+          "CAUTION_T_BASE": "피드백이 직설적으로 들릴 수 있어요. 결론/요약 전에 한 문장만 쿠션을 넣어주세요.",
+          "CAUTION_T_EXTREME": "직설 피드백 강도가 큰 편이에요. 결론/요약 전에 쿠션 문장을 넣고, 확인 질문으로 오해를 줄여주세요.",
+          "CAUTION_F_BASE": "공감이 길어지며 결론이 미뤄질 수 있어요. '오늘 정할 1개'만 먼저 확정하면 좋아요.",
+          "CAUTION_F_EXTREME": "공감 대화 비중이 크게 높아요. 시작할 때 '오늘 정할 1개'를 먼저 못 박으면 흐름이 안정됩니다.",
+          "CAUTION_P_BASE": "일정/범위가 중간에 바뀌기 쉬워요. 마감/완료 기준만 먼저 합의하세요.",
+          "CAUTION_P_EXTREME": "중간 변경 가능성이 높아요. 마감·완료 기준·변경 승인 기준을 초반에 함께 정해두세요.",
+          "CAUTION_DEFAULT_BASE": "구조적 충돌은 적어요. 목표만 선명하면 속도가 더 붙습니다.",
+          "CAUTION_DEFAULT_EXTREME": "큰 충돌은 없지만 축 성향이 뚜렷해요. 목표와 우선순위를 먼저 고정하면 속도가 안정적으로 붙습니다."
         }
       },
       "mostlyPrefix": "{line}"
@@ -927,6 +1158,13 @@
         "ORGANIZE": "정리결정 담당",
         "MEDIATOR": "중재조율 담당"
       },
+      "snapshotTitle": "모임 캐릭터 스냅샷",
+      "snapshotTopCandidate": "대표 후보",
+      "snapshotEmptyRole": "현재 모임에서 비어있는 역할",
+      "snapshotNoCandidate": "아직 성향 데이터가 부족해요.",
+      "snapshotStrength": "역할 강도",
+      "snapshotStrongRole": "강점 역할",
+      "snapshotImproveHint": "보완 인사이트",
       "badges": {
         "STRATEGY": {
           "1": "전략 설계자",
@@ -983,7 +1221,9 @@
           "default": "역할은 고정이 아니에요. 상황에 따라 바뀌어도 자연스러워요.",
           "lack": "주의 포인트: {role}가 비어 있어요. 이 역할을 맡는 사람이 없으면 회의가 길어질 수 있어요."
         }
-      }
+      },
+      "fitLabel": "적합도",
+      "noTopOne": "1위 후보 없음"
     }
   },
   "components": {

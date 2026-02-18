@@ -67,31 +67,88 @@
         "quickTest": "MBTI Test",
         "placeholder": "e.g. ENFP",
         "invalid": "Invalid MBTI format. Example: ENFP",
-        "hint": "Use ENFP format, 4 letters with no spaces"
+        "hint": "Use ENFP format, 4 letters with no spaces",
+        "testPrefillHint": "After MBTI test, axis percentages are auto-filled here."
       },
       "prefs": {
         "strength": {
-          "legend": "4-Axis Strength",
-          "help": "Each axis is independent and can be adjusted from 0 to 100.",
+          "legend": "Conversation Style (Optional)",
+          "help": "In advanced settings, you can lightly tune info/decision style.",
           "idea": "IDEA Strength",
           "fact": "FACT Strength",
           "logic": "LOGIC Strength",
           "people": "PEOPLE Strength"
         },
         "conflict": {
-          "legend": "Conflict Style",
-          "help": "Choose your common response pattern in conflict.",
-          "direct": { "title": "DIRECT", "desc": "Speak directly" },
-          "avoid": { "title": "AVOID", "desc": "Avoid conflict" },
-          "mediate": { "title": "MEDIATE", "desc": "Mediate in the middle" },
-          "burst": { "title": "BURST", "desc": "Hold then burst" }
+          "legend": "Conflict style",
+          "help": "Pick the response closest to your everyday style.",
+          "direct": {
+            "title": "Direct",
+            "desc": "Speak directly",
+            "selectedSummary": "Clear and fast, but it may sound strong."
+          },
+          "avoid": {
+            "title": "Avoiding",
+            "desc": "Avoid conflict",
+            "selectedSummary": "Reduces immediate friction, but issues can be postponed."
+          },
+          "mediate": {
+            "title": "Mediator",
+            "desc": "Coordinate in the middle",
+            "selectedSummary": "Helps buffer tension when conflict starts."
+          },
+          "burst": {
+            "title": "Burst",
+            "desc": "Hold and then burst",
+            "selectedSummary": "Usually calm, but may react strongly after buildup."
+          },
+          "selected": "Selected: {title} — {summary}"
         },
         "energy": {
-          "legend": "Energy Endurance",
-          "help": "How long your social energy tends to last.",
-          "low": "LOW",
-          "mid": "MID",
-          "high": "HIGH"
+          "legend": "Energy endurance",
+          "help": "Choose how long your social energy tends to last.",
+          "low": "I tire quickly",
+          "mid": "I usually sustain",
+          "high": "I sustain to the end",
+          "lowSelectedSummary": "Fits short sessions or schedules with breaks.",
+          "midSelectedSummary": "Works well for average-length gatherings.",
+          "highSelectedSummary": "Can keep pace in long and dense sessions.",
+          "selected": "Selected: {level} — {summary}"
+        },
+        "advanced": {
+          "title": "Improve accuracy (Optional)",
+          "open": "Open",
+          "fold": "Close",
+          "help": "These settings can improve score accuracy."
+        },
+        "style": {
+          "legend": "Conversation Style (Optional)",
+          "help": "Set how you share information and make decisions.",
+          "info": {
+            "title": "Info style",
+            "left": "Ideas",
+            "right": "Reality/Facts"
+          },
+          "decision": {
+            "title": "Decision style",
+            "left": "Empathy/Mood",
+            "right": "Evidence/Efficiency"
+          },
+          "band": {
+            "veryLeft": "very left",
+            "slightlyLeft": "slightly left",
+            "balanced": "balanced",
+            "slightlyRight": "slightly right",
+            "veryRight": "very right"
+          },
+          "summary": {
+            "withSide": "{side} ({band}) {value}%",
+            "balanced": "Balanced ({band}) {value}%"
+          }
+        },
+        "behavior": {
+          "legend": "Conflict/Energy",
+          "help": "Set both conflict response and gathering pace."
         }
       },
       "judge": {
@@ -121,6 +178,84 @@
       "submit": {
         "creating": "Creating...",
         "create": "Create Group"
+      },
+      "why": {
+        "title": "Why add this?",
+        "body": "Even with the same MBTI, conversation style can change chemistry and role fit. (Optional)"
+      },
+      "percent": {
+        "title": "MBTI Axis Percentage Setup",
+        "desc": "Enter the percentages from your test result as-is. (Required)",
+        "testPrefillHint": "MBTI updates automatically when you release each slider.",
+        "energy": "Energy",
+        "info": "Info",
+        "judge": "Judgment",
+        "style": "Style",
+        "preview": "Auto-estimated MBTI: {mbti}",
+        "applyPreview": "Apply this MBTI",
+        "mismatch": "MBTI and percentages can differ. Calculation uses percentages as the source of truth.",
+        "alignMbtiToPercent": "Align MBTI to percentages",
+        "alignPercentToMbti": "Align percentages to MBTI"
+      },
+      "optional": {
+        "title": "Conflict/Energy (Optional)",
+        "desc": "Adding these improves chemistry score and role recommendation accuracy. (Optional)",
+        "open": "Open",
+        "fold": "Close",
+        "conflict": {
+          "title": "Conflict style",
+          "help": "Used for relationship interpretation when selected.",
+          "none": "Not selected (saved with default)",
+          "selected": "Selected: {label} — {desc}",
+          "interpret": {
+            "direct": "Conclusions form fast, but wording can feel strong.",
+            "avoid": "Tension stays low in the moment, but issues may be delayed.",
+            "mediate": "Tends to buffer differences and keep conversation steady.",
+            "burst": "Usually calm, but can react strongly after buildup."
+          },
+          "direct": {
+            "label": "DIRECT",
+            "desc": "Speak directly"
+          },
+          "avoid": {
+            "label": "AVOID",
+            "desc": "Avoid conflict"
+          },
+          "mediate": {
+            "label": "MEDIATE",
+            "desc": "Mediate in the middle"
+          },
+          "burst": {
+            "label": "BURST",
+            "desc": "Hold, then burst"
+          }
+        },
+        "energy": {
+          "title": "Energy endurance",
+          "help": "Used for pace interpretation when selected.",
+          "none": "Not selected (saved with default)",
+          "selected": "Selected: {label} — {desc}",
+          "interpret": {
+            "low": "You maintain pace better in shorter and lighter meetups.",
+            "mid": "You keep a steady pace across most meetup lengths.",
+            "high": "You sustain energy well even in long or high-activity sessions."
+          },
+          "low": {
+            "label": "I tire quickly",
+            "time": "~1-2 hours",
+            "desc": "Short sessions or breaks tend to work better."
+          },
+          "mid": {
+            "label": "I usually sustain",
+            "time": "~2-4 hours",
+            "desc": "Works well for average-length gatherings."
+          },
+          "high": {
+            "label": "I sustain to the end",
+            "time": "4+ hours",
+            "desc": "Can keep pace in long gatherings."
+          }
+        }
       }
     },
     "actionErrors": {
@@ -167,10 +302,22 @@
         "conflict": {
           "legend": "Conflict Style",
           "help": "Choose your common response pattern in conflict.",
-          "direct": { "title": "DIRECT", "desc": "Speak directly" },
-          "avoid": { "title": "AVOID", "desc": "Avoid conflict" },
-          "mediate": { "title": "MEDIATE", "desc": "Mediate in the middle" },
-          "burst": { "title": "BURST", "desc": "Hold then burst" }
+          "direct": {
+            "title": "DIRECT",
+            "desc": "Speak directly"
+          },
+          "avoid": {
+            "title": "AVOID",
+            "desc": "Avoid conflict"
+          },
+          "mediate": {
+            "title": "MEDIATE",
+            "desc": "Mediate in the middle"
+          },
+          "burst": {
+            "title": "BURST",
+            "desc": "Hold then burst"
+          }
         },
         "energy": {
           "legend": "Energy Endurance",
@@ -228,6 +375,7 @@
       "descriptionEmphasis": "thinking style and conversation rhythm",
       "descriptionSuffix": " to check relationship chemistry.",
       "cognitiveGuide": "What are MBTI cognitive functions",
+      "tryTest": "Try MBTI test",
       "quickStart": "Quick Start",
       "tabTests": "MBTI Tests",
       "tabGuides": "Guides",
@@ -831,6 +979,7 @@
         "jpJ": "J (Judging)",
         "jpP": "P (Perceiving)"
       },
+      "percentAverageFormat": "{key} {percent}% avg",
       "vibeSummaryTitle": "Group Atmosphere Summary",
       "cautionPoint": "Caution Point",
       "balanceOne": "Neither side dominates, so the tone shifts naturally by situation.",
@@ -915,6 +1064,88 @@
           "deadlineTail": "is enough to keep one.",
           "noBigDownside": "There is no major downside, and",
           "clearTopic": "it works better when the topic is clear."
+        },
+        "summaryTitle": "Operating Summary",
+        "tokens": {
+          "SCENE_EI_TIE": "Turn-taking is relatively even, and meetings stay stable when someone summarizes the flow.",
+          "SCENE_EI_E_MILD": "Conversation opens quickly and idea exchange starts fast.",
+          "SCENE_EI_E_STRONG": "Conversation tempo is high, and opinions keep coming with short gaps.",
+          "SCENE_EI_E_EXTREME": "Many opinions come out at once, so explicit speaking order helps keep quality.",
+          "SCENE_EI_I_MILD": "People tend to speak after organizing thoughts, so each point carries weight.",
+          "SCENE_EI_I_STRONG": "After listening and organizing first, decision quality rises in the middle and late phase.",
+          "SCENE_EI_I_EXTREME": "Early talk is quiet, but once people speak, comments strongly shape the decision.",
+          "SCENE_NS_TIE": "Idea exploration and reality checks alternate, keeping discussion balanced.",
+          "SCENE_NS_N_MILD": "New ideas naturally attach to the current direction.",
+          "SCENE_NS_N_STRONG": "Topics expand quickly and options multiply, so selection criteria should be explicit.",
+          "SCENE_NS_N_EXTREME": "Ideas chain-expand fast, so fixing priority early is critical.",
+          "SCENE_NS_S_MILD": "Reality constraints and feasibility are checked early, so discussion converges smoothly.",
+          "SCENE_NS_S_STRONG": "Discussion converges quickly around executable actions.",
+          "SCENE_NS_S_EXTREME": "Execution validation strongly leads, so decisions are fast but exploration width can narrow.",
+          "SCENE_JP_TIE": "Exploration and closure are balanced, so the team can switch operating mode by context.",
+          "SCENE_JP_J_MILD": "Conclusions are not delayed and are closed step by step.",
+          "SCENE_JP_J_STRONG": "Decision checkpoints are clear, and meetings end with concrete action items.",
+          "SCENE_JP_J_EXTREME": "Closure speed is very high, so progress is fast but early exploration may be short.",
+          "SCENE_JP_P_MILD": "Conclusions stay open, which supports quick adaptation.",
+          "SCENE_JP_P_STRONG": "The team adjusts while moving, so flexibility is high but decision timing needs control.",
+          "SCENE_JP_P_EXTREME": "Scope and priorities can reset midstream, so agree on deadline and done criteria first.",
+          "SUMMARY_ENP_A1": "Ideas expand quickly, and discussion branches into multiple directions.",
+          "SUMMARY_ENP_A2": "Exploration is efficient, but final lock-in may be pushed back.",
+          "SUMMARY_ENP_B1": "Brainstorming energy is high, and proposals keep stacking.",
+          "SUMMARY_ENP_B2": "This group fits a test-first, organize-later operating style.",
+          "SUMMARY_ENJ_A1": "Ideas are gathered fast and immediately organized into execution order.",
+          "SUMMARY_ENJ_A2": "Meetings tend to end short with clear next actions.",
+          "SUMMARY_ENJ_B1": "The shift from divergence to convergence is fast, connecting quickly to practical decisions.",
+          "SUMMARY_ENJ_B2": "Priorities and owners are often clarified before discussion drags.",
+          "SUMMARY_ESP_A1": "Live issues are shared quickly and adjusted in real time.",
+          "SUMMARY_ESP_A2": "Speed is high, but frequent mid-course changes make scope control decisive.",
+          "SUMMARY_ESP_B1": "Execution-centered talk keeps momentum strong.",
+          "SUMMARY_ESP_B2": "The group tends to choose what works now over fixed structure.",
+          "SUMMARY_ESJ_A1": "Necessary information is gathered fast, then converges into execution and closure.",
+          "SUMMARY_ESJ_A2": "After a decision, roles and deadlines become clear with low drift.",
+          "SUMMARY_ESJ_B1": "Talk volume can be high, but closure is structured.",
+          "SUMMARY_ESJ_B2": "Meetings often end with clear owners and tasks.",
+          "SUMMARY_INP_A1": "Core ideas emerge after reflection, while conclusions stay flexible.",
+          "SUMMARY_INP_A2": "Exploration quality is high, but final lock-in can be delayed.",
+          "SUMMARY_INP_B1": "Well-formed viewpoints gain impact in the middle and late phase.",
+          "SUMMARY_INP_B2": "This group tends to run several review loops before commitment.",
+          "SUMMARY_INJ_A1": "Organized perspectives narrow issues, then conclusions are fixed step by step.",
+          "SUMMARY_INJ_A2": "Even with fewer words, decision density and consistency are high.",
+          "SUMMARY_INJ_B1": "Early exploration is careful, then speed increases in decision zones.",
+          "SUMMARY_INJ_B2": "Once criteria are clear, meetings converge quickly.",
+          "SUMMARY_ISP_A1": "The group reads context quietly, then adjusts execution flexibly.",
+          "SUMMARY_ISP_A2": "Focus is high, but schedule/scope may shift often.",
+          "SUMMARY_ISP_B1": "Even with low talk volume, execution calls are made quickly.",
+          "SUMMARY_ISP_B2": "The group is stronger at situational response than fixed process.",
+          "SUMMARY_ISJ_A1": "The group speaks only what is needed, then converges quickly through execution and closure.",
+          "SUMMARY_ISJ_A2": "Conclusions lock early, making role split and follow-up clear.",
+          "SUMMARY_ISJ_B1": "Review stays calm, and closure is firm.",
+          "SUMMARY_ISJ_B2": "Conclusions are often finalized as checklist-style outputs near the end.",
+          "SUMMARY_FB_EINS_E_N": "Speaking initiative opens quickly, and discussion tends to lean toward idea expansion.",
+          "SUMMARY_FB_EINS_E_S": "Conversation is active, but feasibility checks pull discussion to convergence.",
+          "SUMMARY_FB_EINS_E_X": "Tempo is fast, and expansion vs. convergence shifts by context.",
+          "SUMMARY_FB_EINS_I_N": "Careful speaking plus idea expansion raises mid-phase discussion density.",
+          "SUMMARY_FB_EINS_I_S": "Necessary points are exchanged with stable reality-centered convergence.",
+          "SUMMARY_FB_EINS_I_X": "A careful speaking pattern keeps exploration and validation balanced.",
+          "SUMMARY_FB_EINS_X_N": "Speaking style is balanced, while discussion focus leans toward new alternatives.",
+          "SUMMARY_FB_EINS_X_S": "Speaking style is balanced, while discussion focus leans toward execution and validation.",
+          "SUMMARY_FB_EINS_X_X": "Both speaking and focus are balanced, enabling flexible operating mode shifts.",
+          "SUMMARY_FB_NSJP_N_J": "When the team switches from idea expansion to closure, execution power rises sharply.",
+          "SUMMARY_FB_NSJP_N_P": "Idea exploration tends to run longer while conclusions stay open.",
+          "SUMMARY_FB_NSJP_N_X": "Exploration weight is high, and closure speed depends on context.",
+          "SUMMARY_FB_NSJP_S_J": "After feasibility validation, conclusions close quickly and move to execution.",
+          "SUMMARY_FB_NSJP_S_P": "Reality-driven progress is strong, but frequent mid-course adjustment needs scope control.",
+          "SUMMARY_FB_NSJP_S_X": "Execution checking is dominant, while closure strength varies by situation.",
+          "SUMMARY_FB_NSJP_X_J": "Exploration and validation are balanced, with relatively quick closure.",
+          "SUMMARY_FB_NSJP_X_P": "Exploration and validation are balanced, while closure stays open for adjustment.",
+          "SUMMARY_FB_NSJP_X_X": "Both exploration and closure are balanced, so operating flexibility is high.",
+          "CAUTION_T_BASE": "Feedback may sound direct. Add one cushioning sentence before conclusion/summary.",
+          "CAUTION_T_EXTREME": "Direct-feedback intensity is high. Add a cushioning line and one check question before conclusion/summary.",
+          "CAUTION_F_BASE": "Empathy talk can delay closure. Fix just one decision for today first.",
+          "CAUTION_F_EXTREME": "Empathy discussion is highly dominant. Lock one decision for today at the start to stabilize flow.",
+          "CAUTION_P_BASE": "Schedule/scope can change midstream. Agree on deadline and done criteria first.",
+          "CAUTION_P_EXTREME": "Midstream changes are likely. Align deadline, done criteria, and change-approval rule early.",
+          "CAUTION_DEFAULT_BASE": "Structural conflict is low. Clear goals will add speed.",
+          "CAUTION_DEFAULT_EXTREME": "No major conflict, but axis tendencies are strong. Fix goal and priority first for stable speed."
         }
       },
       "mostlyPrefix": "Mostly {line}"
@@ -927,6 +1158,13 @@
         "ORGANIZE": "Organization and Decision Lead",
         "MEDIATOR": "Mediation and Coordination Lead"
       },
+      "snapshotTitle": "Role Snapshot",
+      "snapshotTopCandidate": "Top Candidate",
+      "snapshotEmptyRole": "Currently open in this group",
+      "snapshotNoCandidate": "Not enough tendency data yet.",
+      "snapshotStrength": "Role Strength",
+      "snapshotStrongRole": "Strong Role",
+      "snapshotImproveHint": "Improvement Insight",
       "badges": {
         "STRATEGY": {
           "1": "Strategy Architect",
@@ -983,7 +1221,9 @@
           "default": "Roles are not fixed. It is natural for them to change by situation.",
           "lack": "Caution: {role} is currently missing. Without someone in this role, meetings can run long."
         }
-      }
+      },
+      "fitLabel": "Fit Score",
+      "noTopOne": "No top candidate"
     }
   },
   "components": {

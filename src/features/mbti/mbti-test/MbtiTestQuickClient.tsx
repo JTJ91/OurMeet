@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
-import { QUESTIONS } from "@/lib/mbtiTest/questions";
-import { scoreMbti, type Answers, type MbtiTestResult } from "@/lib/mbtiTest/score";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { QUESTIONS_8 as QUESTIONS } from "@/lib/mbtiTest/questions8";
+import { scoreMbti, type Answers, type MbtiTestResult } from "@/lib/mbtiTest/score8";
 
 type Locale = "ko" | "en" | "ja";
 
@@ -17,79 +18,69 @@ type ShareStatus = "idle" | "copied";
 const UI_TEXT: Record<
   Locale,
   {
-    scale: readonly { v: 1 | 2 | 3 | 4 | 5; label: string }[];
+    yes: string;
+    no: string;
+    reset: string;
     resultTitle: string;
     retry: string;
-    createWithResult: string;
-    useResult: string;
-    reset: string;
     accuracy: string;
-    autoNextHint: string;
+    useResult: string;
+    createWithResult: string;
+    fullTestLead: string;
+    fullTestLink: string;
+    fullTestTail: string;
     shareResult: string;
-    copied: string;
-    shareTextPrefix: string;
     shareImageSaved: string;
+    shareTextPrefix: string;
   }
 > = {
   ko: {
-    scale: [
-      { v: 1, label: "전혀 아니다" },
-      { v: 2, label: "아니다" },
-      { v: 3, label: "보통" },
-      { v: 4, label: "그렇다" },
-      { v: 5, label: "매우 그렇다" },
-    ],
+    yes: "그렇다",
+    no: "아니다",
+    reset: "초기화",
     resultTitle: "검사 결과",
     retry: "다시하기",
-    createWithResult: "이 검사결과로 방 만들기",
-    useResult: "이 검사결과 사용하기",
-    reset: "초기화",
     accuracy: "정확도",
-    autoNextHint: "※ 답을 누르면 자동으로 다음 문항으로 이동합니다.",
+    useResult: "이 검사결과 사용하기",
+    createWithResult: "이 검사결과로 방 만들기",
+    fullTestLead: "더 자세한 분석은 ",
+    fullTestLink: "60문항 정밀 검사",
+    fullTestTail: "에서 확인할 수 있어요.",
     shareResult: "결과 공유",
-    copied: "복사됨",
-    shareTextPrefix: "내 MBTI 검사 결과",
     shareImageSaved: "이미지 저장됨",
+    shareTextPrefix: "내 MBTI 검사 결과",
   },
   en: {
-    scale: [
-      { v: 1, label: "Strongly disagree" },
-      { v: 2, label: "Disagree" },
-      { v: 3, label: "Neutral" },
-      { v: 4, label: "Agree" },
-      { v: 5, label: "Strongly agree" },
-    ],
+    yes: "Yes",
+    no: "No",
+    reset: "Reset",
     resultTitle: "Test Result",
     retry: "Retake",
-    createWithResult: "Create group with this result",
-    useResult: "Use this result",
-    reset: "Reset",
     accuracy: "Confidence",
-    autoNextHint: "* Selecting an answer automatically moves to the next question.",
+    useResult: "Use this result",
+    createWithResult: "Create group with this result",
+    fullTestLead: "For a deeper analysis, try the ",
+    fullTestLink: "60-question full test",
+    fullTestTail: ".",
     shareResult: "Share Result",
-    copied: "Copied",
-    shareTextPrefix: "My MBTI test result",
     shareImageSaved: "Image saved",
+    shareTextPrefix: "My MBTI test result",
   },
   ja: {
-    scale: [
-      { v: 1, label: "まったくそう思わない" },
-      { v: 2, label: "そう思わない" },
-      { v: 3, label: "どちらでもない" },
-      { v: 4, label: "そう思う" },
-      { v: 5, label: "とてもそう思う" },
-    ],
+    yes: "はい",
+    no: "いいえ",
+    reset: "リセット",
     resultTitle: "診断結果",
     retry: "もう一度",
-    createWithResult: "この結果でグループ作成",
-    useResult: "この結果を使う",
-    reset: "リセット",
     accuracy: "信頼度",
-    autoNextHint: "※ 回答を選ぶと自動で次の質問に進みます。",
+    useResult: "この結果を使う",
+    createWithResult: "この結果でグループ作成",
+    fullTestLead: "より詳しい分析は",
+    fullTestLink: "60問の精密テスト",
+    fullTestTail: "で確認できます。",
     shareResult: "結果を共有",
-    copied: "コピー完了",
-    shareTextPrefix: "私のMBTI診断結果",
     shareImageSaved: "画像を保存",
+    shareTextPrefix: "私のMBTI診断結果",
   },
 };
 
@@ -301,128 +292,24 @@ function animalMetaOf(mbti: string) {
 const QUESTION_TEXT: Record<Locale, Record<string, string>> = {
   ko: {},
   en: {
-    q01: "At gatherings, I often start conversations first.",
-    q02: "In group settings, I naturally become more of a listener.",
-    q03: "Even if my thoughts are not fully organized, talking helps me organize them.",
-    q04: "Before speaking, I organize my thoughts in my head first.",
-    q05: "Meeting new people feels more exciting than stressful.",
-    q06: "Spending a long time with unfamiliar people drains my energy quickly.",
-    q07: "In group chats or gatherings, I tend to make the first suggestion.",
-    q08: "In group chats or gatherings, it takes me time before I speak.",
-    q09: "If I stay home all weekend, I start to feel restless.",
-    q10: "On weekends, resting alone feels better than meeting people.",
-    q11: "I do not mind lively, noisy group settings.",
-    q12: "Quiet conversations in a small group feel much more comfortable.",
-    q13: "I tend to ask questions easily even to people I just met.",
-    q14: "Starting a conversation with someone I just met feels burdensome.",
-    q15: "When a spontaneous meetup comes up, my first reaction is 'let's go'.",
-    q16: "In conversation, what it means in the end feels more important.",
-    q17: "In conversation, what exactly happened feels more important.",
-    q18: "When listening to explanations, I am more comfortable grasping the big picture first.",
-    q19: "When listening to explanations, I need examples or cases to really get it.",
-    q20: "When I hear one story, many related ideas come to mind.",
-    q21: "When I hear a new idea, I first check whether it is realistic.",
-    q22: "While listening, I tend to think about the hidden intention behind the words.",
-    q23: "While listening, I tend to take words at face value.",
-    q24: "When there is a rule, I first wonder why it was made that way.",
-    q25: "When there is a rule, I first wonder how to follow it.",
-    q26: "Even if a conversation is somewhat vague, I am fine if I understand the flow.",
-    q27: "If a conversation is vague, I want to clarify it with concrete details.",
-    q28: "Even when there is a right answer, I keep thinking of better ways.",
-    q29: "I feel more at ease when I follow proven methods.",
-    q30: "I enjoy hypothetical what-if conversations.",
-    q31: "When deciding, I first think about who is objectively right.",
-    q32: "When deciding, I first think about who might get hurt.",
-    q33: "For feedback, accuracy matters more than sounding nice.",
-    q34: "In feedback, tone and wording often matter more than content.",
-    q35: "In an argument, reaching a conclusion comes before emotions.",
-    q36: "In an argument, atmosphere and relationship come before conclusion.",
-    q37: "Even with close people, I speak up right away if something is inefficient.",
-    q38: "With close people, I tend to express criticism indirectly.",
-    q39: "When I hear explanations, I first check whether the logic is sound.",
-    q40: "When I hear explanations, I first sense how that person feels.",
-    q41: "When things are urgent, I tend to make decisions even if feelings get hurt a bit.",
-    q42: "Even when urgent, I feel it is a bigger loss if people get emotionally hurt.",
-    q43: "When problems happen, I look for the cause first.",
-    q44: "When problems happen, I check people's emotional state first.",
-    q45: "In judgment, fair criteria matter more than personal circumstances.",
-    q46: "I feel at ease only when appointments have a fixed date and time.",
-    q47: "I am comfortable setting rough plans and adjusting as we go.",
-    q48: "Before starting something, I first set the order and plan.",
-    q49: "When starting something, I prefer to adjust while doing it.",
-    q50: "Even if the deadline is far away, I feel better finishing early.",
-    q51: "I focus better when the deadline gets close.",
-    q52: "I tend to write tasks down and check them off as I go.",
-    q53: "Even with a to-do list, it changes often, so I do not lock it in too much.",
-    q54: "Decisions should be made quickly so work can move forward.",
-    q55: "I feel more comfortable delaying decisions as much as possible.",
-    q56: "I cannot focus well unless my environment is organized.",
-    q57: "I do not mind much even if things are a bit messy.",
-    q58: "Sudden plan changes stress me out.",
-    q59: "Even if plans change, we can adjust in the moment.",
-    q60: "I only feel at ease when work is fully finished.",
+    q01: "I can quickly start a comfortable conversation even with someone I just met.",
+    q02: "After meeting people, I need alone time to recharge my energy.",
+    q03: "Even when doing nothing, new ideas or imagination keep coming to mind.",
+    q04: "Compared to vague imagination, visible and verified information feels much easier.",
+    q05: "When someone says they are struggling, I tend to suggest solutions over empathy.",
+    q06: "When someone says they are struggling, I tend to understand their feelings over giving solutions.",
+    q07: "If a plan I made changes, I usually feel more stressed than expected.",
+    q08: "Rather than planning every detail from the start, I prefer setting a rough direction and adjusting as I go.",
   },
   ja: {
-    q01: "集まりに行くと、自分から先に会話を始めることが多い。",
-    q02: "集まりでは、自然と聞き役になることが多い。",
-    q03: "考えがまとまっていなくても、話しながら整理できる。",
-    q04: "話す前に、頭の中で整理してから話す。",
-    q05: "新しい人に会うとき、緊張より期待の方が大きい。",
-    q06: "初対面の人と長く一緒にいると、エネルギーが早く減る。",
-    q07: "グループチャットや集まりでは、自分から提案する方だ。",
-    q08: "グループチャットや集まりでは、発言するまでに時間がかかる。",
-    q09: "週末ずっと家にいると、かえって息苦しくなる。",
-    q10: "週末は人に会うより、一人で休む方が心地いい。",
-    q11: "大人数でにぎやかな雰囲気でも苦にならない。",
-    q12: "静かに少人数で話す場の方がずっと楽だ。",
-    q13: "初対面の相手にも、質問を気軽にできる方だ。",
-    q14: "初対面の相手に話しかけるのは負担に感じる。",
-    q15: "急な誘いが来たら、まず「とりあえず行こう」と思う。",
-    q16: "会話では「結局どういう意味か」がより重要だと感じる。",
-    q17: "会話では「正確に何があったか」がより重要だと感じる。",
-    q18: "説明を聞くときは、まず全体の方向性をつかむ方が楽だ。",
-    q19: "説明を聞くとき、例や具体例がないと実感しにくい。",
-    q20: "一つの話を聞くと、関連する別の発想が次々浮かぶ。",
-    q21: "新しいアイデアを聞くと、まず現実的に可能かを考える。",
-    q22: "話を聞くとき、言葉の裏にある意図を考える方だ。",
-    q23: "話を聞くとき、言葉どおりに受け取る方だ。",
-    q24: "ルールがあると、まず「なぜこう作られたのか」が気になる。",
-    q25: "ルールがあると、まず「どうやればよいか」が気になる。",
-    q26: "会話が少し曖昧でも、流れが分かれば問題ない。",
-    q27: "会話が曖昧だと、具体的に確認したくなる。",
-    q28: "正解があっても、もっと良いやり方を考えてしまう。",
-    q29: "検証されたやり方に従う方が安心できる。",
-    q30: "「もし〜なら」のような仮定の話が面白い。",
-    q31: "意思決定では、まず「どちらが正しいか」を考える。",
-    q32: "意思決定では、まず「誰が傷つくか」を考える。",
-    q33: "フィードバックは、言いやすさより正確さが大事だ。",
-    q34: "フィードバックは、内容より口調や表現が大事なことが多い。",
-    q35: "議論では、感情より結論を先に出す方だ。",
-    q36: "議論では、結論より雰囲気や関係を先に考える方だ。",
-    q37: "親しい相手でも、非効率だと感じたらすぐ指摘する方だ。",
-    q38: "親しい相手ほど、遠回しに伝えることが多い。",
-    q39: "説明を聞くと、まず論理的に妥当かを確認する。",
-    q40: "説明を聞くと、まず相手の気持ちを感じ取る。",
-    q41: "急ぎのときは、少し気分を害しても決断する方だ。",
-    q42: "急ぎでも、人の気持ちが崩れる方が結果的に損だと感じる。",
-    q43: "問題が起きたときは、まず原因を探す。",
-    q44: "問題が起きたときは、まず人の状態を気にかける。",
-    q45: "判断では、個人的事情より公平な基準が重要だ。",
-    q46: "予定は日付と時間が確定している方が安心できる。",
-    q47: "予定はざっくり決めて、状況に合わせて調整する方が楽だ。",
-    q48: "何かを始めるときは、まず順序や計画を立てる。",
-    q49: "何かを始めるときは、まずやってみながら合わせる。",
-    q50: "締切が遠くても、先に終わらせる方が安心する。",
-    q51: "締切が近づくほど集中しやすい。",
-    q52: "やることは書き出して、チェックしながら進める方だ。",
-    q53: "やることリストがあってもよく変わるので、強く固定しない。",
-    q54: "決定は早く下した方が、物事が前に進む。",
-    q55: "決定はできるだけ遅らせる方が気が楽だ。",
-    q56: "環境が整っていないと集中しにくい。",
-    q57: "少し散らかっていても、あまり気にならない。",
-    q58: "計画が急に変わるとストレスを感じる。",
-    q59: "計画が変わっても、その場で合わせればいいと思う。",
-    q60: "作業は最後まで完了してこそ安心できる。",
+    q01: "初対面の人とも、わりと早く気楽に会話を続けられる方だ。",
+    q02: "人と会った後は、一人の時間がないとエネルギーが回復しにくい。",
+    q03: "じっとしていても、新しいアイデアや想像が次々に浮かぶ方だ。",
+    q04: "あいまいな想像より、目で見て確認できる情報のほうがずっと楽だ。",
+    q05: "誰かがつらいと言うと、共感より解決策を示すほうに近い。",
+    q06: "誰かがつらいと言うと、解決策より気持ちを理解するほうに近い。",
+    q07: "立てた計画が崩れると、思った以上にストレスを受けやすい。",
+    q08: "最初から細かく計画するより、大枠だけ決めて状況に合わせて動く方だ。",
   },
 };
 
@@ -435,11 +322,7 @@ function traitColor(k: string) {
   return TRAIT_COLOR[k] ?? "#1E88E5";
 }
 
-function roundToTens(value: number) {
-  return Math.max(0, Math.min(100, Math.round(value / 10) * 10));
-}
-
-export default function MbtiTestClient({ locale }: Props) {
+export default function MbtiTestQuickClient({ locale }: Props) {
   const total = QUESTIONS.length;
   const activeLocale = normalizeLocale(locale);
   const ui = UI_TEXT[activeLocale];
@@ -451,7 +334,7 @@ export default function MbtiTestClient({ locale }: Props) {
   const [shareStatus, setShareStatus] = useState<ShareStatus>("idle");
   const [isCapturing, setIsCapturing] = useState(false);
 
-  const [tap, setTap] = useState<number | null>(null);
+  const [tap, setTap] = useState<boolean | null>(null);
 
   const answersRef = useRef<Answers>({});
   const lockRef = useRef(false);
@@ -472,6 +355,15 @@ export default function MbtiTestClient({ locale }: Props) {
   const progressPct = useMemo(() => {
     return Math.round(((step + 1) / total) * 100);
   }, [step, total]);
+
+  const fullTestHref = useMemo(() => {
+    const qp = new URLSearchParams();
+    if (from) qp.set("from", from);
+    if (groupId) qp.set("groupId", groupId);
+    if (returnTo) qp.set("returnTo", returnTo);
+    const qs = qp.toString();
+    return `${base}/mbti-test${qs ? `?${qs}` : ""}`;
+  }, [base, from, groupId, returnTo]);
 
   function queryFromResult(type: string, axes: MbtiTestResult["axes"]) {
     const qs = new URLSearchParams({
@@ -576,7 +468,7 @@ export default function MbtiTestClient({ locale }: Props) {
     if (typeof window === "undefined") return;
     if (!resultCaptureRef.current) return;
 
-    const shareUrl = `${window.location.origin}${base}/mbti-test`;
+    const shareUrl = `${window.location.origin}${base}/mbti-test/quick`;
     const title = `${ui.resultTitle}: ${type}`;
     const text = `${ui.shareTextPrefix}: ${type}`;
     const textWithUrl = `${text}\n${shareUrl}`;
@@ -597,7 +489,7 @@ export default function MbtiTestClient({ locale }: Props) {
       setIsCapturing(false);
       if (!blob) throw new Error("capture_failed");
 
-      const file = new File([blob], `mbti-result-${type}.png`, { type: "image/png" });
+      const file = new File([blob], `mbti-quick-result-${type}.png`, { type: "image/png" });
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         // Some targets (e.g., KakaoTalk) may ignore the `url` field when files are attached.
         // Include the link in `text` so image + link are delivered together.
@@ -610,7 +502,7 @@ export default function MbtiTestClient({ locale }: Props) {
         return;
       }
 
-      saveImageFromBlob(blob, `mbti-result-${type}.png`);
+      saveImageFromBlob(blob, `mbti-quick-result-${type}.png`);
       setCopiedFeedback();
     } catch (error) {
       setIsCapturing(false);
@@ -630,7 +522,7 @@ export default function MbtiTestClient({ locale }: Props) {
     setDone(true);
   }
 
-  function pick(v: number) {
+  function pick(v: boolean) {
     if (!q) return;
     if (lockRef.current) return;
 
@@ -651,27 +543,11 @@ export default function MbtiTestClient({ locale }: Props) {
       } else {
         setStep((s) => s + 1);
       }
-    }, 120);
+    }, 140);
   }
 
   if (done && result) {
     const { type, axes, axisConfidence } = result;
-    const displayAxes = {
-      E: roundToTens(axes.E),
-      N: roundToTens(axes.N),
-      T: roundToTens(axes.T),
-      J: roundToTens(axes.J),
-    };
-    const roundedAxes = {
-      E: displayAxes.E,
-      I: 100 - displayAxes.E,
-      N: displayAxes.N,
-      S: 100 - displayAxes.N,
-      T: displayAxes.T,
-      F: 100 - displayAxes.T,
-      J: displayAxes.J,
-      P: 100 - displayAxes.J,
-    };
     const animal = animalMetaOf(type);
 
     return (
@@ -681,11 +557,7 @@ export default function MbtiTestClient({ locale }: Props) {
             <div className="text-sm font-extrabold text-slate-500">{ui.resultTitle}</div>
             <div className="mt-1 flex items-end gap-1">
               {type.split("").map((ch, i) => (
-                <span
-                  key={i}
-                  className="text-4xl font-black tracking-tight"
-                  style={{ color: traitColor(ch) }}
-                >
+                <span key={i} className="text-4xl font-black tracking-tight" style={{ color: traitColor(ch) }}>
                   {ch}
                 </span>
               ))}
@@ -741,10 +613,10 @@ export default function MbtiTestClient({ locale }: Props) {
         ) : null}
 
         <div className="mt-5 grid gap-2">
-          <AxisRow left="E" right="I" leftPct={roundedAxes.E} rightPct={roundedAxes.I} conf={axisConfidence.EI} locale={activeLocale} accuracyLabel={ui.accuracy} />
-          <AxisRow left="N" right="S" leftPct={roundedAxes.N} rightPct={roundedAxes.S} conf={axisConfidence.NS} locale={activeLocale} accuracyLabel={ui.accuracy} />
-          <AxisRow left="T" right="F" leftPct={roundedAxes.T} rightPct={roundedAxes.F} conf={axisConfidence.TF} locale={activeLocale} accuracyLabel={ui.accuracy} />
-          <AxisRow left="J" right="P" leftPct={roundedAxes.J} rightPct={roundedAxes.P} conf={axisConfidence.JP} locale={activeLocale} accuracyLabel={ui.accuracy} />
+          <AxisRow left="E" right="I" leftPct={axes.E} rightPct={axes.I} conf={axisConfidence.EI} locale={activeLocale} accuracyLabel={ui.accuracy} />
+          <AxisRow left="N" right="S" leftPct={axes.N} rightPct={axes.S} conf={axisConfidence.NS} locale={activeLocale} accuracyLabel={ui.accuracy} />
+          <AxisRow left="T" right="F" leftPct={axes.T} rightPct={axes.F} conf={axisConfidence.TF} locale={activeLocale} accuracyLabel={ui.accuracy} />
+          <AxisRow left="J" right="P" leftPct={axes.J} rightPct={axes.P} conf={axisConfidence.JP} locale={activeLocale} accuracyLabel={ui.accuracy} />
         </div>
 
         {!isCapturing ? (
@@ -760,22 +632,16 @@ export default function MbtiTestClient({ locale }: Props) {
             {isFromForm ? (
               <button
                 type="button"
-                onClick={() => goBackWithMbti(type, roundedAxes)}
-                className="
-                  mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white
-                  transition-all duration-200 active:scale-[0.97]
-                "
+                onClick={() => goBackWithMbti(type, axes)}
+                className="mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white transition-all duration-200 active:scale-[0.97]"
               >
                 {ui.useResult}
               </button>
             ) : (
               <button
                 type="button"
-                onClick={() => router.push(`${base}/mbti/create?${queryFromResult(type, roundedAxes)}`)}
-                className="
-                  mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white
-                  transition-all duration-200 active:scale-[0.97]
-                "
+                onClick={() => router.push(`${base}/mbti/create?${queryFromResult(type, axes)}`)}
+                className="mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white transition-all duration-200 active:scale-[0.97]"
               >
                 {ui.createWithResult}
               </button>
@@ -796,12 +662,7 @@ export default function MbtiTestClient({ locale }: Props) {
         <button
           type="button"
           onClick={resetAll}
-          className="
-            rounded-full px-3 py-1.5
-            text-[11px] font-black text-slate-700
-            bg-white/70 ring-1 ring-black/10 shadow-sm
-            transition hover:bg-white active:scale-[0.98]
-          "
+          className="rounded-full bg-white/70 px-3 py-1.5 text-[11px] font-black text-slate-700 ring-1 ring-black/10 shadow-sm transition hover:bg-white active:scale-[0.98]"
         >
           {ui.reset}
         </button>
@@ -814,43 +675,63 @@ export default function MbtiTestClient({ locale }: Props) {
         />
       </div>
 
-      <div className="mt-6 min-h-[76px] text-[15px] font-black leading-6 text-slate-900 tracking-tight">
+      <div className="mt-6 min-h-[76px] text-[15px] font-black leading-6 tracking-tight text-slate-900">
         {q ? QUESTION_TEXT[activeLocale][q.id] ?? q.text : ""}
       </div>
 
       <div className="mt-4 grid gap-2">
-        {ui.scale.map((s) => (
-          <button
-            key={s.v}
-            type="button"
-            onClick={() => pick(s.v)}
-            className={[
-              "group flex items-center justify-between rounded-2xl px-4 py-3 text-left",
-              "bg-white/70 ring-1 ring-black/10 shadow-sm",
-              "transition-all duration-150 will-change-transform",
-              "hover:bg-white hover:ring-black/15",
-              "active:scale-[0.985] active:translate-y-[1px]",
-              tap === s.v
-                ? "bg-[#DBECFF] ring-2 ring-[#1E88E5] shadow-[0_0_0_3px_rgba(30,136,229,0.22)] scale-[0.985] -translate-y-[1px]"
-                : "",
-            ].join(" ")}
-          >
-            <span className={["text-sm font-black", tap === s.v ? "text-[#0E5EA8]" : "text-slate-800"].join(" ")}>
-              {s.label}
-            </span>
-            <span
-              className={[
-                "tabular-nums text-[11px] font-black transition-colors",
-                tap === s.v ? "text-[#0E5EA8]" : "text-slate-400",
-              ].join(" ")}
-            >
-              {s.v}
-            </span>
-          </button>
-        ))}
+        <button
+          type="button"
+          onClick={() => pick(true)}
+          className={[
+            "group flex items-center justify-between rounded-2xl px-4 py-3 text-left",
+            "bg-white/70 ring-1 ring-black/10 shadow-sm",
+            "transition-all duration-150 will-change-transform",
+            "hover:bg-white hover:ring-black/15",
+            "active:scale-[0.985] active:translate-y-[1px]",
+            tap === true
+              ? "bg-[#DBECFF] ring-2 ring-[#1E88E5] shadow-[0_0_0_3px_rgba(30,136,229,0.22)] scale-[0.985] -translate-y-[1px]"
+              : "",
+          ].join(" ")}
+        >
+          <span className={["text-sm font-black", tap === true ? "text-[#0E5EA8]" : "text-slate-800"].join(" ")}>
+            {ui.yes}
+          </span>
+          <span className={["text-[11px] font-black transition-colors", tap === true ? "text-[#0E5EA8]" : "text-[#1E88E5]"].join(" ")}>
+            Y
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => pick(false)}
+          className={[
+            "group flex items-center justify-between rounded-2xl px-4 py-3 text-left",
+            "bg-white/70 ring-1 ring-black/10 shadow-sm",
+            "transition-all duration-150 will-change-transform",
+            "hover:bg-white hover:ring-black/15",
+            "active:scale-[0.985] active:translate-y-[1px]",
+            tap === false
+              ? "bg-[#DBECFF] ring-2 ring-[#1E88E5] shadow-[0_0_0_3px_rgba(30,136,229,0.22)] scale-[0.985] -translate-y-[1px]"
+              : "",
+          ].join(" ")}
+        >
+          <span className={["text-sm font-black", tap === false ? "text-[#0E5EA8]" : "text-slate-800"].join(" ")}>
+            {ui.no}
+          </span>
+          <span className={["text-[11px] font-black transition-colors", tap === false ? "text-[#0E5EA8]" : "text-slate-400"].join(" ")}>
+            N
+          </span>
+        </button>
       </div>
 
-      <div className="mt-3 text-[11px] font-bold text-slate-500">{ui.autoNextHint}</div>
+      <div className="mt-3 text-[11px] font-bold text-slate-500">
+        {ui.fullTestLead}
+        <Link href={fullTestHref} className="underline underline-offset-2 hover:text-slate-700">
+          {ui.fullTestLink}
+        </Link>
+        {ui.fullTestTail}
+      </div>
     </div>
   );
 }
@@ -899,31 +780,21 @@ function AxisRow({
             >
               {left}
             </span>
-            <span
-              className={[
-                "tabular-nums text-[12px] font-black",
-                isLeftWin ? "text-slate-900" : "text-slate-400",
-              ].join(" ")}
-            >
+            <span className={["tabular-nums text-[12px] font-black", isLeftWin ? "text-slate-900" : "text-slate-400"].join(" ")}>
               {leftPct}%
             </span>
           </div>
         </div>
 
         <div className="flex justify-center">
-          <span className="inline-flex w-[96px] items-center justify-center rounded-full bg-slate-900/5 px-2.5 py-1 text-center text-[11px] font-black text-slate-700 ring-1 ring-black/5 tabular-nums whitespace-nowrap">
+          <span className="inline-flex w-[96px] items-center justify-center rounded-full bg-slate-900/5 px-2.5 py-1 text-center text-[11px] font-black tabular-nums text-slate-700 ring-1 ring-black/5 whitespace-nowrap">
             {accuracyLabel} {conf}%
           </span>
         </div>
 
         <div className="text-right">
           <div className="inline-flex items-end gap-1.5">
-            <span
-              className={[
-                "tabular-nums text-[12px] font-black",
-                isRightWin ? "text-slate-900" : "text-slate-400",
-              ].join(" ")}
-            >
+            <span className={["tabular-nums text-[12px] font-black", isRightWin ? "text-slate-900" : "text-slate-400"].join(" ")}>
               {rightPct}%
             </span>
             <span

@@ -2,25 +2,36 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/mbti/prisma";
 import { notFound } from "next/navigation";
 import InviteActionsIntl from "@/features/mbti/components/InviteActions";
-import RememberGroupClientIntl from "@/components/RememberGroupClient";
-import ChemMoreListIntl from "@/features/mbti/g/[groupId]/components/ChemMoreListIntl";
-import RoleMoreListIntl from "@/features/mbti/g/[groupId]/components/RoleMoreListIntl";
 import GraphServerIntl from "@/features/mbti/g/[groupId]/GraphServerIntl";
-import { getCompatScore } from "@/lib/mbti/mbtiCompat";
+import {
+  getCompatScore,
+  type ChemType,
+  type CompatAdjustBreakdown,
+  type CompatReason,
+  type Level,
+} from "@/lib/mbti/mbtiCompat";
 import { unstable_cache } from "next/cache";
-import ChemReportSectionIntl from "@/features/mbti/g/[groupId]/components/ChemReportSectionIntl";
 import TouchSavedGroupClientIntl from "@/components/TouchSavedGroupClient";
-import SaveGroupClientIntl from "@/components/SaveGroupClient";
 import ChemTopWorstIntl from "@/features/mbti/g/[groupId]/components/ChemTopWorstIntl";
 import { normalizeMemberPrefs, type MemberPrefs } from "@/lib/mbti/memberPrefs";
+import {
+  ROLE_KEYS,
+  pickCandidates,
+  type ConflictInput,
+  type EnergyInput,
+  type RoleCandidateInput,
+  type RoleKey,
+} from "@/lib/mbti/roleScore";
 
 
 import Link from "next/link";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { alternatesForPath } from "@/i18n/metadata";
+import { Compass, Sparkles, Zap, ListChecks, Handshake } from "lucide-react";
 
-type TranslateFn = (key: string, values?: Record<string, any>) => string;
+type TranslateValues = Record<string, string | number | Date>;
+type TranslateFn = (key: string, values?: TranslateValues) => string;
 
 function isMeaningfulTranslation(text: string) {
   const trimmed = text.trim();
@@ -29,7 +40,7 @@ function isMeaningfulTranslation(text: string) {
   return /\{[^}]+\}/.test(trimmed);
 }
 
-function tx(t: TranslateFn | undefined, key: string, fallback: string, values?: Record<string, unknown>) {
+function tx(t: TranslateFn | undefined, key: string, fallback: string, values?: TranslateValues) {
   if (!t) return fallback;
   try {
     const translated = t(key, values);
@@ -53,12 +64,66 @@ function stablePairHash(input: string) {
   return h;
 }
 
+async function getGroupRankingsCacheSeed(groupId: string) {
+  const snapshot = await prisma.group.findUnique({
+    where: { id: groupId },
+    select: {
+      name: true,
+      maxMembers: true,
+      createdAt: true,
+      members: {
+        select: {
+          id: true,
+          nickname: true,
+          mbti: true,
+          ideaStrength: true,
+          factStrength: true,
+          logicStrength: true,
+          peopleStrength: true,
+          conflictStyle: true,
+          energy: true,
+        },
+      },
+    },
+  });
+
+  if (!snapshot) return null;
+
+  const membersKey = snapshot.members
+    .map(
+      (member) =>
+        [
+          member.id,
+          member.nickname,
+          member.mbti ?? "",
+          member.ideaStrength ?? "",
+          member.factStrength ?? "",
+          member.logicStrength ?? "",
+          member.peopleStrength ?? "",
+          member.conflictStyle ?? "",
+          member.energy ?? "",
+        ].join(":")
+    )
+    .sort()
+    .join("|");
+  const membersHash = stablePairHash(membersKey);
+
+  return `${snapshot.createdAt.getTime()}-${snapshot.maxMembers}-${snapshot.name}-${membersHash}`;
+}
+
 type JudgeStyle = "LOGIC" | "PEOPLE";
 type InfoStyle = "IDEA" | "FACT";
 type PairRow = {
   aId: string; aName: string; aMbti: string;
   bId: string; bName: string; bMbti: string;
+  scoreInt: number;
+  micro: number;
   score: number;
+  type: ChemType;
+  level: Level;
+  adjustTotal?: number;
+  adjustBreakdown?: CompatAdjustBreakdown;
+  reason?: CompatReason;
 
   // ✅ 추가 (인지기능 보정용)
   aJudge?: JudgeStyle; aInfo?: InfoStyle;
@@ -76,67 +141,119 @@ type TextToken =
 const T = (t: string): TextToken => ({ t });
 const H = (t: string, k: AxisKey): TextToken => ({ t, k });
 
-type VibeBlock = {
-  core: { label: string; k: AxisKey }[];      // 요약 칩
-  scene: TextToken[][];                        // 문장(토큰 배열) 여러 줄
-  caution: { k: AxisKey; tokens: TextToken[] };// 주의 포인트
-};
-
 
 /** ✅ 1) MBTI 분포 분석 */
-function summarizeMbtiDistribution(mbtis: string[]) {
+type DistributionMember = {
+  mbti?: string | null;
+  ePercent?: number | null;
+  nPercent?: number | null;
+  tPercent?: number | null;
+  jPercent?: number | null;
+};
+
+function summarizeMbtiDistribution(members: DistributionMember[], stableSeed: string) {
   const cnt = { E: 0, I: 0, N: 0, S: 0, T: 0, F: 0, J: 0, P: 0 };
-  for (const m of mbtis) {
-    const t = m.trim().toUpperCase();
+  const validMembers: Array<{ e: number; n: number; t: number; j: number }> = [];
+
+  const clampPercent = (value: unknown) => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    return Math.max(0, Math.min(100, Math.round(n)));
+  };
+
+  for (const member of members) {
+    const t = String(member.mbti ?? "").trim().toUpperCase();
     if (!isValidMbti(t)) continue;
     cnt[t[0] as "E" | "I"]++;
     cnt[t[1] as "N" | "S"]++;
     cnt[t[2] as "T" | "F"]++;
     cnt[t[3] as "J" | "P"]++;
+
+    const e = clampPercent(member.ePercent) ?? 50;
+    const n = clampPercent(member.nPercent) ?? 50;
+    const tt = clampPercent(member.tPercent) ?? 50;
+    const j = clampPercent(member.jPercent) ?? 50;
+
+    validMembers.push({ e, n, t: tt, j });
   }
 
-  const axisLine = (a: keyof typeof cnt, b: keyof typeof cnt, labelA: string, labelB: string) => {
-    const A = cnt[a], B = cnt[b];
-    const total = A + B || 1;
-    const dom = A === B ? null : (A > B ? a : b);
-    const pct = (x: number) => Math.round((x / total) * 100);
+  const avg = validMembers.reduce(
+    (acc, member) => {
+      acc.e += member.e;
+      acc.n += member.n;
+      acc.t += member.t;
+      acc.j += member.j;
+      return acc;
+    },
+    { e: 0, n: 0, t: 0, j: 0 }
+  );
+  const avgE = validMembers.length ? Math.round(avg.e / validMembers.length) : 50;
+  const avgN = validMembers.length ? Math.round(avg.n / validMembers.length) : 50;
+  const avgT = validMembers.length ? Math.round(avg.t / validMembers.length) : 50;
+  const avgJ = validMembers.length ? Math.round(avg.j / validMembers.length) : 50;
 
-    const aPct = pct(A);
-    const bPct = pct(B);
+  const axisLine = (
+    a: keyof typeof cnt,
+    b: keyof typeof cnt,
+    labelA: string,
+    labelB: string,
+    leftPercent: number
+  ) => {
+    const aPct = Math.max(0, Math.min(100, Math.round(leftPercent)));
+    const bPct = 100 - aPct;
+    const dom = aPct === bPct ? null : (aPct > bPct ? a : b);
+    const A = cnt[a];
+    const B = cnt[b];
+
     const diffPct = Math.abs(aPct - bPct); // ✅ 격차 (0~100)
 
     return {
-      a: { key: a, label: labelA, v: A, pct: aPct },
-      b: { key: b, label: labelB, v: B, pct: bPct },
+      a: { key: a, label: labelA, v: aPct, pct: aPct, count: A },
+      b: { key: b, label: labelB, v: bPct, pct: bPct, count: B },
       dom,
       diffPct, // ✅ 추가
     };
   };
 
 
-  const ei = axisLine("E", "I", "E(외향)", "I(내향)");
-  const ns = axisLine("N", "S", "N(직관)", "S(감각)");
-  const tf = axisLine("T", "F", "T(사고)", "F(감정)");
-  const jp = axisLine("J", "P", "J(판단)", "P(인식)");
+  const ei = axisLine("E", "I", "E(외향)", "I(내향)", avgE);
+  const ns = axisLine("N", "S", "N(직관)", "S(감각)", avgN);
+  const tf = axisLine("T", "F", "T(사고)", "F(감정)", avgT);
+  const jp = axisLine("J", "P", "J(판단)", "P(인식)", avgJ);
 
 
   type VibeBlock = {
-    core: { label: string; k: Exclude<AxisKey, "TF"> | "BAL" }[]; // EI/NS/JP/BAL만
+    core: { label: string; k: Exclude<AxisKey, "TF"> | "BAL" }[];
+    summary: string[];
     scene: TextToken[][];
     caution: { k: AxisKey; tokens: TextToken[] };
   };
 
   
-  // 한줄 총평(가벼운 위트, 밈X)
   const vibe: VibeBlock = (() => {
     const domEI = ei.dom; // "E" | "I" | null
     const domNS = ns.dom; // "N" | "S" | null
     const domTF = tf.dom; // "T" | "F" | null
     const domJP = jp.dom; // "J" | "P" | null
 
-    const isTie = (x: { dom: any; diffPct: number }) => x.dom === null || x.diffPct <= 10;
+    const isTie = (x: { dom: string | null; diffPct: number }) => x.dom === null || x.diffPct <= 10;
+    const strengthTier = (x: { dom: string | null; diffPct: number }) => {
+      if (x.dom === null || x.diffPct <= 10) return "tie" as const;
+      if (x.diffPct <= 20) return "mild" as const;
+      if (x.diffPct <= 35) return "strong" as const;
+      return "extreme" as const;
+    };
+    const pickStable = <T,>(items: T[], tokenGroup: string): T => {
+      if (items.length === 1) return items[0];
+      const idx = stablePairHash(`${stableSeed}|${tokenGroup}`) % items.length;
+      return items[idx];
+    };
 
-    // ✅ 1) 핵심 3칩
+    const eiTier = strengthTier(ei);
+    const nsTier = strengthTier(ns);
+    const tfTier = strengthTier(tf);
+    const jpTier = strengthTier(jp);
+
     const core = [
       isTie(ei)
         ? { label: "상황형", k: "BAL" as const }
@@ -151,43 +268,79 @@ function summarizeMbtiDistribution(mbtis: string[]) {
         : { label: domJP === "J" ? "정리 담당 존재" : "즉흥 운영", k: "JP" as const },
     ];
 
-    // ✅ 2) 장면 문장 (핵심 단어만 강조 토큰)
+    const sceneToken = <D extends string>(axis: "EI" | "NS" | "JP", dom: D | null, tier: "tie" | "mild" | "strong" | "extreme") => {
+      if (dom === null || tier === "tie") return `SCENE_${axis}_TIE`;
+      return `SCENE_${axis}_${dom}_${tier.toUpperCase()}`;
+    };
+
+    const summaryVariantsByCombo: Record<string, string[][]> = {
+      ENP: [
+        ["SUMMARY_ENP_A1", "SUMMARY_ENP_A2"],
+        ["SUMMARY_ENP_B1", "SUMMARY_ENP_B2"],
+      ],
+      ENJ: [
+        ["SUMMARY_ENJ_A1", "SUMMARY_ENJ_A2"],
+        ["SUMMARY_ENJ_B1", "SUMMARY_ENJ_B2"],
+      ],
+      ESP: [
+        ["SUMMARY_ESP_A1", "SUMMARY_ESP_A2"],
+        ["SUMMARY_ESP_B1", "SUMMARY_ESP_B2"],
+      ],
+      ESJ: [
+        ["SUMMARY_ESJ_A1", "SUMMARY_ESJ_A2"],
+        ["SUMMARY_ESJ_B1", "SUMMARY_ESJ_B2"],
+      ],
+      INP: [
+        ["SUMMARY_INP_A1", "SUMMARY_INP_A2"],
+        ["SUMMARY_INP_B1", "SUMMARY_INP_B2"],
+      ],
+      INJ: [
+        ["SUMMARY_INJ_A1", "SUMMARY_INJ_A2"],
+        ["SUMMARY_INJ_B1", "SUMMARY_INJ_B2"],
+      ],
+      ISP: [
+        ["SUMMARY_ISP_A1", "SUMMARY_ISP_A2"],
+        ["SUMMARY_ISP_B1", "SUMMARY_ISP_B2"],
+      ],
+      ISJ: [
+        ["SUMMARY_ISJ_A1", "SUMMARY_ISJ_A2"],
+        ["SUMMARY_ISJ_B1", "SUMMARY_ISJ_B2"],
+      ],
+    };
+
+    const summary = (() => {
+      if (domEI && domNS && domJP) {
+        const combo = `${domEI}${domNS}${domJP}`;
+        const variants = summaryVariantsByCombo[combo];
+        if (variants?.length) {
+          return pickStable(variants, `SUMMARY_COMBO_${combo}`);
+        }
+      }
+
+      const fbEins = `SUMMARY_FB_EINS_${domEI ?? "X"}_${domNS ?? "X"}`;
+      const fbNsjp = `SUMMARY_FB_NSJP_${domNS ?? "X"}_${domJP ?? "X"}`;
+      return [fbEins, fbNsjp];
+    })();
+
     const scene: TextToken[][] = [
-      // EI
-      isTie(ei)
-        ? [T("말할 땐 말하고, 쉴 땐 쉬어요.")]
-        : domEI === "E"
-          ? [H("대화", "EI"), T("가 먼저 "), H("시동", "EI"), T("이고, "), H("침묵", "EI"), T("은 잠깐뿐이에요.")]
-          : [H("조용", "EI"), T("하다가 한 번 말하면 "), H("핵심", "EI"), T("만 정확해요.")],
-
-      // NS
-      isTie(ns)
-        ? [H("큰그림", "NS"), T("과 "), H("디테일", "NS"), T("이 번갈아 나와요.")]
-        : domNS === "N"
-          ? [H("주제", "NS"), T("가 옆길로 "), H("확장", "NS"), T("되는 게 정상입니다.")]
-          : [T("얘기가 새도 결국 "), H("실행", "NS"), T(" 얘기로 돌아와요.")],
-
-      // JP
-      isTie(jp)
-        ? [H("결론", "JP"), T("도 열어두고, 필요하면 닫아요.")]
-        : domJP === "J"
-          ? [H("정리", "JP"), T(" 담당이 자연스럽게 등장해서 회의를 닫아줍니다.")]
-          : [H("결론", "JP"), T("은 나중, 일단 "), H("굴리면서", "JP"), T(" 맞춰요.")],
+      [H(sceneToken("EI", domEI, eiTier), "EI")],
+      [H(sceneToken("NS", domNS, nsTier), "NS")],
+      [H(sceneToken("JP", domJP, jpTier), "JP")],
     ];
 
-    // ✅ 3) 주의 포인트 (역시 핵심 단어만 강조)
     const caution = (() => {
+      const hasExtreme = [eiTier, nsTier, tfTier, jpTier].includes("extreme");
       if (!isTie(tf)) {
         if (domTF === "T") {
           return {
             k: "TF" as const,
-            tokens: [H("직설", "TF"), T("로 들릴 수 있어요. "), H("요약 멘트", "TF"), T("에 쿠션을 한 번만.")],
+            tokens: [T(tfTier === "extreme" ? "CAUTION_T_EXTREME" : "CAUTION_T_BASE")],
           };
         }
         if (domTF === "F") {
           return {
             k: "TF" as const,
-            tokens: [H("결론", "TF"), T("이 늦어질 수 있어요. "), H("결정할 항목", "TF"), T("만 미리 박아두면 좋아요.")],
+            tokens: [T(tfTier === "extreme" ? "CAUTION_F_EXTREME" : "CAUTION_F_BASE")],
           };
         }
       }
@@ -195,325 +348,259 @@ function summarizeMbtiDistribution(mbtis: string[]) {
       if (!isTie(jp) && domJP === "P") {
         return {
           k: "JP" as const,
-          tokens: [H("일정", "JP"), T("이 자주 바뀔 수 있어요. "), H("마감", "JP"), T("만 하나 잡아두면 편해요.")],
+          tokens: [T(jpTier === "extreme" ? "CAUTION_P_EXTREME" : "CAUTION_P_BASE")],
         };
       }
 
       return {
         k: "BAL" as const,
-        tokens: [T("큰 단점은 없고, "), H("주제", "BAL"), T("만 명확하면 더 잘 굴러가요.")],
+        tokens: [T(hasExtreme ? "CAUTION_DEFAULT_EXTREME" : "CAUTION_DEFAULT_BASE")],
       };
     })();
 
-    return { core, scene, caution };
+    return { core, summary, scene, caution };
   })();
 
 
 
 
-  return { cnt, ei, ns, tf, jp, vibe };
+  return { cnt, ei, ns, tf, jp, vibe, avgAxis: { e: avgE, n: avgN, t: avgT, j: avgJ } };
 }
 
 /** ✅ 2) 역할 추천 (방 전체) */
-type RoleKey = "STRATEGY" | "VIBE" | "EXEC" | "ORGANIZE" | "MEDIATOR";
-
-function calcFitRanks(list: { fit: number }[]) {
-  const sorted = [...list].sort((a, b) => b.fit - a.fit);
-
-  const fitToRank = new Map<number, number>();
-  let rank = 0;
-  let lastFit: number | null = null;
-
-  for (const m of sorted) {
-    if (lastFit === null || m.fit < lastFit) {
-      rank += 1;
-      lastFit = m.fit;
-    }
-    if (!fitToRank.has(m.fit)) {
-      fitToRank.set(m.fit, rank);
-    }
-  }
-
-  return fitToRank; // fit -> rank (1부터 시작)
-}
-
-
 function roleLabel(r: RoleKey, t?: TranslateFn) {
   switch (r) {
-    case "STRATEGY": return tx(t, "roles.labels.STRATEGY", "🧠 전략 담당");
-    case "VIBE": return tx(t, "roles.labels.VIBE", "💬 분위기 담당");
-    case "EXEC": return tx(t, "roles.labels.EXEC", "🚀 실행 엔진");
-    case "ORGANIZE": return tx(t, "roles.labels.ORGANIZE", "🗂 정리/결정");
-    case "MEDIATOR": return tx(t, "roles.labels.MEDIATOR", "🧯 중재/조율");
+    case "STRATEGY": return tx(t, "roles.labels.STRATEGY", "전략 담당");
+    case "VIBE": return tx(t, "roles.labels.VIBE", "분위기 담당");
+    case "EXEC": return tx(t, "roles.labels.EXEC", "실행 담당");
+    case "ORGANIZE": return tx(t, "roles.labels.ORGANIZE", "정리/결정 담당");
+    case "MEDIATOR": return tx(t, "roles.labels.MEDIATOR", "중재/조율 담당");
   }
 }
 
 function roleTheme(k: RoleKey) {
   switch (k) {
     case "STRATEGY":
-      return { card: "bg-white/70 ring-black/5", accent: "text-fuchsia-700", leftBar: "bg-fuchsia-400" };
+      return {
+        accent: "text-fuchsia-700",
+        leftBar: "bg-fuchsia-500",
+        surface: "from-fuchsia-100/70 via-white to-white",
+      };
     case "VIBE":
-      return { card: "bg-white/70 ring-black/5", accent: "text-sky-700", leftBar: "bg-sky-400" };
+      return {
+        accent: "text-sky-700",
+        leftBar: "bg-sky-500",
+        surface: "from-sky-100/70 via-white to-white",
+      };
     case "EXEC":
-      return { card: "bg-white/70 ring-black/5", accent: "text-emerald-700", leftBar: "bg-emerald-400" };
+      return {
+        accent: "text-emerald-700",
+        leftBar: "bg-emerald-500",
+        surface: "from-emerald-100/70 via-white to-white",
+      };
     case "ORGANIZE":
-      return { card: "bg-white/70 ring-black/5", accent: "text-amber-700", leftBar: "bg-amber-400" };
+      return {
+        accent: "text-amber-700",
+        leftBar: "bg-amber-500",
+        surface: "from-amber-100/70 via-white to-white",
+      };
     case "MEDIATOR":
-      return { card: "bg-white/70 ring-black/5", accent: "text-rose-700", leftBar: "bg-rose-400" };
+      return {
+        accent: "text-rose-700",
+        leftBar: "bg-rose-500",
+        surface: "from-rose-100/70 via-white to-white",
+      };
   }
 }
 
-function roleRankBadge(role: RoleKey, rank: number, t?: TranslateFn) {
-  // rank: 0=1등, 1=2등, 2=3등, 3=4등, 4=5등...
+function roleIconOf(role: RoleKey) {
+  if (role === "STRATEGY") return Compass;
+  if (role === "VIBE") return Sparkles;
+  if (role === "EXEC") return Zap;
+  if (role === "ORGANIZE") return ListChecks;
+  return Handshake;
+}
 
-  if (rank >= 4) {
-    return null; // ✅ 5등부터는 칭호 없음
-  }
+function stablePick<T>(seed: string, items: T[]) {
+  return items[stablePairHash(seed) % items.length];
+}
 
-  const pick = (
-    titles: [string, string, string, string],
-    cls: [string, string, string, string]
-  ) => {
-    return { title: titles[rank], cls: cls[rank] };
+function strongRoleLine(role: RoleKey, locale: string, seed: string) {
+  const ko: Record<RoleKey, string[]> = {
+    STRATEGY: ["복잡한 이슈도 구조를 잡아주는 타입이 있어요.", "판을 먼저 정리해 흐름을 안정시켜요.", "기준선을 세워 회의 방향이 흔들리지 않게 해요."],
+    VIBE: ["어색한 분위기를 빠르게 녹여주는 타입이 있어요.", "사람 사이 연결이 좋아 협업 텐션이 올라가요.", "대화가 끊기지 않게 리듬을 만들어줘요."],
+    EXEC: ["결정되면 바로 움직이는 타입이 있어요.", "실행 전환 속도가 빨라 지체가 적어요.", "아이디어를 액션으로 바꾸는 힘이 강해요."],
+    ORGANIZE: ["결론을 깔끔하게 묶어 마무리해줘요.", "우선순위를 세워 회의를 짧게 끝내줘요.", "핵심만 남기고 정리해 다음 단계가 선명해져요."],
+    MEDIATOR: ["온도 차를 줄여 대화를 이어주는 타입이 있어요.", "입장 차이를 부드럽게 조율해줘요.", "충돌 조짐이 보여도 빠르게 완충해줘요."],
   };
+  const en: Record<RoleKey, string[]> = {
+    STRATEGY: ["Someone here structures complex topics clearly.", "They stabilize flow by framing first.", "They set criteria so discussions stay on track."],
+    VIBE: ["Someone here quickly warms up awkward moments.", "They raise collaboration energy by connecting people.", "They keep conversation rhythm from stalling."],
+    EXEC: ["Someone here moves right after decisions.", "The switch from idea to action is fast.", "They convert plans into execution momentum."],
+    ORGANIZE: ["Someone here closes discussions cleanly.", "They set priorities and shorten meeting length.", "They leave only what matters for next steps."],
+    MEDIATOR: ["Someone here smooths temperature gaps.", "They bridge different positions softly.", "They buffer early conflict signals quickly."],
+  };
+  const ja: Record<RoleKey, string[]> = {
+    STRATEGY: ["複雑な議題でも構造化して整理できる人がいます。", "先に枠組みを作って議論を安定させます。", "判断基準を置いて流れのブレを減らします。"],
+    VIBE: ["空気を和らげて会話を始める人がいます。", "人同士の接続が強く協業テンションを上げます。", "会話のリズムを切らさず維持します。"],
+    EXEC: ["決定後すぐ動ける人がいます。", "アイデアから実行への切替が速いです。", "計画を実行へ押し出す力が強いです。"],
+    ORGANIZE: ["結論をきれいにまとめて締められる人がいます。", "優先順位を立てて会議時間を短くします。", "要点を残して次工程を明確にします。"],
+    MEDIATOR: ["温度差を埋めて会話をつなげる人がいます。", "立場の違いをやわらかく調整できます。", "衝突の兆しを早めに緩衝します。"],
+  };
+  const pool = locale === "en" ? en[role] : locale === "ja" ? ja[role] : ko[role];
+  return stablePick(`${seed}|strong`, pool);
+}
 
-  if (role === "STRATEGY") {
-    return pick(
-      [
-        tx(t, "roles.badges.STRATEGY.1", "전략 설계자"),
-        tx(t, "roles.badges.STRATEGY.2", "구조 장인"),
-        tx(t, "roles.badges.STRATEGY.3", "아이디어 브레인"),
-        tx(t, "roles.badges.STRATEGY.4", "전략 보조"),
-      ],
-      [
-        "text-fuchsia-700 font-extrabold",
-        "text-fuchsia-600 font-bold",
-        "text-fuchsia-500",
-        "text-fuchsia-400",
-      ]
-    );
+function vacancyInsightLine(role: RoleKey, locale: string, seed: string) {
+  const ko: Record<RoleKey, string[]> = {
+    STRATEGY: ["장기 계획은 약할 수 있어요. 목표를 먼저 합의하면 좋아요.", "큰그림이 비기 쉬워요. 시작 전에 성공 기준 1개만 맞춰보세요."],
+    VIBE: ["분위기 완충이 약할 수 있어요. 발언 순서를 한 번만 정하면 안정돼요.", "대화 연결이 끊길 수 있어요. 체크인 멘트를 짧게 넣어보세요."],
+    EXEC: ["실행 전환이 늦어질 수 있어요. 마감과 담당을 먼저 고정해보세요.", "좋은 아이디어가 쌓이기만 할 수 있어요. 오늘 할 1개를 바로 정해보세요."],
+    ORGANIZE: ["결론 고정이 늦어질 수 있어요. 결정 타임박스를 먼저 걸어두세요.", "우선순위가 흔들릴 수 있어요. 중요도 기준을 한 줄로 정해보세요."],
+    MEDIATOR: ["갈등 시 중간 조율이 부족할 수 있어요. 룰을 한 줄만 정해두면 안정돼요.", "온도 차가 커질 수 있어요. 피드백 전에 쿠션 문장을 합의해두세요."],
+  };
+  const en: Record<RoleKey, string[]> = {
+    STRATEGY: ["Long-range framing may be weak. Align one goal first.", "Big-picture planning may thin out. Set one success criterion before starting."],
+    VIBE: ["Mood buffering may be light. A simple speaking order can stabilize flow.", "Conversation linking may break. Add a short check-in prompt."],
+    EXEC: ["Action switch may slow. Lock owner and deadline first.", "Ideas may pile up. Commit one task for today immediately."],
+    ORGANIZE: ["Closure may be delayed. Set a decision timebox early.", "Priorities may drift. Define one-line priority rule first."],
+    MEDIATOR: ["Mid-conflict coordination may be weak. One shared rule can stabilize flow.", "Temperature gaps may widen. Agree on one cushioning line before feedback."],
+  };
+  const ja: Record<RoleKey, string[]> = {
+    STRATEGY: ["長期設計が弱くなる可能性があります。先に目標を1つ合意してください。", "大枠が空きやすいです。開始前に成功基準を1つだけ固定すると安定します。"],
+    VIBE: ["雰囲気緩衝が弱くなる可能性があります。発言順を1回決めるだけで安定します。", "会話接続が切れやすいです。短いチェックイン文を入れてください。"],
+    EXEC: ["実行切替が遅れる可能性があります。担当と締切を先に固定してください。", "良案が積まれやすいです。今日やる1つを先に決めてください。"],
+    ORGANIZE: ["結論固定が遅れる可能性があります。決定タイムボックスを先に置いてください。", "優先順位がぶれやすいです。重要度基準を1行で定義してください。"],
+    MEDIATOR: ["衝突時の中間調整が不足する可能性があります。共通ルール1つで安定します。", "温度差が広がりやすいです。フィードバック前のクッション文を合意してください。"],
+  };
+  const pool = locale === "en" ? en[role] : locale === "ja" ? ja[role] : ko[role];
+  return stablePick(`${seed}|vacancy`, pool);
+}
+
+function rolePersonaTitle(role: RoleKey, locale: string) {
+  if (locale === "en") {
+    const en: Record<RoleKey, string> = {
+      STRATEGY: "Map Mastermind",
+      VIBE: "Mood DJ",
+      EXEC: "Turbo Starter",
+      ORGANIZE: "Deadline Tamer",
+      MEDIATOR: "Peace Buffer",
+    };
+    return en[role];
   }
-
-  if (role === "ORGANIZE") {
-    return pick(
-      [
-        tx(t, "roles.badges.ORGANIZE.1", "정리왕"),
-        tx(t, "roles.badges.ORGANIZE.2", "결정 장인"),
-        tx(t, "roles.badges.ORGANIZE.3", "체계 관리자"),
-        tx(t, "roles.badges.ORGANIZE.4", "보조 정리러"),
-      ],
-      [
-        "text-amber-700 font-extrabold",
-        "text-amber-600 font-bold",
-        "text-amber-500",
-        "text-amber-400",
-      ]
-    );
+  if (locale === "ja") {
+    const ja: Record<RoleKey, string> = {
+      STRATEGY: "作戦ボ스",
+      VIBE: "ムードDJ",
+      EXEC: "爆速スターター",
+      ORGANIZE: "締切ハンター",
+      MEDIATOR: "平和バッファー",
+    };
+    return ja[role];
   }
+  const ko: Record<RoleKey, string> = {
+    STRATEGY: "전략설계자",
+    VIBE: "분위기 메이커",
+    EXEC: "실행 엔진",
+    ORGANIZE: "정리왕",
+    MEDIATOR: "평화 유지군",
+  };
+  return ko[role];
+}
 
-  if (role === "VIBE") {
-    return pick(
-      [
-        tx(t, "roles.badges.VIBE.1", "분위기 메이커"),
-        tx(t, "roles.badges.VIBE.2", "공감 리더"),
-        tx(t, "roles.badges.VIBE.3", "대화 촉진자"),
-        tx(t, "roles.badges.VIBE.4", "소통 보조"),
-      ],
-      [
-        "text-sky-700 font-extrabold",
-        "text-sky-600 font-bold",
-        "text-sky-500",
-        "text-sky-400",
-      ]
-    );
-  }
 
-  if (role === "EXEC") {
-    return pick(
-      [
-        tx(t, "roles.badges.EXEC.1", "실행 엔진"),
-        tx(t, "roles.badges.EXEC.2", "행동 대장"),
-        tx(t, "roles.badges.EXEC.3", "추진 담당"),
-        tx(t, "roles.badges.EXEC.4", "참여형"),
-      ],
-      [
-        "text-emerald-700 font-extrabold",
-        "text-emerald-600 font-bold",
-        "text-emerald-500",
-        "text-emerald-400",
-      ]
-    );
-  }
+type RoleMemberSource = {
+  id: string;
+  nickname: string;
+  mbti?: string | null;
+  ePercent?: number | null;
+  nPercent?: number | null;
+  tPercent?: number | null;
+  jPercent?: number | null;
+  conflictStyle?: string | null;
+  energy?: string | number | null;
+};
 
-  // MEDIATOR
-  return pick(
-    [
-      tx(t, "roles.badges.MEDIATOR.1", "평화 유지군"),
-      tx(t, "roles.badges.MEDIATOR.2", "조율 장인"),
-      tx(t, "roles.badges.MEDIATOR.3", "감정 균형자"),
-      tx(t, "roles.badges.MEDIATOR.4", "중재 보조"),
-    ],
-    [
-      "text-rose-700 font-extrabold",
-      "text-rose-600 font-bold",
-      "text-rose-500",
-      "text-rose-400",
-    ]
+function mbtiAxisFallback(mbti: string) {
+  return {
+    E: mbti[0] === "E" ? 100 : 0,
+    N: mbti[1] === "N" ? 100 : 0,
+    T: mbti[2] === "T" ? 100 : 0,
+    J: mbti[3] === "J" ? 100 : 0,
+  };
+}
+
+function normalizeAxisValue(value: number | null | undefined, fallback: number) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(0, Math.min(100, n));
+}
+
+function normalizeConflictInput(value: string | null | undefined): ConflictInput {
+  const raw = String(value ?? "").trim().toUpperCase();
+  if (raw === "DIRECT" || raw === "AVOID" || raw === "MEDIATE" || raw === "BURST") return raw;
+  return null;
+}
+
+function normalizeEnergyInput(value: string | number | null | undefined): EnergyInput {
+  if (value === 1 || value === 2 || value === 3) return value;
+  const raw = String(value ?? "").trim().toUpperCase();
+  if (raw === "LOW") return 1;
+  if (raw === "MID") return 2;
+  if (raw === "HIGH") return 3;
+  return null;
+}
+
+function pickRolesForGroup(members: RoleMemberSource[]) {
+  type RoleCandidateWithId = RoleCandidateInput & { id: string };
+
+  const validMembers: RoleCandidateWithId[] = members
+    .map((member) => {
+      const mbti = String(member.mbti ?? "").trim().toUpperCase();
+      if (!isValidMbti(mbti)) return null;
+      const fallbackAxis = mbtiAxisFallback(mbti);
+      return {
+        id: member.id,
+        name: member.nickname,
+        mbti,
+        axis: {
+          E: normalizeAxisValue(member.ePercent, fallbackAxis.E),
+          N: normalizeAxisValue(member.nPercent, fallbackAxis.N),
+          T: normalizeAxisValue(member.tPercent, fallbackAxis.T),
+          J: normalizeAxisValue(member.jPercent, fallbackAxis.J),
+        },
+        conflict: normalizeConflictInput(member.conflictStyle),
+        energy: normalizeEnergyInput(member.energy),
+      };
+    })
+    .filter((member): member is RoleCandidateWithId => !!member);
+
+  const bucket = ROLE_KEYS.reduce(
+    (acc, role) => {
+      acc[role] = pickCandidates(role, validMembers).map((member) => ({
+        id: member.id ?? `${member.name}|${member.mbti}`,
+        name: member.name,
+        mbti: member.mbti,
+        fit: member.score,
+      }));
+      return acc;
+    },
+    {
+      STRATEGY: [],
+      VIBE: [],
+      EXEC: [],
+      ORGANIZE: [],
+      MEDIATOR: [],
+    } as Record<RoleKey, { id: string; name: string; mbti: string; fit: number }[]>
   );
-}
 
-function roleDescMessage(role: RoleKey, t?: TranslateFn) {
-  switch (role) {
-    case "STRATEGY":
-      return tx(t, "roles.desc.STRATEGY", "큰그림·패턴을 먼저 보는 편이에요. 방향 잡고 설계하는 역할에 강해요.");
-    case "VIBE":
-      return tx(t, "roles.desc.VIBE", "분위기 읽고 말 잘 이어주는 편이에요. 어색함을 풀어주는 역할이에요.");
-    case "EXEC":
-      return tx(t, "roles.desc.EXEC", "생각보다 ‘일단 해보자’가 빠른 편이에요. 움직이게 만드는 추진력이에요.");
-    case "ORGANIZE":
-      return tx(t, "roles.desc.ORGANIZE", "정리·우선순위·결론을 잘 내는 편이에요. 회의 마무리 담당이에요.");
-    case "MEDIATOR":
-      return tx(t, "roles.desc.MEDIATOR", "서로 입장 차이를 부드럽게 맞추는 편이에요. 갈등을 줄여주는 역할이에요.");
-  }
-}
-
-
-function roleEmptyMessage(role: RoleKey, t?: TranslateFn) {
-  switch (role) {
-    case "STRATEGY":
-      return tx(t, "roles.empty.STRATEGY", "큰 방향을 잡는 사람이 없어서, 회의가 길어질 수 있어요.");
-    case "VIBE":
-      return tx(t, "roles.empty.VIBE", "분위기를 잡아주는 사람이 없어서, 말이 조금 딱딱해질 수 있어요.");
-    case "EXEC":
-      return tx(t, "roles.empty.EXEC", "실행으로 밀어붙일 사람이 없어서, 아이디어가 멈출 수 있어요.");
-    case "ORGANIZE":
-      return tx(t, "roles.empty.ORGANIZE", "정리/결정 담당이 없어서, 결론이 미뤄질 수 있어요.");
-    case "MEDIATOR":
-      return tx(t, "roles.empty.MEDIATOR", "중재해줄 사람이 없어서, 작은 오해가 오래 갈 수 있어요.");
-  }
-}
-
-
-function pickRolesForGroup(
-  members: { nickname: string; mbti: string; prefs?: Partial<MemberPrefs> | null }[],
-  t?: TranslateFn
-) {
-  const valid = members
-    .map((m) => ({
-      name: m.nickname,
-      mbti: m.mbti.trim().toUpperCase(),
-      prefs: normalizeMemberPrefs(m.prefs),
-    }))
-    .filter((m) => isValidMbti(m.mbti));
-
-  const energyScore = (energy: MemberPrefs["energy"]) => {
-    if (energy === "LOW") return 35;
-    if (energy === "MID") return 65;
-    return 90;
-  };
-
-  const mbtiBonus = (mbti: string, axis: "E" | "P" | "J") => {
-    if (axis === "E") return mbti[0] === "E" ? 100 : 40;
-    if (axis === "P") return mbti[3] === "P" ? 100 : 45;
-    return mbti[3] === "J" ? 100 : 45;
-  };
-
-  const roleFitScore = (mbti: string, prefs: MemberPrefs, role: RoleKey) => {
-    const eScore = energyScore(prefs.energy);
-    const mediateBonus = prefs.conflictStyle === "MEDIATE" ? 100 : 50;
-
-    if (role === "STRATEGY") {
-      return Math.round(0.55 * prefs.ideaStrength + 0.45 * prefs.logicStrength);
-    }
-    if (role === "VIBE") {
-      return Math.round(0.6 * prefs.peopleStrength + 0.2 * eScore + 0.2 * mbtiBonus(mbti, "E"));
-    }
-    if (role === "EXEC") {
-      return Math.round(0.55 * prefs.factStrength + 0.25 * mbtiBonus(mbti, "P") + 0.2 * eScore);
-    }
-    if (role === "ORGANIZE") {
-      return Math.round(0.6 * prefs.logicStrength + 0.3 * prefs.factStrength + 0.1 * mbtiBonus(mbti, "J"));
-    }
-    return Math.round(0.55 * prefs.peopleStrength + 0.25 * mediateBonus + 0.2 * prefs.factStrength);
-  };
-
-  const bucket: Record<RoleKey, { name: string; mbti: string; fit: number }[]> = {
-    STRATEGY: [],
-    VIBE: [],
-    EXEC: [],
-    ORGANIZE: [],
-    MEDIATOR: [],
-  };
-
-  for (const m of valid) {
-    for (const r of Object.keys(bucket) as RoleKey[]) {
-      bucket[r].push({
-        name: m.name,
-        mbti: m.mbti,
-        fit: roleFitScore(m.mbti, m.prefs, r),
-      });
-    }
-  }
-
-  const roleMean = (role: RoleKey) => {
-    const list = bucket[role];
-    if (!list.length) return 0;
-    return list.reduce((sum, m) => sum + m.fit, 0) / list.length;
-  };
-
-  const sorted = (Object.keys(bucket) as RoleKey[])
-    .map((k) => ({ k, v: roleMean(k) }))
-    .sort((a, b) => b.v - a.v);
-
-  const top2 = sorted.slice(0, 2);
-  const lacking2 = [...sorted].reverse().slice(0, 2);
-
-  const headline = (() => {
-    const [a, b] = top2;
-    if (!a) return tx(t, "roles.summary.headline.noMembers", "구성원이 더 모이면 역할이 더 또렷해져요.");
-    if (a.v === 0) return tx(t, "roles.summary.headline.noDistribution", "아직 역할 분포가 얇아요. 더 많은 MBTI 입력이 필요해요.");
-    return tx(
-      t,
-      "roles.summary.headline.default",
-      `이 방은 ${roleLabel(a.k, t)} 성향이 강하고, ${b ? roleLabel(b.k, t) : tx(t, "balanceLabel", "균형")} 쪽도 같이 있어요.`,
-      {
-        mainRole: roleLabel(a.k, t),
-        secondaryRole: b ? roleLabel(b.k, t) : tx(t, "balanceLabel", "균형"),
-      }
-    );
-  })();
-
-  const tip = (() => {
-    const lack = lacking2[0];
-    if (!lack || lack.v >= 55) return tx(t, "roles.summary.tip.default", "역할은 고정이 아니에요. 상황에 따라 바뀌어도 자연스러워요.");
-    return tx(
-      t,
-      "roles.summary.tip.lack",
-      `조심 포인트: ${roleLabel(lack.k, t)} 점수가 낮아요. 이 역할을 맡는 사람이 없으면 회의가 길어질 수 있어요.`,
-      { role: roleLabel(lack.k, t) }
-    );
-  })();
-
-  const topPick: Record<RoleKey, { name: string; mbti: string; fit: number } | null> = {
-    STRATEGY: null,
-    VIBE: null,
-    EXEC: null,
-    ORGANIZE: null,
-    MEDIATOR: null,
-  };
-
-  (Object.keys(bucket) as RoleKey[]).forEach((k) => {
-    if (bucket[k].length === 0) return;
-    topPick[k] = [...bucket[k]].sort((a, b) => b.fit - a.fit)[0];
-  });
-
-  return { bucket, top2, lacking2, headline, tip, topPick };
+  return { bucket };
 }
 
 /** ✅ 3) 케미 타입 분류 (점수 기반 + 약간의 위트) */
 
 //** ✅ cached rankings (groupId 별 캐시 분리 + best/worst 안정 계산) */
-const getRankings = (groupId: string) =>
+const getRankings = (groupId: string, cacheSeed: string) =>
   unstable_cache(
     async () => {
       const group = await prisma.group.findUnique({
@@ -547,7 +634,7 @@ const getRankings = (groupId: string) =>
           const a = membersForRank[i];
           const b = membersForRank[j];
 
-          const score = getCompatScore(a.id, a.mbti, b.id, b.mbti, a.prefs, b.prefs).score;
+          const compat = getCompatScore(a.id, a.mbti, b.id, b.mbti, a.prefs, b.prefs);
 
           pairs.push({
             aId: a.id,
@@ -556,7 +643,14 @@ const getRankings = (groupId: string) =>
             bId: b.id,
             bName: b.nickname,
             bMbti: b.mbti,
-            score,
+            scoreInt: compat.scoreInt,
+            micro: compat.micro,
+            score: compat.score,
+            type: compat.type,
+            level: compat.level,
+            adjustTotal: compat.adjustTotal,
+            adjustBreakdown: compat.adjustBreakdown,
+            reason: compat.reason,
             aPrefs: a.prefs,
             bPrefs: b.prefs,
           });
@@ -581,78 +675,16 @@ const getRankings = (groupId: string) =>
       const best3 = sortedDesc.slice(0, 3);
       const worst3 = sortedAsc.slice(0, 3);
 
-      return { group, best3, worst3, pairs };
+      return { group, best3, worst3 };
     },
     // ✅ groupId를 캐시 키에 포함 (그룹별 캐시 완전 분리)
-    ["group-rankings", groupId],
-    { revalidate: 60 }
+    ["group-rankings", groupId, cacheSeed],
+    {
+      revalidate: 60,
+      tags: [`group-rankings:${groupId}`],
+    }
   )();
 
-
-type Level = 1 | 2 | 3 | 4 | 5;
-
-const LEVEL_META: Record<Level, { label: string; color: string }> = {
-  5: { label: "찰떡궁합", color: "#1E88E5" },
-  4: { label: "합좋은편", color: "#00C853" },
-  3: { label: "그럭저럭", color: "#FDD835" },
-  2: { label: "조율필요", color: "#FB8C00" },
-  1: { label: "위험", color: "#E53935" },
-};
-
-function clampScore(n: number) {
-  return Math.max(0, Math.min(100, Math.round(n)));
-}
-
-function adjustChemScoreByStyles(
-  base: number,
-  a: { judge?: JudgeStyle; info?: InfoStyle },
-  b: { judge?: JudgeStyle; info?: InfoStyle }
-) {
-  let s = base;
-
-  const aj = a.judge ?? "LOGIC";
-  const bj = b.judge ?? "LOGIC";
-  const ai = a.info ?? "IDEA";
-  const bi = b.info ?? "IDEA";
-
-  // -----------------------------
-  // 1️⃣ 판단 기준 (논리 vs 사람)
-  // -----------------------------
-  if (aj === bj) {
-    s += 4; // ✅ 같은 기준 → 말이 빨리 맞음
-  } else {
-    s -= 5; // ❗ 핵심 충돌: 결론 내는 방식 자체가 다름
-  }
-
-  // -----------------------------
-  // 2️⃣ 정보 처리 (아이디어 vs 사실)
-  // -----------------------------
-  if (ai === bi) {
-    s += 3; // 같은 레벨에서 이야기
-  } else {
-    s -= 3; // 전제부터 어긋남
-  }
-
-  // -----------------------------
-  // 3️⃣ 궁합이 낮은데 스타일까지 다르면 증폭
-  // -----------------------------
-  if (base < 55 && aj !== bj) {
-    s -= 3; // ❗ 싸움으로 번질 확률
-  }
-
-  if (base < 55 && ai !== bi) {
-    s -= 2; // 은근한 피로 누적
-  }
-
-  // -----------------------------
-  // 4️⃣ 궁합이 높은데 스타일이 맞으면 보너스
-  // -----------------------------
-  if (base >= 70 && aj === bj && ai === bi) {
-    s += 2; // 말 안 해도 통하는 느낌
-  }
-
-  return clampScore(s);
-}
 
 function SectionCard2({
   icon,
@@ -743,36 +775,49 @@ export default async function GroupPage({
 }) {
   const { locale, groupId } = await params;
   const t = await getTranslations({ locale, namespace: "groupPage" });
-  const tt = (key: string, fallback: string, values?: Record<string, unknown>) => tx(t, key, fallback, values);
+  const tt = (key: string, fallback: string, values?: TranslateValues) => tx(t, key, fallback, values);
   const sp = (await searchParams) ?? {};
   const centerId = sp.center;
   const base = locale === "ko" ? "" : `/${locale}`;
 
-  const pctNum = (n: number, total: number) => (total ? Math.round((n / total) * 100) : 0);
-  const fracText = (n: number, total: number) =>
-    tt("countFormat", `${n}/${total}명 (${pctNum(n, total)}%)`, { value: n, total, percent: pctNum(n, total) });
+  const cacheSeed = await getGroupRankingsCacheSeed(groupId);
+  if (!cacheSeed) return notFound();
 
-  const cached = await getRankings(groupId);
+  const cached = await getRankings(groupId, cacheSeed);
   if (!cached) return notFound();
 
-  const { group, best3, worst3, pairs } = cached;
+  const { group, best3, worst3 } = cached;
 
   const count = group.members.length;
   const max = group.maxMembers;
   const ratio = max > 0 ? Math.min(100, Math.round((count / max) * 100)) : 0;
-
-  const center = (centerId ? group.members.find((m) => m.id === centerId) : null) ?? group.members[0];
 
   // ✅ 추가 콘텐츠 계산(서버에서 한번만)
   const validMbtis = group.members
     .map((m) => (m.mbti ?? "").trim().toUpperCase())
     .filter(isValidMbti);
 
-  const distTotal = validMbtis.length || 1;
+  const distMembers = group.members
+    .filter((m) => isValidMbti(m.mbti))
+    .map((m) => ({
+      mbti: (m.mbti ?? "").trim().toUpperCase(),
+      ePercent: m.ePercent,
+      nPercent: m.nPercent,
+      tPercent: m.tPercent,
+      jPercent: m.jPercent,
+    }));
+
+  const distTotal = distMembers.length || 1;
   const pctPeople = (n: number) => Math.round((n / distTotal) * 100);
   const fracText2 = (n: number) => tt("countFormat", `${n}/${distTotal}명 (${pctPeople(n)}%)`, { value: n, total: distTotal, percent: pctPeople(n) });
+  const distShareLabel =
+    locale === "en" ? "Member share" : locale === "ja" ? "人数比率" : "인원 비율";
+  const vibeSeed = `${groupId}|${group.members.map((member) => member.id).sort().join("|")}`;
 
-  const dist = summarizeMbtiDistribution(validMbtis);
+  const dist = summarizeMbtiDistribution(distMembers, vibeSeed);
+  if (process.env.NODE_ENV === "development") {
+    console.log("✔ Axis percent avg:", dist.avgAxis.e, dist.avgAxis.n, dist.avgAxis.t, dist.avgAxis.j);
+  }
 
   dist.ei.a.label = tt("distribution.axisLabels.eiE", "E(외향)");
   dist.ei.b.label = tt("distribution.axisLabels.eiI", "I(내향)");
@@ -783,7 +828,7 @@ export default async function GroupPage({
   dist.jp.a.label = tt("distribution.axisLabels.jpJ", "J(판단)");
   dist.jp.b.label = tt("distribution.axisLabels.jpP", "P(인식)");
 
-  const vibeTokenMap: Record<string, string> = {
+  const coreTokenMap: Record<string, string> = {
     "상황형": tt("distribution.vibe.core.situational", "상황형"),
     "토크형": tt("distribution.vibe.core.talkative", "토크형"),
     "조용한 핵심형": tt("distribution.vibe.core.quietCore", "조용한 핵심형"),
@@ -793,150 +838,41 @@ export default async function GroupPage({
     "유연 운영": tt("distribution.vibe.core.flexibleOps", "유연 운영"),
     "정리 담당 존재": tt("distribution.vibe.core.organizerPresent", "정리 담당 존재"),
     "즉흥 운영": tt("distribution.vibe.core.impromptuOps", "즉흥 운영"),
-    "말할 땐 말하고, 쉴 땐 쉬어요.": tt("distribution.vibe.scene.ei.tie", "말할 땐 말하고, 쉴 땐 쉬어요."),
-    "대화": tt("distribution.vibe.scene.ei.talk", "대화"),
-    "가 먼저 ": tt("distribution.vibe.scene.ei.talkFirst", "가 먼저 "),
-    "시동": tt("distribution.vibe.scene.ei.ignite", "시동"),
-    "이고, ": tt("distribution.vibe.scene.ei.and", "이고, "),
-    "침묵": tt("distribution.vibe.scene.ei.silence", "침묵"),
-    "은 잠깐뿐이에요.": tt("distribution.vibe.scene.ei.shortOnly", "은 잠깐뿐이에요."),
-    "조용": tt("distribution.vibe.scene.ei.quiet", "조용"),
-    "하다가 한 번 말하면 ": tt("distribution.vibe.scene.ei.quietThen", "하다가 한 번 말하면 "),
-    "핵심": tt("distribution.vibe.scene.ei.core", "핵심"),
-    "만 정확해요.": tt("distribution.vibe.scene.ei.preciseOnly", "만 정확해요."),
-    "큰그림": tt("distribution.vibe.scene.ns.bigPicture", "큰그림"),
-    "과 ": tt("distribution.vibe.scene.ns.with", "과 "),
-    "디테일": tt("distribution.vibe.scene.ns.detail", "디테일"),
-    "이 번갈아 나와요.": tt("distribution.vibe.scene.ns.alternate", "이 번갈아 나와요."),
-    "주제": tt("distribution.vibe.scene.ns.topic", "주제"),
-    "가 옆길로 ": tt("distribution.vibe.scene.ns.sidePath", "가 옆길로 "),
-    "확장": tt("distribution.vibe.scene.ns.expand", "확장"),
-    "되는 게 정상입니다.": tt("distribution.vibe.scene.ns.normal", "되는 게 정상입니다."),
-    "얘기가 새도 결국 ": tt("distribution.vibe.scene.ns.offTopic", "얘기가 새도 결국 "),
-    "실행": tt("distribution.vibe.scene.ns.execution", "실행"),
-    " 얘기로 돌아와요.": tt("distribution.vibe.scene.ns.backToExec", " 얘기로 돌아와요."),
-    "결론": tt("distribution.vibe.scene.jp.conclusion", "결론"),
-    "도 열어두고, 필요하면 닫아요.": tt("distribution.vibe.scene.jp.openClose", "도 열어두고, 필요하면 닫아요."),
-    "정리": tt("distribution.vibe.scene.jp.organize", "정리"),
-    " 담당이 자연스럽게 등장해서 회의를 닫아줍니다.": tt("distribution.vibe.scene.jp.organizerAppears", " 담당이 자연스럽게 등장해서 회의를 닫아줍니다."),
-    "은 나중, 일단 ": tt("distribution.vibe.scene.jp.laterFirst", "은 나중, 일단 "),
-    "굴리면서": tt("distribution.vibe.scene.jp.roll", "굴리면서"),
-    " 맞춰요.": tt("distribution.vibe.scene.jp.adjust", " 맞춰요."),
-    "직설": tt("distribution.vibe.caution.direct", "직설"),
-    "로 들릴 수 있어요. ": tt("distribution.vibe.caution.directTail", "로 들릴 수 있어요. "),
-    "요약 멘트": tt("distribution.vibe.caution.summary", "요약 멘트"),
-    "에 쿠션을 한 번만.": tt("distribution.vibe.caution.summaryTail", "에 쿠션을 한 번만."),
-    "이 늦어질 수 있어요. ": tt("distribution.vibe.caution.conclusionTail", "이 늦어질 수 있어요. "),
-    "결정할 항목": tt("distribution.vibe.caution.decideItem", "결정할 항목"),
-    "만 미리 박아두면 좋아요.": tt("distribution.vibe.caution.decideTail", "만 미리 박아두면 좋아요."),
-    "일정": tt("distribution.vibe.caution.schedule", "일정"),
-    "이 자주 바뀔 수 있어요. ": tt("distribution.vibe.caution.scheduleTail", "이 자주 바뀔 수 있어요. "),
-    "마감": tt("distribution.vibe.caution.deadline", "마감"),
-    "만 하나 잡아두면 편해요.": tt("distribution.vibe.caution.deadlineTail", "만 하나 잡아두면 편해요."),
-    "큰 단점은 없고, ": tt("distribution.vibe.caution.noBigDownside", "큰 단점은 없고, "),
-    "만 명확하면 더 잘 굴러가요.": tt("distribution.vibe.caution.clearTopic", "만 명확하면 더 잘 굴러가요."),
   };
-  const mapVibeText = (value: string) => vibeTokenMap[value] ?? value;
+  const mapVibeText = (value: string) => {
+    if (coreTokenMap[value]) return coreTokenMap[value];
+    if (value.startsWith("SCENE_") || value.startsWith("SUMMARY_") || value.startsWith("CAUTION_")) {
+      return tt(`distribution.vibe.tokens.${value}`, value);
+    }
+    return value;
+  };
   dist.vibe.core = dist.vibe.core.map((c) => ({ ...c, label: mapVibeText(c.label) }));
+  dist.vibe.summary = dist.vibe.summary.map((line) => mapVibeText(line));
   dist.vibe.scene = dist.vibe.scene.map((line) => line.map((token) => ({ ...token, t: mapVibeText(token.t) })));
   dist.vibe.caution.tokens = dist.vibe.caution.tokens.map((token) => ({ ...token, t: mapVibeText(token.t) }));
-
-  const prefsList = group.members.map((m) =>
-    normalizeMemberPrefs({
-      ideaStrength: m.ideaStrength,
-      factStrength: m.factStrength,
-      logicStrength: m.logicStrength,
-      peopleStrength: m.peopleStrength,
-      conflictStyle: m.conflictStyle,
-      energy: m.energy,
-    })
-  );
-
-  const avgStrength = (() => {
-    const total = Math.max(1, prefsList.length);
-    const sum = prefsList.reduce(
-      (acc, p) => {
-        acc.idea += p.ideaStrength;
-        acc.fact += p.factStrength;
-        acc.logic += p.logicStrength;
-        acc.people += p.peopleStrength;
-        return acc;
-      },
-      { idea: 0, fact: 0, logic: 0, people: 0 }
-    );
-    return {
-      idea: Number((sum.idea / total).toFixed(1)),
-      fact: Number((sum.fact / total).toFixed(1)),
-      logic: Number((sum.logic / total).toFixed(1)),
-      people: Number((sum.people / total).toFixed(1)),
-    };
-  })();
-
-  const localeTag = locale === "en" || locale === "ja" ? locale : "ko";
-  const strengthUi = {
-    ko: {
-      title: "4축 강도 평균",
-      subtitle: "IDEA/FACT/LOGIC/PEOPLE",
-      logicFocus: "근거 중심",
-      peopleFocus: "분위기 중심",
-      ideaFocus: "아이디어 운영",
-      factFocus: "현실 결론",
-      balanced: "균형형",
-    },
-    en: {
-      title: "4-axis Strength Average",
-      subtitle: "IDEA/FACT/LOGIC/PEOPLE",
-      logicFocus: "Logic-focused",
-      peopleFocus: "People-focused",
-      ideaFocus: "Idea-driven",
-      factFocus: "Practical-close",
-      balanced: "Balanced",
-    },
-    ja: {
-      title: "4軸強度の平均",
-      subtitle: "IDEA/FACT/LOGIC/PEOPLE",
-      logicFocus: "根拠中心",
-      peopleFocus: "雰囲気中心",
-      ideaFocus: "アイデア運営",
-      factFocus: "現実結論",
-      balanced: "バランス型",
-    },
-  }[localeTag];
-
-  const logicTone =
-    avgStrength.logic > avgStrength.people + 10
-      ? strengthUi.logicFocus
-      : avgStrength.people > avgStrength.logic + 10
-        ? strengthUi.peopleFocus
-        : strengthUi.balanced;
-
-  const infoTone =
-    avgStrength.idea > avgStrength.fact + 10
-      ? strengthUi.ideaFocus
-      : avgStrength.fact > avgStrength.idea + 10
-        ? strengthUi.factFocus
-        : strengthUi.balanced;
-
-  const strengthSummary = `${logicTone} · ${infoTone}`;
 
   const roles = pickRolesForGroup(
     group.members
       .filter((m) => isValidMbti(m.mbti))
       .map((m) => ({
+        id: m.id,
         nickname: m.nickname,
-        mbti: m.mbti ?? "",
-        prefs: {
-          ideaStrength: m.ideaStrength,
-          factStrength: m.factStrength,
-          logicStrength: m.logicStrength,
-          peopleStrength: m.peopleStrength,
-          conflictStyle: m.conflictStyle,
-          energy: m.energy,
-        },
+        mbti: m.mbti,
+        ePercent: m.ePercent,
+        nPercent: m.nPercent,
+        tPercent: m.tPercent,
+        jPercent: m.jPercent,
+        conflictStyle: m.conflictStyle,
+        energy: m.energy,
       }))
-    ,
-    t
   );
+
+  const roleCards = ROLE_KEYS.map((role) => {
+    const list = [...roles.bucket[role]].sort((a, b) => b.fit - a.fit);
+    const top = list[0] ?? null;
+    const seed = `${groupId}|${role}|${top?.id ?? "empty"}`;
+    return { role, list, top, seed };
+  });
 
   type AxisKey2 = "EI" | "NS" | "TF" | "JP";
   const AXIS_ONE: Record<AxisKey2, Record<string, string>> = {
@@ -973,46 +909,29 @@ export default async function GroupPage({
     P: "#F97316",
   };
   
-
-  const AXIS_COLOR: Record<AxisKey | "BAL", string> = {
-    EI: MBTI_COLOR[dist.ei.dom ?? "E"], // tie면 E색 대충
-    NS: MBTI_COLOR[dist.ns.dom ?? "N"],
-    TF: MBTI_COLOR[dist.tf.dom ?? "T"],
-    JP: MBTI_COLOR[dist.jp.dom ?? "J"],
-    BAL: "#64748B", // slate-500 느낌
+  const axisToChar: Record<Exclude<AxisKey, "BAL">, "E" | "I" | "N" | "S" | "T" | "F" | "J" | "P"> = {
+    EI: dist.ei.dom === "I" ? "I" : "E",
+    NS: dist.ns.dom === "S" ? "S" : "N",
+    TF: dist.tf.dom === "F" ? "F" : "T",
+    JP: dist.jp.dom === "P" ? "P" : "J",
   };
-  function H({ k, children }: { k: AxisKey | "BAL"; children: React.ReactNode }) {
-    return (
-      <span className="font-extrabold" style={{ color: AXIS_COLOR[k] }}>
-        {children}
-      </span>
+
+  const axisColor = (k: AxisKey) => {
+    if (k === "BAL") return "#64748B"; // slate-500
+    return MBTI_COLOR[axisToChar[k]];
+  };
+
+  function renderTokens(tokens: TextToken[]) {
+    return tokens.map((x, i) =>
+      "k" in x ? (
+        <span key={i} className="font-extrabold" style={{ color: axisColor(x.k) }}>
+          {x.t}
+        </span>
+      ) : (
+        <span key={i}>{x.t}</span>
+      )
     );
   }
-
-
-const axisToChar: Record<Exclude<AxisKey, "BAL">, "E"|"I"|"N"|"S"|"T"|"F"|"J"|"P"> = {
-  EI: (dist.ei.dom ?? "E") as any,
-  NS: (dist.ns.dom ?? "N") as any,
-  TF: (dist.tf.dom ?? "T") as any,
-  JP: (dist.jp.dom ?? "J") as any,
-};
-
-const axisColor = (k: AxisKey) => {
-  if (k === "BAL") return "#64748B"; // slate-500
-  return MBTI_COLOR[axisToChar[k]];
-};
-
-function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
-  return tokens.map((x, i) =>
-    x.k ? (
-      <span key={i} className="font-extrabold" style={{ color: axisColor(x.k) }}>
-        {x.t}
-      </span>
-    ) : (
-      <span key={i}>{x.t}</span>
-    )
-  );
-}
 
 
   return (
@@ -1116,14 +1035,15 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                     { title: tt("distribution.axisTitles.judgement", "판단"), a: dist.tf.a, b: dist.tf.b },
                     { title: tt("distribution.axisTitles.style", "스타일"), a: dist.jp.a, b: dist.jp.b },
                   ].map((row) => {
-                    const total = row.a.v + row.b.v || 1;
+                    const axisTotal = row.a.count + row.b.count || 1;
+                    const sharePct = (count: number) => Math.round((count / axisTotal) * 100);
 
-                    // ✅ 더 많은 쪽을 위(first)로
-                    const first = row.a.v >= row.b.v ? row.a : row.b;
-                    const second = row.a.v >= row.b.v ? row.b : row.a;
+                    // ✅ 인원 비율이 많은 쪽을 위(first)로
+                    const first = row.a.count >= row.b.count ? row.a : row.b;
+                    const second = row.a.count >= row.b.count ? row.b : row.a;
 
-                    const firstPct = Math.round((first.v / total) * 100);
-                    const secondPct = 100 - firstPct;
+                    const firstPct = sharePct(first.count);
+                    const secondPct = sharePct(second.count);
 
                     // ✅ gap을 먼저 선언!
                     const gap = Math.abs(firstPct - secondPct);
@@ -1134,7 +1054,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                       row.title === tt("distribution.axisTitles.judgement", "판단") ? ("TF" as const) :
                       ("JP" as const);
 
-                    const isTie = first.v === second.v;
+                    const isTie = first.count === second.count;
 
                     // ✅ 이제 gap 사용
                     const tone =
@@ -1158,7 +1078,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                             {first.label}
                           </div>
                           <div className="mt-1 text-right text-[11px] font-semibold leading-tight tabular-nums" style={{ color: MBTI_COLOR[first.key] }}>
-                            {fracText2(first.v)}
+                            {distShareLabel} · {fracText2(first.count)}
                           </div>
                         </div>
                         <div className="mt-2 h-2 w-full rounded-full bg-slate-200">
@@ -1174,7 +1094,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                             {second.label}
                           </div>
                           <div className="mt-1 text-right text-[11px] font-semibold leading-tight tabular-nums" style={{ color: MBTI_COLOR[second.key] }}>
-                            {fracText2(second.v)}
+                            {distShareLabel} · {fracText2(second.count)}
                           </div>
                         </div>
                         <div className="mt-2 h-2 w-full rounded-full bg-slate-200">
@@ -1195,33 +1115,6 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                 </div>
 
                 <div className="mt-3 rounded-2xl border border-slate-200/70 bg-white/88 p-3">
-                  <div className="text-xs font-extrabold text-slate-800">{strengthUi.title}</div>
-                  <div className="mt-0.5 text-[11px] font-semibold text-slate-500">{strengthUi.subtitle}</div>
-
-                  <div className="mt-2 grid grid-cols-2 gap-2">
-                    {[
-                      { label: "IDEA", value: avgStrength.idea, color: "#8B5CF6" },
-                      { label: "FACT", value: avgStrength.fact, color: "#10B981" },
-                      { label: "LOGIC", value: avgStrength.logic, color: "#F59E0B" },
-                      { label: "PEOPLE", value: avgStrength.people, color: "#EC4899" },
-                    ].map((row) => (
-                      <div key={row.label} className="rounded-xl border border-slate-200/70 bg-white/90 p-2">
-                        <div className="flex items-center justify-between text-[11px] font-extrabold">
-                          <span style={{ color: row.color }}>{row.label}</span>
-                          <span className="text-slate-700">{row.value.toFixed(1)}</span>
-                        </div>
-                        <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200/80">
-                          <div className="h-2 rounded-full" style={{ width: `${row.value}%`, backgroundColor: row.color }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-2 text-[11px] font-extrabold text-slate-600">{strengthSummary}</div>
-                </div>
-
-                
-                <div className="mt-3 rounded-2xl border border-slate-200/70 bg-white/88 p-3">
                   <div className="text-xs font-extrabold text-slate-800">{tt("distribution.vibeSummaryTitle", "모임 분위기 요약")}</div>
 
                   {/* ✅ 핵심 3칩 */}
@@ -1237,10 +1130,19 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                     ))}
                   </div>
 
+                  <div className="mt-2 text-[11px] font-extrabold text-slate-600">
+                    {tt("distribution.vibe.summaryTitle", "핵심 운영 요약")}
+                  </div>
+                  <div className="mt-1 space-y-1.5 text-xs leading-relaxed text-slate-700">
+                    {dist.vibe.summary.map((line, i) => (
+                      <div key={`vibe-summary-${i}`}>• {line}</div>
+                    ))}
+                  </div>
+
                   {/* ✅ 장면 문장들: 핵심 단어만 색/굵게 */}
                   <div className="mt-2 space-y-1.5 text-xs leading-relaxed text-slate-600">
                     {dist.vibe.scene.map((line, i) => (
-                      <div key={i}>• {renderTokens(line as any)}</div>
+                      <div key={i}>• {renderTokens(line)}</div>
                     ))}
                   </div>
 
@@ -1252,7 +1154,7 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
                       </span>
                     </div>
                     <div className="mt-0.5 text-xs leading-relaxed text-slate-600">
-                      {renderTokens(dist.vibe.caution.tokens as any)}
+                      {renderTokens(dist.vibe.caution.tokens)}
                     </div>
                   </div>
                 </div>
@@ -1276,138 +1178,54 @@ function renderTokens(tokens: { t: string; k?: AxisKey }[]) {
             </p>
           ) : (
             <>
-                {/* ✅ Summary card */}
-                <div className="mt-3 rounded-2xl border border-slate-200/70 bg-white/88 p-3">
-                  <div className="text-xs font-extrabold text-slate-900">{roles.headline}</div>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-600">{roles.tip}</p>
-                </div>
+              <div className="mt-3 grid grid-cols-1 gap-2">
+                {roleCards.map((card) => {
+                  const th = roleTheme(card.role);
+                  const RoleIcon = roleIconOf(card.role);
+                  const top = card.top;
+                  const line = top
+                    ? strongRoleLine(card.role, locale, card.seed)
+                    : vacancyInsightLine(card.role, locale, `${card.seed}|insight`);
 
-                {/* ✅ Role grid cards */}
-                <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {(Object.keys(roles.bucket) as RoleKey[]).map((k) => {
-                    const th = roleTheme(k);
-                    const list = roles.bucket[k];
-                    const pick1 = roles.topPick?.[k];
-
-                    const sorted = list
-                      .slice()
-                      .sort((a, b) => b.fit - a.fit);
-
-                    const fitRankMap = calcFitRanks(sorted);
-
-                    return (
-                      <div
-                        key={k}
-                        className={[
-                          "relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white/88 p-3",
-                          "shadow-[0_6px_16px_rgba(15,23,42,0.05)]",
-                        ].join(" ")}
-                      >
-                        {/* left accent bar */}
-                        <div className={`absolute left-0 top-0 h-full w-1 ${th.leftBar}`} />
-
-                        {/* header */}
-                        <div className="flex items-start justify-between gap-2 pl-2">
-                          <div className="min-w-0">
-                            <div className={`text-xs font-extrabold truncate ${th.accent}`}>
-                              {roleLabel(k, t)}
-                            </div>
-                            <div className="mt-0.5 text-[11px] text-slate-500">
-                              {roleDescMessage(k, t)}
-                            </div>
-                          </div>
-
-                          <div className="shrink-0 pl-2 text-[11px] font-bold text-slate-600">
-                            {tt("memberCount", `${list.length}명`, { count: list.length })}
-                          </div>
-                        </div>
-
-                        {/* 멤버 리스트: 대표는 리스트 안에서만 강조 */}
-                        {sorted.length > 0 && (
-                          
-                          <div className="mt-3 pl-2">
-                            <ul className="divide-y divide-black/5 overflow-hidden rounded-xl border border-slate-200/70 bg-white/88">
-                              {sorted.slice(0, 5).map((m, idx) => {
-                                const rank = fitRankMap.get(m.fit) ?? 999; // 1,2,3...
-                                const badge = roleRankBadge(k, rank - 1, t); // roleRankBadge는 0=1등 규칙
-                                const isCoFirst = rank === 1;
-
-                                return (
-                                  <li
-                                    key={`${k}-${m.name}-${m.mbti}`}
-                                    className={[
-                                      "relative flex items-center justify-between px-3 py-2",
-                                      isCoFirst ? "bg-white/85" : ""
-                                    ].join(" ")}
-                                    title={tt("fitTitle", `적합도 ${m.fit}`, { score: m.fit })}
-                                  >
-                                    
-                                    <div className="min-w-0 flex items-center gap-2">
-                                      <span className="w-4 shrink-0 text-[11px] font-extrabold text-slate-400">
-                                        {idx + 1}
-                                      </span>
-
-                                      <span className="truncate text-xs font-extrabold text-slate-900">
-                                        {m.name}
-                                      </span>
-
-                                      <span className="text-slate-300">·</span>
-
-                                      <span className="shrink-0 text-xs font-extrabold text-slate-600">
-                                        {m.mbti}
-                                      </span>
-                                    </div>
-
-                                    {/* ✅ 우측: 1등만 왕관 + 순위 칭호(색은 순위에 따라 점점 화려) */}
-                                    <span className="shrink-0 text-right text-[11px] leading-tight">
-                                      <div>
-                                        {isCoFirst && "👑 "}
-                                        {badge && <span className={badge.cls}>{badge.title}</span>}
-                                      </div>
-                                      <div className="font-extrabold text-slate-700">
-                                        {m.fit}{tt("scoreUnit", "점")}
-                                      </div>
-                                    </span>
-
-                                  </li>
-                                );
-                              })}
-
-                            </ul>
-
-                            <RoleMoreListIntl roleKey={k} members={sorted} shown={5} />
-                          </div>
-                        )}
-                        {sorted.length === 0 && (
-                          <div className="mt-3 pl-2">
-                            <div className="rounded-xl border border-slate-200/70 bg-white/88 px-3 py-3">
-                              <div className="text-[11px] font-extrabold text-slate-500">
-                                {tt("noTendency", "해당 성향 없음")}
-                              </div>
-                              <div className="mt-1 text-[11px] text-slate-400 leading-relaxed">
-                                {roleEmptyMessage(k, t)}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
+                  return (
+                    <div
+                      key={card.role}
+                      className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-3 pl-4"
+                    >
+                      <div className={`absolute left-0 top-0 h-full w-1.5 rounded-r-lg ${th.leftBar}`} />
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`truncate text-[15px] font-black ${th.accent}`}>{roleLabel(card.role, t)}</span>
                       </div>
-                    );
-                  })}
-                </div>
+                      <div className="mt-1 text-[11px] leading-relaxed text-slate-500">{line}</div>
+
+                      <div className="mt-2 overflow-hidden rounded-xl border border-slate-200/80 bg-white">
+                        {!top ? (
+                          <div className="px-3 py-2 text-[11px] font-bold text-slate-500">
+                            {tt("roles.snapshotEmptyRole", "현재 모임에서 비어있는 역할")}
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2.5 py-2">
+                            <div className="min-w-0 truncate text-sm font-black text-slate-800">
+                              {top.name}
+                              <span className="mx-1 text-slate-300">·</span>
+                              <span className="text-[13px] text-slate-600">{top.mbti}</span>
+                            </div>
+                            <div className="text-right">
+                              <div className={`inline-flex items-center gap-1 text-[11px] font-black ${th.accent}`}>
+                                <RoleIcon className="h-3.5 w-3.5" aria-hidden />
+                                <span>{rolePersonaTitle(card.role, locale)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
               </>
           )}
-        </SectionCard2>
-
-        {/* ✅ 케미 리포트 (랭킹 + 타입요약) */}
-        <SectionCard2
-          icon="🔍"
-          title={tt("reportTitle", "케미 리포트")}
-          subtitle={tt("reportSubtitle", "우리모임 조합 랭킹")}
-          tone="violet"
-        >
-          <ChemReportSectionIntl pairs={pairs} />
         </SectionCard2>
 
         <section className="mt-6">

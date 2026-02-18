@@ -117,7 +117,9 @@ export default function AppHeader() {
         desc: d("mbti.desc"),
         children: [
           { type: "link", label: d("mbti.home"), href: "/mbti" },
-          { type: "link", label: d("mbti.test"), href: "/mbti-test" },
+          { type: "heading", label: d("mbti.testSection") },
+          { type: "link", label: d("mbti.testFull"), href: "/mbti-test" },
+          { type: "link", label: d("mbti.testQuick"), href: "/mbti-test/quick" },
           { type: "heading", label: d("mbti.guideSection") },
           { type: "link", label: d("mbti.cognitive"), href: "/mbti/cognitive-functions" },
           { type: "link", label: d("mbti.groupGuide"), href: "/guides/mbti" },

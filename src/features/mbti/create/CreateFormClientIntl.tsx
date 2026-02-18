@@ -1,27 +1,44 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createGroupAction } from "@/features/mbti/actions/group";
 import { upsertSavedGroup } from "@/lib/mbti/groupHistory";
 import MbtiTestSelectModal from "@/features/mbti/components/MbtiTestSelectModal";
 import { sanitizeNicknameInput } from "@/features/mbti/lib/nickname";
+import { animalMetaOf, type AnimalLocale } from "@/lib/mbti/animalMeta";
 import {
-  DEFAULT_MEMBER_STRENGTHS,
   clampStrength,
   normalizeConflictStyle,
   normalizeEnergyLevel,
-  prefillStrengthsFromMbti,
   toLegacyInfoStyle,
   toLegacyJudgeStyle,
   type ConflictStyle,
   type EnergyLevel,
-  type MemberStrengths,
 } from "@/lib/mbti/memberPrefs";
+import {
+  DEFAULT_AXIS_PERCENTS,
+  prefillAxisPercentFromMbti,
+  toMbtiFromAxisPercent,
+  toStrengthFromPercent,
+  type AxisPercentState,
+} from "@/lib/mbti/axisPercent";
 
 type Props = {
   locale: string;
+};
+
+const TRAIT_COLOR: Record<string, string> = {
+  E: "#FF6B6B",
+  I: "#4D96FF",
+  N: "#9B59B6",
+  S: "#2ECC71",
+  T: "#F39C12",
+  F: "#E84393",
+  J: "#2D3436",
+  P: "#16A085",
 };
 
 function isValidMbti(mbti: string) {
@@ -32,10 +49,46 @@ function localeBase(locale: string) {
   return locale === "ko" ? "" : `/${locale}`;
 }
 
+function sanitizeMbtiInput(value: string) {
+  return value
+    .replace(/\s/g, "")
+    .toUpperCase()
+    .replace(/[^EINSFTJP]/g, "")
+    .slice(0, 4);
+}
+
 function nicknameHintByLocale(locale: string) {
   if (locale === "en") return "No spaces. Up to 6 English chars or 3 Korean/Japanese chars.";
   if (locale === "ja") return "空白なし。英字は最大6文字、韓国語・日本語は最大3文字。";
   return "공백 없이 한글/일본어 3자, 영어 6자";
+}
+
+function parsePercentQuery(value: string | null) {
+  if (value == null) return null;
+  const raw = value.trim();
+  if (!raw) return null;
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return null;
+  return clampStrength(n);
+}
+
+function hexToRgba(hex: string, alpha: number) {
+  const clean = hex.replace("#", "");
+  if (clean.length !== 6) return `rgba(30, 136, 229, ${alpha})`;
+  const r = Number.parseInt(clean.slice(0, 2), 16);
+  const g = Number.parseInt(clean.slice(2, 4), 16);
+  const b = Number.parseInt(clean.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function fullAxisPercentFromMbti(mbtiRaw: string): AxisPercentState {
+  const mbti = (mbtiRaw || "").trim().toUpperCase();
+  return {
+    ePercent: mbti[0] === "E" ? 100 : 0,
+    nPercent: mbti[1] === "N" ? 100 : 0,
+    tPercent: mbti[2] === "T" ? 100 : 0,
+    jPercent: mbti[3] === "J" ? 100 : 0,
+  };
 }
 
 export default function CreateFormClientIntl({ locale }: Props) {
@@ -43,23 +96,152 @@ export default function CreateFormClientIntl({ locale }: Props) {
   const [mbtiError, setMbtiError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [testSelectOpen, setTestSelectOpen] = useState(false);
+  const [optionalOpen, setOptionalOpen] = useState(false);
+
+  const sp = useSearchParams();
+  const mbtiFromTest = sanitizeMbtiInput(sp.get("mbti") ?? "");
+  const queryAxis = {
+    ePercent: parsePercentQuery(sp.get("ePercent")),
+    nPercent: parsePercentQuery(sp.get("nPercent")),
+    tPercent: parsePercentQuery(sp.get("tPercent")),
+    jPercent: parsePercentQuery(sp.get("jPercent")),
+  };
+  const axisFromTest: AxisPercentState | null =
+    queryAxis.ePercent != null &&
+    queryAxis.nPercent != null &&
+    queryAxis.tPercent != null &&
+    queryAxis.jPercent != null
+      ? {
+          ePercent: queryAxis.ePercent,
+          nPercent: queryAxis.nPercent,
+          tPercent: queryAxis.tPercent,
+          jPercent: queryAxis.jPercent,
+        }
+      : null;
+  const initialMbti =
+    isValidMbti(mbtiFromTest) ? mbtiFromTest : axisFromTest ? toMbtiFromAxisPercent(axisFromTest) : "";
 
   const lockedRef = useRef(false);
-  const mbtiInputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
-  const sp = useSearchParams();
-  const mbtiFromTest = (sp.get("mbti") ?? "").trim().toUpperCase();
   const base = localeBase(locale);
   const nicknameHint = nicknameHintByLocale(locale);
-  const [strengths, setStrengths] = useState<MemberStrengths>(() =>
-    isValidMbti(mbtiFromTest) ? prefillStrengthsFromMbti(mbtiFromTest) : { ...DEFAULT_MEMBER_STRENGTHS }
+
+  const [mbtiValue, setMbtiValue] = useState<string>(initialMbti);
+  const [mbtiSource, setMbtiSource] = useState<"manual" | "auto">(axisFromTest ? "auto" : "manual");
+  const [didTouchPercent, setDidTouchPercent] = useState(false);
+  const [percents, setPercents] = useState<AxisPercentState>(() =>
+    axisFromTest
+      ? axisFromTest
+      : isValidMbti(initialMbti)
+        ? prefillAxisPercentFromMbti(initialMbti)
+      : { ...DEFAULT_AXIS_PERCENTS }
   );
-  const [strengthTouched, setStrengthTouched] = useState(false);
-  const [conflictStyle, setConflictStyle] = useState<ConflictStyle>("MEDIATE");
-  const [energy, setEnergy] = useState<EnergyLevel>("MID");
+  const percentsRef = useRef<AxisPercentState>(percents);
+
+  const [conflictStyle, setConflictStyle] = useState<ConflictStyle | null>(null);
+  const [energy, setEnergy] = useState<EnergyLevel | null>(null);
+
+  useEffect(() => {
+    percentsRef.current = percents;
+  }, [percents]);
+
+  const strengths = useMemo(() => {
+    return toStrengthFromPercent({
+      nPercent: percents.nPercent,
+      tPercent: percents.tPercent,
+    });
+  }, [percents.nPercent, percents.tPercent]);
 
   const legacyJudgeStyle = toLegacyJudgeStyle(strengths);
   const legacyInfoStyle = toLegacyInfoStyle(strengths);
+
+  const conflictOptions = useMemo(
+    () =>
+      [
+        {
+          value: "DIRECT" as const,
+          label: t("optional.conflict.direct.label"),
+          desc: t("optional.conflict.direct.desc"),
+        },
+        {
+          value: "AVOID" as const,
+          label: t("optional.conflict.avoid.label"),
+          desc: t("optional.conflict.avoid.desc"),
+        },
+        {
+          value: "MEDIATE" as const,
+          label: t("optional.conflict.mediate.label"),
+          desc: t("optional.conflict.mediate.desc"),
+        },
+        {
+          value: "BURST" as const,
+          label: t("optional.conflict.burst.label"),
+          desc: t("optional.conflict.burst.desc"),
+        },
+      ] as const,
+    [t]
+  );
+
+  const energyOptions = useMemo(
+    () =>
+      [
+        {
+          value: "LOW" as const,
+          label: t("optional.energy.low.label"),
+          time: t("optional.energy.low.time"),
+          desc: t("optional.energy.low.desc"),
+        },
+        {
+          value: "MID" as const,
+          label: t("optional.energy.mid.label"),
+          time: t("optional.energy.mid.time"),
+          desc: t("optional.energy.mid.desc"),
+        },
+        {
+          value: "HIGH" as const,
+          label: t("optional.energy.high.label"),
+          time: t("optional.energy.high.time"),
+          desc: t("optional.energy.high.desc"),
+        },
+      ] as const,
+    [t]
+  );
+
+  const selectedConflict = conflictOptions.find((opt) => opt.value === conflictStyle) ?? null;
+  const selectedEnergy = energyOptions.find((opt) => opt.value === energy) ?? null;
+  const activeLocale: AnimalLocale = locale === "en" || locale === "ja" ? locale : "ko";
+  const selectedAnimal = useMemo(() => animalMetaOf(mbtiValue), [mbtiValue]);
+
+  const canSubmit = isValidMbti(mbtiValue) && !isSubmitting;
+  const conflictInterpretation = selectedConflict
+    ? conflictStyle === "DIRECT"
+      ? t("optional.conflict.interpret.direct")
+      : conflictStyle === "AVOID"
+        ? t("optional.conflict.interpret.avoid")
+        : conflictStyle === "MEDIATE"
+          ? t("optional.conflict.interpret.mediate")
+          : t("optional.conflict.interpret.burst")
+    : null;
+  const energyInterpretation = selectedEnergy
+    ? energy === "LOW"
+      ? t("optional.energy.interpret.low")
+      : energy === "MID"
+        ? t("optional.energy.interpret.mid")
+        : t("optional.energy.interpret.high")
+    : null;
+
+  const applyMbtiFromPercent = useCallback((sourcePercents?: AxisPercentState) => {
+    const percentsToUse = sourcePercents ?? percentsRef.current;
+    setMbtiValue((prev) => {
+      const next = toMbtiFromAxisPercent({
+        ...percentsToUse,
+        prevMbti: prev,
+      });
+      return isValidMbti(next) ? next : prev;
+    });
+    setMbtiSource("auto");
+    setMbtiError(null);
+  }, []);
 
   function moveToTest(kind: "quick" | "full") {
     setTestSelectOpen(false);
@@ -70,17 +252,6 @@ export default function CreateFormClientIntl({ locale }: Props) {
     });
     router.push(`${base}${targetPath}?${qs.toString()}`);
   }
-
-  useEffect(() => {
-    const raw = (sp.get("mbti") || "")
-      .replace(/\s/g, "")
-      .toUpperCase()
-      .replace(/[^EINSFTJP]/g, "")
-      .slice(0, 4);
-
-    if (!raw) return;
-    if (mbtiInputRef.current) mbtiInputRef.current.value = raw;
-  }, [sp]);
 
   return (
     <form
@@ -122,7 +293,8 @@ export default function CreateFormClientIntl({ locale }: Props) {
 
         groupEl.value = groupEl.value.trim();
         nickEl.value = sanitizeNicknameInput(nickEl.value || "");
-        const mbti = mbtiEl.value.replace(/\s/g, "").toUpperCase().slice(0, 4);
+
+        const mbti = sanitizeMbtiInput(mbtiEl.value || "");
         mbtiEl.value = mbti;
 
         if (!isValidMbti(mbti)) {
@@ -179,28 +351,30 @@ export default function CreateFormClientIntl({ locale }: Props) {
         <p className="mt-1 text-[11px] text-slate-500">{nicknameHint}</p>
       </label>
 
-      <label className="block">
-        <div className="flex items-center justify-between">
+      <div className="block">
+        <div className="flex items-start justify-between">
           <div className="text-sm font-bold text-slate-800">MBTI</div>
-          <button
-            type="button"
-            disabled={isSubmitting}
-            onClick={() => setTestSelectOpen(true)}
-            className="mbti-primary-btn inline-flex items-center justify-center rounded-full px-4 py-2 text-[12px] font-black text-white ring-1 ring-[#1E88E5]/20 transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {t("mbti.quickTest")}
-          </button>
+          <div className="flex flex-col items-end gap-1">
+            <button
+              type="button"
+              disabled={isSubmitting}
+              onClick={() => setTestSelectOpen(true)}
+              className="mbti-primary-btn inline-flex items-center justify-center rounded-full px-4 py-2 text-[12px] font-black text-white ring-1 ring-[#1E88E5]/20 transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {t("mbti.quickTest")}
+            </button>
+          </div>
         </div>
 
         <input
-          ref={mbtiInputRef}
+          id="create-mbti"
           name="mbti"
           required
           maxLength={4}
           placeholder={t("mbti.placeholder")}
           disabled={isSubmitting}
           aria-invalid={!!mbtiError}
-          defaultValue={mbtiFromTest}
+          value={mbtiValue}
           className={[
             "mt-2 h-12 w-full rounded-2xl border bg-white px-4 text-[16px] uppercase outline-none disabled:opacity-60",
             mbtiError ? "border-red-400 focus:border-red-400" : "border-black/10 focus:border-[#1E88E5]/50",
@@ -209,20 +383,21 @@ export default function CreateFormClientIntl({ locale }: Props) {
             if (e.key === " ") e.preventDefault();
           }}
           onChange={(e) => {
-            const v = e.currentTarget.value
-              .replace(/\s/g, "")
-              .toUpperCase()
-              .replace(/[^EINSFTJP]/g, "")
-              .slice(0, 4);
+            const v = sanitizeMbtiInput(e.currentTarget.value);
             e.currentTarget.value = v;
-            if (v.length === 4 && isValidMbti(v) && !strengthTouched) {
-              setStrengths(prefillStrengthsFromMbti(v));
+            setMbtiValue(v);
+            setMbtiSource("manual");
+            if (v.length === 4 && isValidMbti(v)) {
+              const full = fullAxisPercentFromMbti(v);
+              percentsRef.current = full;
+              setPercents(full);
             }
+
             if (v.length === 4) setMbtiError(isValidMbti(v) ? null : t("mbti.invalid"));
             else setMbtiError(null);
           }}
           onBlur={(e) => {
-            const v = (e.currentTarget.value || "").replace(/\s/g, "").toUpperCase();
+            const v = sanitizeMbtiInput(e.currentTarget.value || "");
             if (v.length === 4 && !isValidMbti(v)) setMbtiError(t("mbti.invalid"));
           }}
         />
@@ -232,117 +407,312 @@ export default function CreateFormClientIntl({ locale }: Props) {
         ) : (
           <p className="mt-1 text-[11px] text-slate-500">{t("mbti.hint")}</p>
         )}
-      </label>
+      </div>
 
-      <fieldset className="block">
-        <legend className="text-sm font-bold text-slate-800">{t("prefs.strength.legend")}</legend>
-        <p className="mt-1 text-[11px] text-slate-500">{t("prefs.strength.help")}</p>
+      {selectedAnimal ? (
+        <div className="rounded-2xl border border-slate-200/80 bg-white/85 p-3 ring-1 ring-black/5">
+          <div className="flex items-center gap-3">
+            <Image
+              key={`${mbtiValue}-animal`}
+              src={selectedAnimal.imageSrc}
+              alt={`${mbtiValue} ${selectedAnimal.name[activeLocale]}`}
+              width={56}
+              height={56}
+              unoptimized
+              className="h-14 w-14 shrink-0 rounded-xl border border-slate-200/80 bg-white object-cover"
+            />
+            <div className="min-w-0">
+              <div className="text-sm font-black text-slate-900">
+                {selectedAnimal.emoji} {mbtiValue} · {selectedAnimal.name[activeLocale]}
+              </div>
+              <div className="mt-1 text-[12px] leading-relaxed text-slate-600">
+                {selectedAnimal.reason[activeLocale]}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
-        <div className="mt-2 space-y-3 rounded-2xl border border-black/10 bg-white p-3">
+      <fieldset className="rounded-2xl border border-black/10 bg-white p-3">
+        <legend className="px-1 text-sm font-extrabold text-slate-900">{t("percent.title")}</legend>
+        <p className="mb-1.5 text-[10px] font-semibold text-[#1E88E5]">{t("mbti.testPrefillHint")}</p>
+
+        <div className="mt-1 grid grid-cols-2 gap-1.5">
           {(
-            [
-              { key: "ideaStrength", label: t("prefs.strength.idea"), color: "bg-violet-500" },
-              { key: "factStrength", label: t("prefs.strength.fact"), color: "bg-emerald-500" },
-              { key: "logicStrength", label: t("prefs.strength.logic"), color: "bg-amber-500" },
-              { key: "peopleStrength", label: t("prefs.strength.people"), color: "bg-rose-500" },
-            ] as const
-          ).map((row) => (
-            <label key={row.key} className="block">
-              <div className="mb-1 flex items-center justify-between text-[12px] font-bold text-slate-700">
-                <span>{row.label}</span>
-                <span>{strengths[row.key]}%</span>
+          [
+            {
+              key: "ePercent",
+              label: t("percent.energy"),
+              left: "E",
+              right: "I",
+            },
+            {
+              key: "nPercent",
+              label: t("percent.info"),
+              left: "N",
+              right: "S",
+            },
+            {
+              key: "tPercent",
+              label: t("percent.judge"),
+              left: "T",
+              right: "F",
+            },
+            {
+              key: "jPercent",
+              label: t("percent.style"),
+              left: "J",
+              right: "P",
+            },
+          ] as const
+          ).map((row) => {
+            const value = percents[row.key];
+            const rightValue = 100 - value;
+            const delta = value - 50;
+            const leanLeft = delta >= 0;
+            const diff = Math.round(Math.abs(delta));
+            const halfFill = Math.min(100, diff * 2);
+            const winner = value >= rightValue ? row.left : row.right;
+            const isLeftWin = winner === row.left;
+            const isRightWin = winner === row.right;
+            const color = TRAIT_COLOR[winner] ?? "#1E88E5";
+            return (
+              <div
+                key={row.key}
+                className="mbti-card-soft rounded-xl p-1.5 ring-1 ring-black/10"
+                style={{ backgroundColor: hexToRgba(color, 0.04) }}
+              >
+                <div className="mb-0.5 pl-0.5 text-[9px] font-extrabold tracking-tight text-slate-500">{row.label}</div>
+                <div className="grid grid-cols-[48px_1fr_48px] items-center">
+                  <div className="text-left">
+                    <div className="inline-flex items-end gap-1">
+                      <span
+                        className={["leading-none text-[14px] font-black", isLeftWin ? "" : "opacity-40"].join(" ")}
+                        style={{ color: TRAIT_COLOR[row.left] }}
+                      >
+                        {row.left}
+                      </span>
+                      <span
+                        className={[
+                          "tabular-nums text-[9px] font-black",
+                          isLeftWin ? "text-slate-900" : "text-slate-400",
+                        ].join(" ")}
+                      >
+                        {value}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div />
+
+                  <div className="text-right">
+                    <div className="inline-flex items-end gap-1">
+                      <span
+                        className={[
+                          "tabular-nums text-[9px] font-black",
+                          isRightWin ? "text-slate-900" : "text-slate-400",
+                        ].join(" ")}
+                      >
+                        {rightValue}%
+                      </span>
+                      <span
+                        className={["leading-none text-[14px] font-black", isRightWin ? "" : "opacity-40"].join(" ")}
+                        style={{ color: TRAIT_COLOR[row.right] }}
+                      >
+                        {row.right}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-200/80 ring-1 ring-black/5">
+                  <div className="absolute inset-0 flex">
+                    <div className="relative h-full w-1/2 overflow-hidden">
+                      <div
+                        className="absolute right-0 top-0 h-full rounded-l-full transition-[width] duration-300"
+                        style={{ width: `${leanLeft ? halfFill : 0}%`, backgroundColor: color }}
+                      />
+                    </div>
+
+                    <div className="relative h-full w-1/2 overflow-hidden">
+                      <div
+                        className="absolute left-0 top-0 h-full rounded-r-full transition-[width] duration-300"
+                        style={{ width: `${leanLeft ? 0 : halfFill}%`, backgroundColor: color }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-slate-400/70" />
+                </div>
+
+                <div className="mt-0.5">
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={10}
+                    value={value}
+                    onChange={(e) => {
+                      const next = clampStrength(e.currentTarget.value);
+                      setDidTouchPercent(true);
+                      setPercents((prev) => {
+                        const nextState = { ...prev, [row.key]: next };
+                        percentsRef.current = nextState;
+                        return nextState;
+                      });
+                    }}
+                    onPointerUp={() => applyMbtiFromPercent()}
+                    onMouseUp={() => applyMbtiFromPercent()}
+                    onTouchEnd={() => applyMbtiFromPercent()}
+                    onBlur={() => applyMbtiFromPercent()}
+                    onKeyUp={(e) => {
+                      if (
+                        e.key === "ArrowLeft" ||
+                        e.key === "ArrowRight" ||
+                        e.key === "ArrowUp" ||
+                        e.key === "ArrowDown" ||
+                        e.key === "Home" ||
+                        e.key === "End" ||
+                        e.key === "PageUp" ||
+                        e.key === "PageDown"
+                      ) {
+                        applyMbtiFromPercent();
+                      }
+                    }}
+                    style={{ accentColor: color }}
+                    className="h-1 w-full cursor-pointer appearance-none rounded-full bg-slate-200/90 [direction:rtl]"
+                  />
+                </div>
               </div>
-              <input
-                type="range"
-                name={row.key}
-                min={0}
-                max={100}
-                step={1}
-                value={strengths[row.key]}
-                onChange={(e) => {
-                  const nextValue = clampStrength(e.currentTarget.value);
-                  setStrengthTouched(true);
-                  setStrengths((prev) => ({ ...prev, [row.key]: nextValue }));
-                }}
-                className="h-2.5 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-[#1E88E5]"
-              />
-              <div className="mt-1 h-1.5 w-full rounded-full bg-slate-100">
-                <div className={`h-1.5 rounded-full ${row.color}`} style={{ width: `${strengths[row.key]}%` }} />
-              </div>
-            </label>
-          ))}
+            );
+          })}
         </div>
       </fieldset>
 
-      <fieldset className="block">
-        <legend className="text-sm font-bold text-slate-800">{t("prefs.conflict.legend")}</legend>
-        <p className="mt-1 text-[11px] text-slate-500">{t("prefs.conflict.help")}</p>
+      <div className="rounded-2xl border border-sky-200/80 bg-gradient-to-r from-sky-50 to-blue-50 px-3 py-2.5">
+        <p className="text-[11px] font-extrabold text-sky-700">{t("optional.title")}</p>
+        <p className="mt-0.5 text-[11px] text-sky-900/80">{t("optional.desc")}</p>
+      </div>
 
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          {(
-            [
-              { value: "DIRECT", title: t("prefs.conflict.direct.title"), desc: t("prefs.conflict.direct.desc") },
-              { value: "AVOID", title: t("prefs.conflict.avoid.title"), desc: t("prefs.conflict.avoid.desc") },
-              { value: "MEDIATE", title: t("prefs.conflict.mediate.title"), desc: t("prefs.conflict.mediate.desc") },
-              { value: "BURST", title: t("prefs.conflict.burst.title"), desc: t("prefs.conflict.burst.desc") },
-            ] as const
-          ).map((opt) => (
-            <label key={opt.value} className="cursor-pointer">
-              <input
-                type="radio"
-                name="conflictStyle"
-                value={opt.value}
-                checked={conflictStyle === opt.value}
-                onChange={(e) => setConflictStyle(normalizeConflictStyle(e.currentTarget.value))}
-                className="peer sr-only"
-              />
-              <div className="min-h-14 rounded-2xl bg-white px-3 py-2 ring-1 ring-black/10 text-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
-                <div className="text-[12px] font-extrabold text-slate-800">{opt.title}</div>
-                <div className="mt-0.5 text-[11px] leading-snug text-slate-500">{opt.desc}</div>
+      <details
+        className="rounded-2xl border border-slate-200 bg-white/90 shadow-[0_6px_16px_rgba(15,23,42,0.04)]"
+        open={optionalOpen}
+        onToggle={(e) => setOptionalOpen((e.currentTarget as HTMLDetailsElement).open)}
+      >
+        <summary className="flex cursor-pointer list-none items-center justify-between rounded-2xl bg-slate-50/80 px-4 py-3">
+          <span className="text-sm font-extrabold text-slate-900">{t("optional.title")}</span>
+          <span className="text-[11px] font-bold text-slate-500">{optionalOpen ? t("optional.fold") : t("optional.open")}</span>
+        </summary>
+
+        <div className="border-t border-black/5 px-4 pb-4 pt-3">
+          <div className="mt-4">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-6 items-center justify-center rounded-full bg-rose-100 px-2 text-[11px] font-black text-rose-700">
+                Conflict
+              </span>
+              <div className="text-sm font-bold text-slate-800">{t("optional.conflict.title")}</div>
+            </div>
+            <p className="mt-1 text-[11px] text-slate-500">{t("optional.conflict.help")}</p>
+
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {conflictOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() =>
+                    setConflictStyle((prev) => (prev === opt.value ? null : normalizeConflictStyle(opt.value)))
+                  }
+                  className={[
+                    "min-h-14 rounded-2xl border px-3 py-2 text-center transition-all",
+                    conflictStyle === opt.value
+                      ? "border-rose-300 bg-gradient-to-b from-rose-50 to-white shadow-[0_4px_10px_rgba(244,63,94,0.12)] ring-2 ring-rose-300/40"
+                      : "border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/40",
+                  ].join(" ")}
+                >
+                  <div className="text-[12px] font-extrabold text-slate-800">{opt.label}</div>
+                  <div className="mt-0.5 text-[11px] leading-snug text-slate-500">{opt.desc}</div>
+                </button>
+              ))}
+            </div>
+
+            <p className="mt-2 text-[11px] font-semibold text-slate-600">
+              {!selectedConflict ? t("optional.conflict.none") : ""}
+            </p>
+            {conflictInterpretation ? (
+              <div className="mt-2 rounded-xl border border-rose-200/80 bg-rose-50/70 px-2.5 py-2 text-[11px] font-semibold text-rose-900/90">
+                {conflictInterpretation}
               </div>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+            ) : null}
+          </div>
 
-      <fieldset className="block">
-        <legend className="text-sm font-bold text-slate-800">{t("prefs.energy.legend")}</legend>
-        <p className="mt-1 text-[11px] text-slate-500">{t("prefs.energy.help")}</p>
+          <div className="mt-4">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-6 items-center justify-center rounded-full bg-amber-100 px-2 text-[11px] font-black text-amber-700">
+                Energy
+              </span>
+              <div className="text-sm font-bold text-slate-800">{t("optional.energy.title")}</div>
+            </div>
+            <p className="mt-1 text-[11px] text-slate-500">{t("optional.energy.help")}</p>
 
-        <div className="mt-2 grid grid-cols-3 gap-2">
-          {(
-            [
-              { value: "LOW", label: t("prefs.energy.low") },
-              { value: "MID", label: t("prefs.energy.mid") },
-              { value: "HIGH", label: t("prefs.energy.high") },
-            ] as const
-          ).map((opt) => (
-            <label key={opt.value} className="cursor-pointer">
-              <input
-                type="radio"
-                name="energy"
-                value={opt.value}
-                checked={energy === opt.value}
-                onChange={(e) => setEnergy(normalizeEnergyLevel(e.currentTarget.value))}
-                className="peer sr-only"
-              />
-              <div className="h-11 rounded-2xl bg-white px-3 ring-1 ring-black/10 text-[12px] font-extrabold text-slate-700 flex items-center justify-center peer-checked:ring-2 peer-checked:ring-[#1E88E5]/50 peer-checked:bg-[#1E88E5]/[0.06]">
-                {opt.label}
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {energyOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setEnergy((prev) => (prev === opt.value ? null : normalizeEnergyLevel(opt.value)))}
+                  className={[
+                    "min-h-[64px] rounded-2xl border px-2 py-2 text-[12px] font-extrabold transition-all",
+                    energy === opt.value
+                      ? "border-amber-300 bg-gradient-to-b from-amber-50 to-white text-slate-800 shadow-[0_4px_10px_rgba(245,158,11,0.16)] ring-2 ring-amber-300/40"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-amber-200 hover:bg-amber-50/40",
+                  ].join(" ")}
+                >
+                  <span className="block whitespace-normal text-center leading-tight break-words">{opt.label}</span>
+                  <span className="mt-0.5 block whitespace-normal text-center text-[10px] font-semibold text-slate-500 leading-tight break-words">
+                    {opt.time}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <p className="mt-2 text-[11px] font-semibold text-slate-600">
+              {!selectedEnergy ? t("optional.energy.none") : ""}
+            </p>
+            {energyInterpretation ? (
+              <div className="mt-2 rounded-xl border border-amber-200/80 bg-amber-50/70 px-2.5 py-2 text-[11px] font-semibold text-amber-900/90">
+                {energyInterpretation}
               </div>
-            </label>
-          ))}
+            ) : null}
+          </div>
         </div>
-      </fieldset>
+      </details>
 
       <input type="hidden" name="judge" value={legacyJudgeStyle} />
       <input type="hidden" name="info" value={legacyInfoStyle} />
 
+      <input type="hidden" name="ePercent" value={clampStrength(percents.ePercent)} />
+      <input type="hidden" name="nPercent" value={clampStrength(percents.nPercent)} />
+      <input type="hidden" name="tPercent" value={clampStrength(percents.tPercent)} />
+      <input type="hidden" name="jPercent" value={clampStrength(percents.jPercent)} />
+
+      <input type="hidden" name="ideaStrength" value={strengths.ideaStrength} />
+      <input type="hidden" name="factStrength" value={strengths.factStrength} />
+      <input type="hidden" name="logicStrength" value={strengths.logicStrength} />
+      <input type="hidden" name="peopleStrength" value={strengths.peopleStrength} />
+
+      <input type="hidden" name="conflictStyle" value={conflictStyle ?? ""} />
+      <input type="hidden" name="energy" value={energy ?? ""} />
+      <input type="hidden" name="conflictExplicit" value={conflictStyle ? "1" : "0"} />
+      <input type="hidden" name="energyExplicit" value={energy ? "1" : "0"} />
+      <input type="hidden" name="didTouchPercent" value={didTouchPercent ? "1" : "0"} />
+      <input type="hidden" name="mbtiSource" value={mbtiSource} />
+
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={!canSubmit}
         className={[
-          "w-full rounded-2xl mt-4 px-4 py-4 text-sm font-extrabold text-white transition-all duration-200 active:scale-[0.98]",
-          isSubmitting ? "bg-slate-300 shadow-none" : "mbti-primary-btn",
+          "mt-4 w-full rounded-2xl px-4 py-4 text-sm font-extrabold text-white transition-all duration-200 active:scale-[0.98]",
+          !canSubmit ? "cursor-not-allowed bg-slate-300 shadow-none" : "mbti-primary-btn",
         ].join(" ")}
       >
         {isSubmitting ? t("submit.creating") : t("submit.create")}

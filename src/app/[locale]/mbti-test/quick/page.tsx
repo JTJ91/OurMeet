@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import MbtiTestClient from "@/features/mbti/mbti-test/MbtiTestClient";
+import MbtiTestQuickClient from "@/features/mbti/mbti-test/MbtiTestQuickClient";
 import { alternatesForPath } from "@/i18n/metadata";
 
 type Props = {
@@ -24,7 +24,7 @@ function readFirst(value?: string | string[]) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "mbtiTest.page" });
+  const t = await getTranslations({ locale, namespace: "mbtiQuickTest.page" });
   const metaTitle = t("metaTitle");
   const metaDescription = t("metaDescription");
   const keywords = t("metaKeywords")
@@ -46,24 +46,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: metaTitle,
       description: metaDescription,
     },
-    alternates: alternatesForPath("/mbti-test", locale),
+    alternates: alternatesForPath("/mbti-test/quick", locale),
   };
 }
 
-export default async function LocalizedMbtiTestPage({ params, searchParams }: Props) {
+export default async function LocalizedMbtiQuickTestPage({ params, searchParams }: Props) {
   const { locale } = await params;
   const sp = (await searchParams) ?? {};
-  const t = await getTranslations({ locale, namespace: "mbtiTest.page" });
+  const t = await getTranslations({ locale, namespace: "mbtiQuickTest.page" });
   const base = localeBase(locale);
   const from = readFirst(sp.from);
   const groupId = readFirst(sp.groupId);
   const returnTo = readFirst(sp.returnTo);
 
-  const quickQuery = new URLSearchParams();
-  if (from) quickQuery.set("from", from);
-  if (groupId) quickQuery.set("groupId", groupId);
-  if (returnTo) quickQuery.set("returnTo", returnTo);
-  const quickHref = `${base}/mbti-test/quick${quickQuery.toString() ? `?${quickQuery.toString()}` : ""}`;
+  const fullQuery = new URLSearchParams();
+  if (from) fullQuery.set("from", from);
+  if (groupId) fullQuery.set("groupId", groupId);
+  if (returnTo) fullQuery.set("returnTo", returnTo);
+  const fullHref = `${base}/mbti-test${fullQuery.toString() ? `?${fullQuery.toString()}` : ""}`;
 
   return (
     <main className="mbti-page-bg">
@@ -91,15 +91,15 @@ export default async function LocalizedMbtiTestPage({ params, searchParams }: Pr
           </p>
 
           <Link
-            href={quickHref}
+            href={fullHref}
             className="mt-3 inline-block text-xs font-bold text-slate-500 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-700"
           >
-            {t("quickLink")}
+            {t("fullLink")}
           </Link>
         </header>
 
         <section className="mbti-card mbti-card-frame mt-5 p-5">
-          <MbtiTestClient locale={locale} />
+          <MbtiTestQuickClient locale={locale} />
         </section>
 
         <div className="mt-6 text-center text-[11px] font-bold text-slate-500">{t("footerNote")}</div>

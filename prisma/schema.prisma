@@ -37,8 +37,14 @@ model Member {
   factStrength   Int @default(50)
   logicStrength  Int @default(50)
   peopleStrength Int @default(50)
+  ePercent       Int @default(50)
+  nPercent       Int @default(50)
+  tPercent       Int @default(50)
+  jPercent       Int @default(50)
   conflictStyle  ConflictStyle @default(MEDIATE)
+  conflictExplicit Boolean @default(false)
   energy         EnergyLevel   @default(MID)
+  energyExplicit Boolean @default(false)
 
   judgeStyle String @default("LOGIC") // LOGIC | PEOPLE
   infoStyle  String @default("IDEA")  // IDEA | FACT

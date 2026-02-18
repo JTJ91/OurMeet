@@ -153,6 +153,7 @@ export default function MbtiTestModal({
     stepRef.current = step;
   }, [step]);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!open) {
       lockRef.current = false;
@@ -168,6 +169,7 @@ export default function MbtiTestModal({
       setLocked(false);
     }
   }, [open]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const q = QUESTIONS[step];
 

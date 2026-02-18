@@ -27,6 +27,17 @@ type Props = {
   onCenterChange?: (id: string) => void;
 };
 
+type HitTarget = {
+  id: string;
+  x: number;
+  y: number;
+  hitR2: number;
+  labelLeft: number;
+  labelRight: number;
+  labelTop: number;
+  labelBottom: number;
+};
+
 const LEVEL_META: Record<Level, { color: string }> = {
   5: { color: "#1E88E5" },
   4: { color: "#00C853" },
@@ -635,13 +646,11 @@ function ScoreBar({
 }
 
 function EgoGraphCanvasResponsiveInner({
-  groupName,
   memberCount,
   centerName,
   centerSub,
   nodes,
   pairAverageScore = null,
-  ringCount = 3,
   maxSize = 760,
   minSize = 280,
   aspect = 1,
@@ -668,14 +677,15 @@ function EgoGraphCanvasResponsiveInner({
     fitScale: 1,
     cx: 0,
     cy: 0,
-    hitR2: 0,
     // screen positions for hit-test
-    pts: [] as Array<{ id: string; x: number; y: number }>,
+    pts: [] as HitTarget[],
   });
 
   // ??RAF�?draw ?�치�?
   const rafRef = useRef<number | null>(null);
   const drawQueuedRef = useRef(false);
+  const drawRef = useRef<() => void>(() => {});
+  const bgFillRef = useRef<{ w: number; h: number; dpr: number; fill: CanvasGradient | string } | null>(null);
   const iconCacheRef = useRef<Record<string, HTMLImageElement>>({});
   const frozenDemoAvgRef = useRef<number | null>(null);
 
@@ -758,7 +768,7 @@ function EgoGraphCanvasResponsiveInner({
     drawQueuedRef.current = true;
     rafRef.current = window.requestAnimationFrame(() => {
       drawQueuedRef.current = false;
-      draw();
+      drawRef.current();
     });
   };
 
@@ -806,23 +816,26 @@ function EgoGraphCanvasResponsiveInner({
     ctx.clearRect(0, 0, w, h);
 
     // ??배경(?�이??
-    const bg = ctx.createRadialGradient(
-      w / 2,
-      h / 2,
-      10 * dpr,
-      w / 2,
-      h / 2,
-      Math.min(w, h) * 0.55
-    );
-    bg.addColorStop(0, "rgba(255,255,255,1)");
-    bg.addColorStop(1, "rgba(248,250,252,1)");
-    ctx.fillStyle = bg;
+    const cachedBg = bgFillRef.current;
+    let bgFill: CanvasGradient | string;
+    if (cachedBg && cachedBg.w === w && cachedBg.h === h && cachedBg.dpr === dpr) {
+      bgFill = cachedBg.fill;
+    } else {
+      const bg = ctx.createRadialGradient(
+        w / 2,
+        h / 2,
+        10 * dpr,
+        w / 2,
+        h / 2,
+        Math.min(w, h) * 0.55
+      );
+      bg.addColorStop(0, "rgba(255,255,255,1)");
+      bg.addColorStop(1, "rgba(248,250,252,1)");
+      bgFill = bg;
+      bgFillRef.current = { w, h, dpr, fill: bgFill };
+    }
+    ctx.fillStyle = bgFill;
     ctx.fillRect(0, 0, w, h);
-
-    const toScreen = (wx: number, wy: number) => ({
-      x: cx + wx * fitScale * dpr,
-      y: graphCy + wy * fitScale * dpr,
-    });
 
     const denseT = Math.max(0, Math.min(1, (placed.length - 10) / 10));
     const nodeScale = 1 - 0.18 * denseT;
@@ -858,6 +871,12 @@ function EgoGraphCanvasResponsiveInner({
     fitVertically();
     fitVertically();
 
+    const placedScreen = placed.map((n) => ({
+      n,
+      x: cx + n.x * fitScale * dpr,
+      y: graphCy + n.y * fitScale * dpr,
+    }));
+
     // ??hover??ref?�서 ?�기
     const hoverId = hoverIdRef.current;
 
@@ -880,16 +899,8 @@ function EgoGraphCanvasResponsiveInner({
 
     // ???�인(?�드 ?�결) ??gradient ?�성 비용 줄이?�면 ?�색+alpha로도 충분??
     // 지금�? 기존 ?�낌 ?��??�되, focus/hover?�서�?진하�?
-    const orderedForLines =
-      activeId === null
-        ? placed
-        : [
-            ...placed.filter((n) => n.id !== activeId),
-            ...placed.filter((n) => n.id === activeId),
-          ];
-
-    orderedForLines.forEach((n) => {
-      const p = toScreen(n.x, n.y);
+    const drawEdge = (item: { n: Placed; x: number; y: number }) => {
+      const { n, x, y } = item;
       const isActive = activeId === n.id;
       const isHover = hoverId === n.id;
 
@@ -898,12 +909,13 @@ function EgoGraphCanvasResponsiveInner({
 
       const alpha = hasFocus ? (focused ? 0.94 : 0.12) : 0.48;
       const baseLW = isHover ? 5.0 : hasFocus ? (focused ? 4.4 : 2.4) : 3.6;
+      const isDashed = n.level <= 2;
 
-      // ??gradient???��??�되, alpha ??�� ?�는 ?�색?�로 가볍게(?��? 최적??
-      const useGrad = alpha > 0.18;
+      // Gradient is expensive; reserve it for active/hovered edge only.
+      const useGrad = isActive || isHover;
       const stroke: string | CanvasGradient = useGrad
         ? (() => {
-            const g = ctx.createLinearGradient(cx, graphCy, p.x, p.y);
+            const g = ctx.createLinearGradient(cx, graphCy, x, y);
             g.addColorStop(0, hexToRgba(col, Math.min(0.55, alpha)));
             g.addColorStop(1, hexToRgba(col, Math.min(0.95, alpha)));
             return g;
@@ -916,12 +928,11 @@ function EgoGraphCanvasResponsiveInner({
       ctx.lineWidth = baseLW * dpr;
       ctx.lineCap = "round";
 
-      const isDashed = n.level <= 2;
       if (isDashed) ctx.setLineDash([7 * dpr, 10 * dpr]);
       else ctx.setLineDash([]);
 
-      const dx = p.x - cx;
-      const dy = p.y - graphCy;
+      const dx = x - cx;
+      const dy = y - graphCy;
       const len = Math.hypot(dx, dy) || 1;
       const ux = dx / len;
       const uy = dy / len;
@@ -930,13 +941,23 @@ function EgoGraphCanvasResponsiveInner({
       const pad = isDashed ? 0.25 * dpr : 2.5 * dpr;
       const x1 = cx + ux * (centerR + pad);
       const y1 = graphCy + uy * (centerR + pad);
-      const x2 = p.x - ux * (endR + pad);
-      const y2 = p.y - uy * (endR + pad);
+      const x2 = x - ux * (endR + pad);
+      const y2 = y - uy * (endR + pad);
 
       const bend = 0.12;
       drawCurvedLine(ctx, x1, y1, x2, y2, bend);
       ctx.restore();
-    });
+    };
+
+    if (activeId === null) {
+      placedScreen.forEach(drawEdge);
+    } else {
+      placedScreen.forEach((item) => {
+        if (item.n.id !== activeId) drawEdge(item);
+      });
+      const activeItem = placedScreen.find((item) => item.n.id === activeId);
+      if (activeItem) drawEdge(activeItem);
+    }
 
     // Center node: draw in the same visual language as surrounding nodes.
     drawPremiumNodeCircle(ctx, cx, graphCy, centerR, "#94A3B8", false, false, false);
@@ -984,11 +1005,10 @@ function EgoGraphCanvasResponsiveInner({
     }
     ctx.restore();
 
-    const pts: Array<{ id: string; x: number; y: number }> = [];
+    const pts: HitTarget[] = [];
 
-    placed.forEach((n) => {
-      const p = toScreen(n.x, n.y);
-      pts.push({ id: n.id, x: p.x, y: p.y });
+    placedScreen.forEach(({ n, x, y }) => {
+      const p = { x, y };
 
       const isActive = activeId === n.id;
       const isHover = hoverId === n.id;
@@ -1073,18 +1093,30 @@ function EgoGraphCanvasResponsiveInner({
       const labelLineGap = Math.max(10 * dpr, nameFontPx * 0.7, mbtiFontPx * 1.05);
       ctx.font = `700 ${mbtiFontPx}px ui-sans-serif, system-ui, -apple-system`;
       ctx.fillText(mbtiKey, p.x, nameY + labelLineGap);
+
+      const mbtiW = Math.max(10, mbtiKey.length * mbtiFontPx * 0.62);
+      const nameW = Math.max(12, label.length * nameFontPx * 0.62);
+      const labelHalfW = Math.max(nameW, mbtiW) / 2 + Math.max(8 * dpr, r * 0.22);
+      const labelHalfH = Math.max(nameFontPx, mbtiFontPx) * 0.65;
+      pts.push({
+        id: n.id,
+        x: p.x,
+        y: p.y,
+        hitR2: Math.pow(r * 1.08, 2),
+        labelLeft: p.x - labelHalfW,
+        labelRight: p.x + labelHalfW,
+        labelTop: nameY - labelHalfH,
+        labelBottom: nameY + labelLineGap + labelHalfH,
+      });
       ctx.restore();
     });
 
     // ??hitTest 캐시 갱신
     geomRef.current.pts = pts;
 
-    // ??hit radius 캐시: ?�제 ?�드 반�?�?기반?�로 (빈공�??�릭 ?�판 줄이�?
-    const hitR = nodeR * 1.08; // 1.05~1.15 ?�이 취향(?�을?�록 빈공�????�힘)
-    geomRef.current.hitR2 = hitR * hitR;
-
     ctx.globalAlpha = 1;
   };
+  drawRef.current = draw;
 
   // ??1) 캔버??버퍼/?��????�데?�트: size/height 변???�만
   useEffect(() => {
@@ -1136,7 +1168,6 @@ function EgoGraphCanvasResponsiveInner({
   // ??2) draw ?�리�? state 변??hover ?�외)
   useEffect(() => {
     requestDraw();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId, focusLevel, centerName, centerSub, ringsR]);
 
   // ??rect???�크롤로??변?�니 ?�인???�벤?�에??최신??가벼운 ?��?)
@@ -1154,12 +1185,14 @@ function EgoGraphCanvasResponsiveInner({
     const sx = (clientX - g.rect.left) * g.scaleX;
     const sy = (clientY - g.rect.top) * g.scaleY;
 
-    const hitR2 = g.hitR2 || 0;
     const pts = g.pts;
 
-    for (let i = 0; i < pts.length; i++) {
+    for (let i = pts.length - 1; i >= 0; i--) {
       const p = pts[i];
-      if (dist2(sx, sy, p.x, p.y) <= hitR2) return p.id;
+      if (dist2(sx, sy, p.x, p.y) <= p.hitR2) return p.id;
+      if (sx >= p.labelLeft && sx <= p.labelRight && sy >= p.labelTop && sy <= p.labelBottom) {
+        return p.id;
+      }
     }
     return null;
   };
@@ -1178,8 +1211,7 @@ function EgoGraphCanvasResponsiveInner({
       hoverIdRef.current = null;
       const canvas = canvasRef.current;
       if (canvas) canvas.style.cursor = "default";
-
-      draw(); // ???�제 최신 state�?즉시 draw ??
+      requestDraw();
       return;
     }
 
@@ -1195,9 +1227,7 @@ function EgoGraphCanvasResponsiveInner({
       const canvas = canvasRef.current;
       if (canvas) canvas.style.cursor = "default";
     }
-
-    draw();        // ???�릭 즉시 커짐/?�아�?반영
-    requestDraw(); // ???�시 ?�여 RAF가 ?�으�??�전?�게 ??�???
+    requestDraw();
   };
 
 

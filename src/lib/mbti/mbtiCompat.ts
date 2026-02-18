@@ -7,6 +7,12 @@ import { normalizeMemberPrefs, type MemberPrefs } from "@/lib/mbti/memberPrefs";
 // -----------------------------
 export type Level = 1 | 2 | 3 | 4 | 5;
 export type ChemType = "STABLE" | "COMPLEMENT" | "SPARK" | "EXPLODE";
+export type CompatReason = "conflict_friction" | "conflict_buffer" | "energy_match" | "style_gap";
+export type CompatAdjustBreakdown = {
+  strength: number;
+  conflict: number;
+  energy: number;
+};
 
 type Attitude = "E" | "I";
 type Perceiving = "N" | "S";
@@ -18,9 +24,15 @@ type Stack = [Func, Func, Func, Func];
 
 export type CompatScore = {
   scoreInt: number;   // 0~100 정수(베이스)
+  micro: number;      // 0~100 소수점(베이스 + 안정 타이브레이커)
   score: number;      // 0~100 소수점(리포트/캔버스 표시용)  ex) 67.24
   level: Level;       // 1~5 (캔버스 범례/색 통일)
   type: ChemType;     // 안정/보완/스파크/폭발
+  adjustTotal?: number;
+  adjustBreakdown?: CompatAdjustBreakdown;
+  delta?: number;
+  factors?: CompatAdjustBreakdown;
+  reason?: CompatReason;
 };
 
 type MaybePrefs = MemberPrefs | null | undefined;
@@ -177,14 +189,37 @@ function internalCompat(
   rightPrefs?: MaybePrefs
 ): CompatScore {
   const scoreInt = calcCompatScore(leftMbti, rightMbti); // ✅ 이제 pairTiebreak가 대칭이면 안정
-  const micro = microFromBase(leftId, leftMbti, rightId, rightMbti, scoreInt);
-  const adjust = totalPrefsAdjust(micro, leftPrefs, rightPrefs);
-  const score = Number(Math.max(0, Math.min(100, micro + adjust)).toFixed(2));
+  const baseMicro = microFromBase(leftId, leftMbti, rightId, rightMbti, scoreInt);
+  const factors = prefsFactors(baseMicro, leftPrefs, rightPrefs);
+  const adjustRaw = factors.strength + factors.conflict + factors.energy;
+  const adjust = clampAdjust(adjustRaw);
+  const final = clamp(baseMicro + adjust, 0, 100);
+  const micro = Number(baseMicro.toFixed(2));
+  const adjustTotal = Number(adjust.toFixed(2));
+  const adjustBreakdown: CompatAdjustBreakdown = {
+    strength: Number(factors.strength.toFixed(2)),
+    conflict: Number(factors.conflict.toFixed(2)),
+    energy: Number(factors.energy.toFixed(2)),
+  };
+  const score = Number(final.toFixed(2));
 
   const level = levelFromScore(score);
   const type = classifyChemType(leftMbti, rightMbti, score);
+  const reason = pickReason(factors);
 
-  return { scoreInt, score, level, type };
+  return {
+    scoreInt,
+    micro,
+    score,
+    level,
+    type,
+    adjustTotal,
+    adjustBreakdown,
+    // Legacy aliases for existing call sites.
+    delta: adjustTotal,
+    factors: adjustBreakdown,
+    reason,
+  };
 }
 
 
@@ -382,13 +417,34 @@ function energyAdjust(baseMicroScore: number, aPrefs: MaybePrefs, bPrefs: MaybeP
   return base;
 }
 
-function totalPrefsAdjust(baseMicroScore: number, aPrefs: MaybePrefs, bPrefs: MaybePrefs) {
-  if (!aPrefs || !bPrefs) return 0;
-  const sum =
-    strengthAdjust(aPrefs, bPrefs) +
-    conflictAdjust(aPrefs, bPrefs) +
-    energyAdjust(baseMicroScore, aPrefs, bPrefs);
-  return clamp(sum, -8, 8);
+function prefsFactors(baseMicroScore: number, aPrefs: MaybePrefs, bPrefs: MaybePrefs) {
+  if (!aPrefs || !bPrefs) return { strength: 0, conflict: 0, energy: 0 };
+  return {
+    strength: strengthAdjust(aPrefs, bPrefs),
+    conflict: conflictAdjust(aPrefs, bPrefs),
+    energy: energyAdjust(baseMicroScore, aPrefs, bPrefs),
+  };
+}
+
+function clampAdjust(value: number) {
+  const soft = 4;
+  const hard = 6;
+  const abs = Math.abs(value);
+  if (abs <= soft) return value;
+  const extra = hard - soft;
+  const curved = soft + extra * Math.tanh((abs - soft) / 2);
+  return clamp(Math.sign(value) * curved, -hard, hard);
+}
+
+function pickReason(factors: { strength: number; conflict: number; energy: number }): CompatReason | undefined {
+  const candidates: Array<{ key: CompatReason; mag: number }> = [];
+  if (factors.conflict <= -1.0) candidates.push({ key: "conflict_friction", mag: Math.abs(factors.conflict) });
+  if (factors.conflict >= 0.8) candidates.push({ key: "conflict_buffer", mag: Math.abs(factors.conflict) });
+  if (factors.energy >= 0.6) candidates.push({ key: "energy_match", mag: Math.abs(factors.energy) });
+  if (factors.strength <= -1.2) candidates.push({ key: "style_gap", mag: Math.abs(factors.strength) });
+  if (!candidates.length) return undefined;
+  candidates.sort((a, b) => b.mag - a.mag);
+  return candidates[0].key;
 }
 
 

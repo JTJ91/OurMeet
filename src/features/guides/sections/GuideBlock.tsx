@@ -59,7 +59,7 @@ export default function GuideBlock({
                     </ul>
                   </div>
                   <div>
-                    <div className="font-extrabold">DON'T</div>
+                    <div className="font-extrabold">DON&apos;T</div>
                     <ul className="mt-2 space-y-1 text-sm text-slate-700">
                       {section.items.dont.map((d, i) => (
                         <li key={i}>• {d}</li>

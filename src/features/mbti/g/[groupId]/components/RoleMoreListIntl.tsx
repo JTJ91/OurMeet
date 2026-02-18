@@ -23,9 +23,8 @@ export default function RoleMoreListIntl({
 
   const total = members.length;
   const moreCount = Math.max(0, total - shown);
-  if (moreCount === 0) return null;
-
   const rest = useMemo(() => members.slice(shown), [members, shown]);
+  if (moreCount === 0) return null;
 
   if (!open) {
     return (

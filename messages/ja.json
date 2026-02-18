@@ -67,12 +67,13 @@
         "quickTest": "MBTI診断",
         "placeholder": "例: ENFP",
         "invalid": "MBTI形式が正しくありません。例: ENFP",
-        "hint": "ENFP形式、空白なし4文字"
+        "hint": "ENFP形式、空白なし4文字",
+        "testPrefillHint": "MBTI診断を完了すると、パーセントが自動入力されます。"
       },
       "prefs": {
         "strength": {
-          "legend": "4軸の強度",
-          "help": "各軸は独立しており、0〜100で調整できます。",
+          "legend": "会話スタイル（任意）",
+          "help": "詳細設定で情報/判断スタイルを軽く調整できます。",
           "idea": "IDEA強度",
           "fact": "FACT強度",
           "logic": "LOGIC強度",
@@ -80,18 +81,74 @@
         },
         "conflict": {
           "legend": "衝突スタイル",
-          "help": "衝突時によく出る反応を選択してください。",
-          "direct": { "title": "DIRECT", "desc": "率直に伝える" },
-          "avoid": { "title": "AVOID", "desc": "衝突を避ける" },
-          "mediate": { "title": "MEDIATE", "desc": "間に立って調整" },
-          "burst": { "title": "BURST", "desc": "ためて一気に爆発" }
+          "help": "衝突時の普段の反応に近いものを選んでください。",
+          "direct": {
+            "title": "率直",
+            "desc": "その場で伝える",
+            "selectedSummary": "明確で速い反面、強く聞こえることがあります。"
+          },
+          "avoid": {
+            "title": "回避",
+            "desc": "衝突を避ける",
+            "selectedSummary": "即時の摩擦は減る一方、課題が先送りになりやすいです。"
+          },
+          "mediate": {
+            "title": "調整",
+            "desc": "間に入って調整",
+            "selectedSummary": "対立時に雰囲気を和らげやすいです。"
+          },
+          "burst": {
+            "title": "我慢後に爆発",
+            "desc": "ためて一気に反応",
+            "selectedSummary": "普段は静かでも、蓄積すると強く反応しやすいです。"
+          },
+          "selected": "選択中: {title} — {summary}"
         },
         "energy": {
           "legend": "エネルギー持続力",
-          "help": "集まりでエネルギーが続く度合いを選択してください。",
-          "low": "LOW",
-          "mid": "MID",
-          "high": "HIGH"
+          "help": "集まりでどれくらいエネルギーが続くか選んでください。",
+          "low": "すぐ疲れる",
+          "mid": "ふつうに維持できる",
+          "high": "最後まで維持できる",
+          "lowSelectedSummary": "短めの集まりや休憩のある予定に向いています。",
+          "midSelectedSummary": "平均的な長さの集まりに向いています。",
+          "highSelectedSummary": "長時間・高密度の集まりでもペースを保ちやすいです。",
+          "selected": "選択中: {level} — {summary}"
+        },
+        "advanced": {
+          "title": "精度を上げる（任意）",
+          "open": "開く",
+          "fold": "閉じる",
+          "help": "設定するとスコアの精度が上がります。"
+        },
+        "style": {
+          "legend": "会話スタイル（任意）",
+          "help": "情報の扱い方と意思決定の傾向を設定しましょう。",
+          "info": {
+            "title": "情報スタイル",
+            "left": "アイデア",
+            "right": "現実/事実"
+          },
+          "decision": {
+            "title": "判断スタイル",
+            "left": "共感/雰囲気",
+            "right": "根拠/効率"
+          },
+          "band": {
+            "veryLeft": "かなり左",
+            "slightlyLeft": "やや左",
+            "balanced": "バランス",
+            "slightlyRight": "やや右",
+            "veryRight": "かなり右"
+          },
+          "summary": {
+            "withSide": "{side}型（{band}） {value}%",
+            "balanced": "バランス型（{band}） {value}%"
+          }
+        },
+        "behavior": {
+          "legend": "衝突/エネルギー",
+          "help": "衝突への対応と集まりのペースを一緒に設定します。"
         }
       },
       "judge": {
@@ -121,6 +178,84 @@
       "submit": {
         "creating": "作成中...",
         "create": "グループを作成"
+      },
+      "why": {
+        "title": "なぜ入力するの？",
+        "body": "同じMBTIでも会話スタイルが違うと、相性や役割が変わることがあります。（任意入力）"
+      },
+      "percent": {
+        "title": "MBTI軸パーセント設定",
+        "desc": "診断結果のパーセントをそのまま入力してください。（必須）",
+        "testPrefillHint": "スライダーを離したタイミングでMBTIが自動反映されます。",
+        "energy": "エネルギー",
+        "info": "情報",
+        "judge": "判断",
+        "style": "スタイル",
+        "preview": "自動推定MBTI: {mbti}",
+        "applyPreview": "この値でMBTIを適用",
+        "mismatch": "MBTIとパーセントが一致しない場合があります。計算はパーセント基準で行われます。",
+        "alignMbtiToPercent": "MBTIをパーセントに合わせる",
+        "alignPercentToMbti": "パーセントをMBTIに合わせる"
+      },
+      "optional": {
+        "title": "衝突/エネルギー（任意）",
+        "desc": "追加で入力すると、相性スコア/役割推薦の精度が上がります。（任意）",
+        "open": "開く",
+        "fold": "閉じる",
+        "conflict": {
+          "title": "衝突スタイル",
+          "help": "選択すると関係解釈に反映されます。",
+          "none": "未選択（デフォルトで保存）",
+          "selected": "選択中: {label} — {desc}",
+          "interpret": {
+            "direct": "結論は早く出ますが、言い方が強く伝わることがあります。",
+            "avoid": "その場の摩擦は抑えられますが、課題が後回しになりやすいです。",
+            "mediate": "温度差を緩衝し、会話の流れを安定させやすいです。",
+            "burst": "普段は抑えますが、蓄積すると強く反応することがあります。"
+          },
+          "direct": {
+            "label": "DIRECT",
+            "desc": "その場で伝える"
+          },
+          "avoid": {
+            "label": "AVOID",
+            "desc": "衝突を避ける"
+          },
+          "mediate": {
+            "label": "MEDIATE",
+            "desc": "間に入って調整"
+          },
+          "burst": {
+            "label": "BURST",
+            "desc": "ためて一気に反応"
+          }
+        },
+        "energy": {
+          "title": "エネルギー持続力",
+          "help": "選択すると集まりのテンポ解釈に反映されます。",
+          "none": "未選択（デフォルトで保存）",
+          "selected": "選択中: {label} — {desc}",
+          "interpret": {
+            "low": "短めで軽い集まりのほうがペースを保ちやすいです。",
+            "mid": "多くの集まり時間で安定してペースを維持できます。",
+            "high": "長時間や活動量の多い場でもエネルギーを維持しやすいです。"
+          },
+          "low": {
+            "label": "すぐ疲れる",
+            "time": "約1〜2時間",
+            "desc": "短めの集まりや休憩ありの予定が合います。"
+          },
+          "mid": {
+            "label": "ふつうに維持できる",
+            "time": "約2〜4時間",
+            "desc": "平均的な長さの集まりに合います。"
+          },
+          "high": {
+            "label": "最後まで維持できる",
+            "time": "4時間以上",
+            "desc": "長時間の集まりでもペースを保ちやすいです。"
+          }
+        }
       }
     },
     "actionErrors": {
@@ -167,10 +302,22 @@
         "conflict": {
           "legend": "衝突スタイル",
           "help": "衝突時によく出る反応を選択してください。",
-          "direct": { "title": "DIRECT", "desc": "率直に伝える" },
-          "avoid": { "title": "AVOID", "desc": "衝突を避ける" },
-          "mediate": { "title": "MEDIATE", "desc": "間に立って調整" },
-          "burst": { "title": "BURST", "desc": "ためて一気に爆発" }
+          "direct": {
+            "title": "DIRECT",
+            "desc": "率直に伝える"
+          },
+          "avoid": {
+            "title": "AVOID",
+            "desc": "衝突を避ける"
+          },
+          "mediate": {
+            "title": "MEDIATE",
+            "desc": "間に立って調整"
+          },
+          "burst": {
+            "title": "BURST",
+            "desc": "ためて一気に爆発"
+          }
         },
         "energy": {
           "legend": "エネルギー持続力",
@@ -228,6 +375,7 @@
       "descriptionEmphasis": "考え方と会話リズム",
       "descriptionSuffix": "を比較して、関係のケミを確認します。",
       "cognitiveGuide": "MBTI認知機能とは？",
+      "tryTest": "MBTI検査してみる",
       "quickStart": "クイックスタート",
       "tabTests": "MBTI検査",
       "tabGuides": "ガイド",
@@ -831,6 +979,7 @@
         "jpJ": "J 判断",
         "jpP": "P 知覚"
       },
+      "percentAverageFormat": "{key} {percent}% 平均",
       "vibeSummaryTitle": "グループ雰囲気の要約",
       "cautionPoint": "注意ポイント",
       "balanceOne": "どちらかに偏らず、状況に応じてトーンが自然に切り替わります。",
@@ -915,6 +1064,88 @@
           "deadlineTail": "を一つ決めるだけでも楽になります。",
           "noBigDownside": "大きな短所はなく、",
           "clearTopic": "テーマが明確ならよりうまく回ります。"
+        },
+        "summaryTitle": "運営サマリー",
+        "tokens": {
+          "SCENE_EI_TIE": "発言機会が比較的均等で、進行の要点を整理すると会議が安定して回ります。",
+          "SCENE_EI_E_MILD": "会話が早く開き、意見交換がスムーズに始まります。",
+          "SCENE_EI_E_STRONG": "会話テンポが速く、短い間隔で意見が連続して出ます。",
+          "SCENE_EI_E_EXTREME": "同時多発で意見が出やすいため、発言順の整理が品質維持に有効です。",
+          "SCENE_EI_I_MILD": "考えを整理してから発言する傾向があり、発言の密度が高いです。",
+          "SCENE_EI_I_STRONG": "十分に聞いて整理してから話すため、中盤以降の意思決定品質が上がります。",
+          "SCENE_EI_I_EXTREME": "序盤の発言は少なめですが、発言時の結論への寄与が大きいです。",
+          "SCENE_NS_TIE": "アイデア探索と現実検証が交互に出て、議論バランスが安定しています。",
+          "SCENE_NS_N_MILD": "既存案に対して拡張アイデアが自然に重なっていきます。",
+          "SCENE_NS_N_STRONG": "論点が広がり選択肢が増えやすいので、選定基準の明確化が必要です。",
+          "SCENE_NS_N_EXTREME": "アイデアが連鎖的に拡張しやすく、優先順位の先固定が重要です。",
+          "SCENE_NS_S_MILD": "現実条件と実行可能性を早めに確認し、議論が滑らかに収束します。",
+          "SCENE_NS_S_STRONG": "議論が実行項目中心に早く収束し、次アクションが明確です。",
+          "SCENE_NS_S_EXTREME": "実行検証が強く先行するため、決定は速い一方で探索幅は狭まりやすいです。",
+          "SCENE_JP_TIE": "探索と結論固定のバランスが良く、状況に応じた運営切替がしやすいです。",
+          "SCENE_JP_J_MILD": "結論を先送りせず、段階的に閉じながら会議を進めます。",
+          "SCENE_JP_J_STRONG": "意思決定ポイントが明確で、会議終了時に実行項目がはっきり残ります。",
+          "SCENE_JP_J_EXTREME": "結論固定が非常に速く進行は早いですが、初期探索時間が不足しやすいです。",
+          "SCENE_JP_P_MILD": "結論を開いたまま進めるため、変化対応は速い傾向です。",
+          "SCENE_JP_P_STRONG": "動かしながら合わせる運営が強く、柔軟ですが決定タイミング管理が必要です。",
+          "SCENE_JP_P_EXTREME": "進行中に範囲や優先順位が再設定されやすく、締切/完了基準の先合意が重要です。",
+          "SUMMARY_ENP_A1": "アイデアが素早く広がり、議論が複数方向へ展開しやすい構造です。",
+          "SUMMARY_ENP_A2": "探索効率は高い一方、最終確定は後ろにずれやすいです。",
+          "SUMMARY_ENP_B1": "ブレストの勢いが強く、新提案が連続して積み上がります。",
+          "SUMMARY_ENP_B2": "まず試し、後で整理する運営が合いやすい組み合わせです。",
+          "SUMMARY_ENJ_A1": "アイデアを素早く集め、実行順にすぐ整理する運営です。",
+          "SUMMARY_ENJ_A2": "会議は短く終わり、次アクションが明確に決まりやすいです。",
+          "SUMMARY_ENJ_B1": "発散から収束への切替が速く、実務判断につながりやすいです。",
+          "SUMMARY_ENJ_B2": "議論が長引く前に優先順位と担当が整理される傾向です。",
+          "SUMMARY_ESP_A1": "現場課題を即共有し、状況に合わせて素早く調整するスタイルです。",
+          "SUMMARY_ESP_A2": "速度は高い一方で途中変更が増えやすく、範囲管理が鍵になります。",
+          "SUMMARY_ESP_B1": "実行中心の対話が続き、推進力が強い傾向です。",
+          "SUMMARY_ESP_B2": "固定構造より、その場で有効な選択を優先しやすいです。",
+          "SUMMARY_ESJ_A1": "必要情報を素早く集め、実行と整理へ収束する構造です。",
+          "SUMMARY_ESJ_A2": "決定後は役割と締切が明確で、ぶれが少ないです。",
+          "SUMMARY_ESJ_B1": "会話量は多くても、結論は構造的に固定されやすいです。",
+          "SUMMARY_ESJ_B2": "会議終了時に担当とタスクが明確に残りやすいです。",
+          "SUMMARY_INP_A1": "熟考後に核心アイデアが出て、結論は柔軟に保持されます。",
+          "SUMMARY_INP_A2": "探索の質は高い一方、最終確定は遅れやすいです。",
+          "SUMMARY_INP_B1": "整理された視点が中盤以降に強く効くパターンです。",
+          "SUMMARY_INP_B2": "確定前に複数回の見直しループを回しやすい運営です。",
+          "SUMMARY_INJ_A1": "整理された視点で論点を絞り、結論を段階的に固定していきます。",
+          "SUMMARY_INJ_A2": "発言量が少なくても、意思決定の密度と一貫性は高いです。",
+          "SUMMARY_INJ_B1": "序盤探索は慎重ですが、意思決定区間で速度が上がります。",
+          "SUMMARY_INJ_B2": "基準が固まると会議は一気に収束します。",
+          "SUMMARY_ISP_A1": "静かに状況を把握し、必要な実行を柔軟に調整します。",
+          "SUMMARY_ISP_A2": "集中度は高い一方、日程/範囲は変わりやすいです。",
+          "SUMMARY_ISP_B1": "発言量が少なくても実行判断は速く下りやすいです。",
+          "SUMMARY_ISP_B2": "固定手順より現場適応に強い運営です。",
+          "SUMMARY_ISJ_A1": "必要な発言だけで進み、実行と整理で素早く収束する構造です。",
+          "SUMMARY_ISJ_A2": "結論が早めに固定され、役割分担と後続実行が明確です。",
+          "SUMMARY_ISJ_B1": "検討は落ち着いて、締めは堅くまとまるパターンです。",
+          "SUMMARY_ISJ_B2": "会議終盤にチェックリスト型で結論が整理されやすいです。",
+          "SUMMARY_FB_EINS_E_N": "発言主導は早く開き、議論はアイデア拡張寄りになりやすいです。",
+          "SUMMARY_FB_EINS_E_S": "会話は活発ですが、実行可能性の確認で比較的早く収束します。",
+          "SUMMARY_FB_EINS_E_X": "会話テンポは速く、拡張と収束は状況次第で切り替わります。",
+          "SUMMARY_FB_EINS_I_N": "慎重な発言に拡張アイデアが重なり、中盤以降の密度が高まります。",
+          "SUMMARY_FB_EINS_I_S": "必要事項中心の対話で、現実検証へ安定収束しやすいです。",
+          "SUMMARY_FB_EINS_I_X": "慎重な発言パターンの中で、探索と検証がバランスします。",
+          "SUMMARY_FB_EINS_X_N": "発言スタイルは均衡しつつ、論点は新規代案探索へ向かいやすいです。",
+          "SUMMARY_FB_EINS_X_S": "発言スタイルは均衡しつつ、論点は実行/検証へ向かいやすいです。",
+          "SUMMARY_FB_EINS_X_X": "発言と論点の双方が均衡し、運営モード切替が柔軟です。",
+          "SUMMARY_FB_NSJP_N_J": "アイデア発散から結論固定へ切り替わると、実行力が大きく上がります。",
+          "SUMMARY_FB_NSJP_N_P": "アイデア探索を長めに取り、結論は柔軟に維持される流れです。",
+          "SUMMARY_FB_NSJP_N_X": "探索比重が高く、結論速度は状況依存で変動します。",
+          "SUMMARY_FB_NSJP_S_J": "現実検証の後に素早く結論を閉じ、実行段階へ移りやすいです。",
+          "SUMMARY_FB_NSJP_S_P": "現実中心で進みつつ、途中調整が増えやすく範囲管理が必要です。",
+          "SUMMARY_FB_NSJP_S_X": "実行検証の比重が高く、結論固定の強さは状況影響を受けます。",
+          "SUMMARY_FB_NSJP_X_J": "探索/検証は均衡しつつ、結論は比較的早く閉じます。",
+          "SUMMARY_FB_NSJP_X_P": "探索/検証は均衡しつつ、結論は開いたまま調整されやすいです。",
+          "SUMMARY_FB_NSJP_X_X": "探索と結論の双方が均衡し、会議運営の柔軟性が高いです。",
+          "CAUTION_T_BASE": "フィードバックが率直に聞こえる可能性があります。結論/要約の前にクッション文を1つ入れてください。",
+          "CAUTION_T_EXTREME": "率直フィードバックの強度が高めです。結論/要約前にクッション文と確認質問を入れて誤解を減らしてください。",
+          "CAUTION_F_BASE": "共感対話が長くなると結論が遅れます。まず『今日決める1つ』を先に固定すると安定します。",
+          "CAUTION_F_EXTREME": "共感対話の比重がかなり高いです。開始時に『今日決める1つ』を先に固定してください。",
+          "CAUTION_P_BASE": "日程/範囲が途中で変わりやすいです。締切と完了基準を先に合意してください。",
+          "CAUTION_P_EXTREME": "途中変更の可能性が高いです。締切・完了基準・変更承認ルールを初期に合わせてください。",
+          "CAUTION_DEFAULT_BASE": "構造的な衝突は少ないです。目標を明確にすると速度が上がります。",
+          "CAUTION_DEFAULT_EXTREME": "大きな衝突はない一方で軸傾向が強めです。目標と優先順位を先固定すると速度が安定します。"
         }
       },
       "mostlyPrefix": "{line}"
@@ -927,6 +1158,13 @@
         "ORGANIZE": "整理決定担当",
         "MEDIATOR": "仲裁調整担当"
       },
+      "snapshotTitle": "役割スナップショット",
+      "snapshotTopCandidate": "代表候補",
+      "snapshotEmptyRole": "現在この集まりで空いている役割",
+      "snapshotNoCandidate": "まだ傾向データが不足しています。",
+      "snapshotStrength": "役割強度",
+      "snapshotStrongRole": "強み役",
+      "snapshotImproveHint": "補完インサイト",
       "badges": {
         "STRATEGY": {
           "1": "戦略設計者",
@@ -983,7 +1221,9 @@
           "default": "役割は固定ではありません。状況に応じて変わっても自然です。",
           "lack": "注意ポイント: {role} が空いています。この役割を担う人がいないと会議が長引くことがあります。"
         }
-      }
+      },
+      "fitLabel": "適合度",
+      "noTopOne": "1位候補なし"
     }
   },
   "components": {

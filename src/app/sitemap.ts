@@ -15,6 +15,7 @@ const STATIC_ROUTES: Array<{ path: string; options: Omit<SitemapItemOptions, "la
   { path: "/mbti", options: { changeFrequency: "daily", priority: 0.95 } },
   { path: "/mbti/create", options: { changeFrequency: "weekly", priority: 0.8 } },
   { path: "/mbti-test", options: { changeFrequency: "weekly", priority: 0.8 } },
+  { path: "/mbti-test/quick", options: { changeFrequency: "weekly", priority: 0.75 } },
   { path: "/mbti/cognitive-functions", options: { changeFrequency: "monthly", priority: 0.75 } },
   { path: "/faq/mbti", options: { changeFrequency: "monthly", priority: 0.7 } },
   { path: "/guides/mbti", options: { changeFrequency: "weekly", priority: 0.85 } },
