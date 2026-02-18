@@ -470,6 +470,13 @@ export default function MbtiTestQuickClient({ locale }: Props) {
     };
   }
 
+  function capturePixelRatio(size: { width: number; height: number }) {
+    const preferred = 2.2;
+    const bySide = Math.min(4096 / size.width, 4096 / size.height);
+    const byArea = Math.sqrt(14_000_000 / (size.width * size.height));
+    return Math.max(1, Math.min(preferred, bySide, byArea));
+  }
+
   async function shareResult(type: string) {
     if (typeof window === "undefined") return;
     if (!resultCaptureRef.current) return;
@@ -485,12 +492,13 @@ export default function MbtiTestQuickClient({ locale }: Props) {
       });
       await waitForCaptureAssets(resultCaptureRef.current);
       const size = captureSize(resultCaptureRef.current);
+      const pixelRatio = capturePixelRatio(size);
 
       const { toBlob } = await import("html-to-image");
       const blob = await toBlob(resultCaptureRef.current, {
         width: size.width,
         height: size.height,
-        pixelRatio: 1,
+        pixelRatio,
         cacheBust: true,
         backgroundColor: "#ffffff",
       });
@@ -558,7 +566,10 @@ export default function MbtiTestQuickClient({ locale }: Props) {
     const animal = animalMetaOf(type);
 
     return (
-      <div ref={resultCaptureRef} className="relative rounded-3xl bg-white p-1">
+      <div
+        ref={resultCaptureRef}
+        className={["relative rounded-3xl bg-white", isCapturing ? "p-5" : "p-1"].join(" ")}
+      >
         <div className="flex items-start justify-between gap-3">
           <div>
             <div className="text-sm font-extrabold text-slate-500">{ui.resultTitle}</div>
@@ -775,8 +786,8 @@ function AxisRow({
 
   return (
     <div className="mbti-card-soft rounded-3xl p-4 ring-1 ring-black/10">
-      <div className="grid grid-cols-[96px_1fr_96px] items-center">
-        <div className="text-left">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+        <div className="min-w-0 text-left">
           <div className="inline-flex items-end gap-1.5">
             <span
               className={[
@@ -799,8 +810,8 @@ function AxisRow({
           </span>
         </div>
 
-        <div className="text-right">
-          <div className="inline-flex items-end gap-1.5">
+        <div className="min-w-0 text-right">
+          <div className="inline-flex items-end justify-end gap-1.5">
             <span className={["tabular-nums text-[12px] font-black", isRightWin ? "text-slate-900" : "text-slate-400"].join(" ")}>
               {rightPct}%
             </span>
