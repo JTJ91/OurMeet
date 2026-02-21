@@ -3,7 +3,7 @@ import { GUIDES as MBTI_GUIDES } from "@/features/guides/data/mbti/guides";
 import { locales, type Locale } from "@/i18n/config";
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") || "https://www.moimrank.com";
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") || "https://www.moimflow.com";
 
 type SitemapItemOptions = Pick<
   MetadataRoute.Sitemap[number],

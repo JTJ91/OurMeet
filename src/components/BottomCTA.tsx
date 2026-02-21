@@ -83,6 +83,7 @@ export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: b
     <div
       data-bottom-cta
       className={[
+        "preview-hide",
         desktopSticky ? "fixed inset-x-0 bottom-0 z-50" : "fixed inset-x-0 bottom-0 z-50 sm:static sm:z-auto sm:mt-10",
         menuOpen ? "hidden" : "",
       ].join(" ")}

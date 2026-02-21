@@ -830,7 +830,35 @@
   },
   "landing": {
     "brandPrefix": "모임",
-    "brandAccent": "랭킹",
+    "brandAccent": "플로우",
+    "tagline": "모임 관계 점수 · 랭킹 · 케미를 재미로 측정",
+    "platformHeadline1": "우리 모임의",
+    "platformHeadlineAccent": "관계 점수와 랭킹",
+    "platformHeadline2": "데이터로 재미있게 분석해보세요",
+    "platformDescription1": "모임플로우는 MBTI뿐 아니라 대화 성향, 역할 분포, 상호작용 패턴 등 여러 가지 데이터를 종합해 우리 모임의 관계 점수와 케미 랭킹을 재미로 측정하는 서비스입니다.",
+    "platformDescription2": "친구 모임, 회사 팀, 동호회, 스터디까지 - 누가 누구와 잘 맞는지, 어디서 충돌이 생기는지 한눈에 확인해보세요.",
+    "feature": {
+      "mbtiCogChem": {
+        "title": "MBTI 인지기능 케미",
+        "desc": "모임 멤버들의 인지기능 흐름을 기반으로 케미/충돌 포인트/역할 균형을 한 화면에서 확인합니다.",
+        "b1": "궁합 점수 + 관계 그래프",
+        "b2": "케미랭킹 최고/최악 TOP3",
+        "b3": "역할별 적임자 추천"
+      },
+      "saju": {
+        "title": "사주 기반 궁합",
+        "desc": "생년월일시 기반으로 성향/흐름/궁합을 모임 관점에서 해석하는 기능을 준비 중입니다.",
+        "b1": "개인 성향 요약",
+        "b2": "두 사람/모임 궁합",
+        "b3": "월별 흐름/주의 포인트"
+      }
+    },
+    "preview": "미리보기",
+    "view": "바로가기",
+    "wait": "준비중",
+    "close": "닫기",
+    "closeAria": "미리보기 모달 닫기",
+    "previewHint": "미리보기는 일부 화면만 보여줄 수 있어요. 전체 기능은 바로가기로 확인하세요.",
     "headlinePrefix": "우리 모임 안에서",
     "headlineAccent": "누가 누구랑 잘 맞는지",
     "headlineSuffix": "흐름으로 보여주는 케미 분석",
@@ -1228,7 +1256,7 @@
   },
   "components": {
     "header": {
-      "brand": "모임랭킹",
+      "brand": "모임플로우",
       "mbti": "MBTI",
       "guides": "가이드",
       "create": "모임 만들기"

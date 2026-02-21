@@ -5,6 +5,7 @@ import { QUESTIONS } from "@/lib/mbtiTest/questions";
 import { scoreMbti, type Answers, type MbtiTestResult } from "@/lib/mbtiTest/score";
 import { useRouter, useSearchParams } from "next/navigation";
 import { animalMetaOf } from "@/lib/mbti/animalMeta";
+import { getResultNarrative, RESULT_NARRATIVE_TITLE } from "@/features/mbti/mbti-test/resultNarratives";
 
 type Locale = "ko" | "en" | "ja";
 
@@ -21,6 +22,8 @@ const UI_TEXT: Record<
     resultTitle: string;
     retry: string;
     createWithResult: string;
+    createHintLabel: string;
+    createHint: string;
     useResult: string;
     reset: string;
     autoNextHint: string;
@@ -41,6 +44,8 @@ const UI_TEXT: Record<
     resultTitle: "검사 결과",
     retry: "다시하기",
     createWithResult: "이 검사결과로 방 만들기",
+    createHintLabel: "TIP",
+    createHint: "방을 만들면 초대 링크를 공유해 멤버를 모으고, 우리 모임의 케미·관계 그래프·역할 분포를 확인할 수 있어요.",
     useResult: "이 검사결과 사용하기",
     reset: "초기화",
     autoNextHint: "※ 답을 누르면 자동으로 다음 문항으로 이동합니다.",
@@ -60,6 +65,9 @@ const UI_TEXT: Record<
     resultTitle: "Test Result",
     retry: "Retake",
     createWithResult: "Create group with this result",
+    createHintLabel: "TIP",
+    createHint:
+      "Create a room to share an invite link, gather members, and view your group's chemistry, relationship graph, and role distribution.",
     useResult: "Use this result",
     reset: "Reset",
     autoNextHint: "* Selecting an answer automatically moves to the next question.",
@@ -79,6 +87,9 @@ const UI_TEXT: Record<
     resultTitle: "診断結果",
     retry: "もう一度",
     createWithResult: "この結果でグループ作成",
+    createHintLabel: "ヒント",
+    createHint:
+      "グループを作成すると、招待リンクでメンバーを集めて、グループの相性・関係グラフ・役割分布を確認できます。",
     useResult: "この結果を使う",
     reset: "リセット",
     autoNextHint: "※ 回答を選ぶと自動で次の質問に進みます。",
@@ -504,6 +515,7 @@ export default function MbtiTestClient({ locale }: Props) {
   if (done && result) {
     const { type, axes } = result;
     const animal = animalMetaOf(type);
+    const typeNarrative = getResultNarrative(activeLocale, type);
 
     return (
       <div
@@ -588,39 +600,67 @@ export default function MbtiTestClient({ locale }: Props) {
           <AxisRow left="J" right="P" leftPct={axes.J} rightPct={axes.P} locale={activeLocale} captureMode={isCapturing} />
         </div>
 
-        {!isCapturing ? (
-          <div className="mt-6 flex items-center justify-between gap-2">
-            <button
-              type="button"
-              onClick={resetAll}
-              className="rounded-full px-4 py-2 text-xs font-extrabold text-slate-700 ring-1 ring-black/10 hover:bg-slate-50"
-            >
-              {ui.retry}
-            </button>
+        {typeNarrative ? (
+          <div
+            className={[
+              "mt-4 rounded-2xl p-4",
+              isCapturing ? "border border-slate-300 bg-white" : "border border-slate-200/80 bg-white/80 ring-1 ring-black/5",
+            ].join(" ")}
+          >
+            <div className="text-[11px] font-black uppercase tracking-wide text-slate-500">
+              {RESULT_NARRATIVE_TITLE[activeLocale]}
+            </div>
+            <div className="mt-2 grid gap-1.5">
+              {typeNarrative.map((line, idx) => (
+                <p key={`${type}-note-${idx}`} className="text-[12px] font-semibold leading-relaxed text-slate-700">
+                  {line}
+                </p>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
-            {isFromForm ? (
+        {!isCapturing ? (
+          <div className="mt-6">
+            <div className="flex items-center justify-between gap-2">
               <button
                 type="button"
-                onClick={() => goBackWithMbti(type, axes)}
-                className="
-                  mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white
-                  transition-all duration-200 active:scale-[0.97]
-                "
+                onClick={resetAll}
+                className="rounded-full px-4 py-2 text-xs font-extrabold text-slate-700 ring-1 ring-black/10 hover:bg-slate-50"
               >
-                {ui.useResult}
+                {ui.retry}
               </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => router.push(`${base}/mbti/create?${queryFromResult(type, axes)}`)}
-                className="
-                  mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white
-                  transition-all duration-200 active:scale-[0.97]
-                "
-              >
-                {ui.createWithResult}
-              </button>
-            )}
+
+              {isFromForm ? (
+                <button
+                  type="button"
+                  onClick={() => goBackWithMbti(type, axes)}
+                  className="
+                    mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white
+                    transition-all duration-200 active:scale-[0.97]
+                  "
+                >
+                  {ui.useResult}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => router.push(`${base}/mbti/create?${queryFromResult(type, axes)}`)}
+                  className="
+                    mbti-primary-btn rounded-full px-5 py-2 text-xs font-extrabold text-white
+                    transition-all duration-200 active:scale-[0.97]
+                  "
+                >
+                  {ui.createWithResult}
+                </button>
+              )}
+            </div>
+
+            {!isFromForm ? (
+              <div className="mt-2 rounded-xl border border-[#1E88E5]/20 bg-[#1E88E5]/5 px-3 py-2.5">
+                <div className="text-[11px] font-semibold leading-relaxed text-slate-600">{ui.createHint}</div>
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>

@@ -50,15 +50,15 @@ export async function generateMetadata({
   const localePrefix = locale === "ko" ? "" : `/${locale}`;
 
   return {
-    title: `${guide.title} | Moimrank`,
+    title: `${guide.title} | moimflow`,
     description: guide.description,
     keywords: guide.keywords ?? [],
     alternates: alternatesForPath(path, locale),
     openGraph: {
-      title: `${guide.title} | Moimrank`,
+      title: `${guide.title} | moimflow`,
       description: guide.description,
       type: "article",
-      url: `https://www.moimrank.com${localePrefix}/guides/${system}/${guide.slug}`
+      url: `https://www.moimflow.com${localePrefix}/guides/${system}/${guide.slug}`
     }
   };
 }

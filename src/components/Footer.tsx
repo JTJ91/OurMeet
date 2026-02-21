@@ -30,7 +30,7 @@ export default function Footer() {
     bare.startsWith("/mbti") || bare.startsWith("/guides/mbti") || bare.startsWith("/systems/mbti");
 
   return (
-    <footer className="bg-[#F5F9FF] pb-30 text-center text-xs text-slate-500">
+    <footer className="bg-[#F5F9FF] pb-30 text-center text-xs text-slate-500 preview-hide">
       <div className="flex flex-wrap items-center justify-center gap-3">
         {mbtiContext ? (
           <>

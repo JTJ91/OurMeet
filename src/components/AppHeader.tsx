@@ -92,9 +92,31 @@ export default function AppHeader() {
   const d = useTranslations("components.headerDrawer");
   const brand = t("brand");
   const accentStart = (() => {
-    if (locale === "ko") return brand.indexOf("랭");
-    if (locale === "ja") return brand.indexOf("ランク");
-    return brand.toLowerCase().lastIndexOf("rank");
+    if (locale === "ko") {
+      const koTokens = ["플로우", "랭킹", "랭크", "랭"];
+      for (const token of koTokens) {
+        const idx = brand.lastIndexOf(token);
+        if (idx >= 0) return idx;
+      }
+      return -1;
+    }
+
+    if (locale === "ja") {
+      const jaTokens = ["フロー", "ランク"];
+      for (const token of jaTokens) {
+        const idx = brand.lastIndexOf(token);
+        if (idx >= 0) return idx;
+      }
+      return -1;
+    }
+
+    const lowerBrand = brand.toLowerCase();
+    const enTokens = ["flow", "rank"];
+    for (const token of enTokens) {
+      const idx = lowerBrand.lastIndexOf(token);
+      if (idx >= 0) return idx;
+    }
+    return -1;
   })();
   const hasAccent = accentStart >= 0;
 
@@ -210,13 +232,15 @@ export default function AppHeader() {
 
   const isActiveHref = (href: string) => {
     if (href === "/mbti") return barePath === "/mbti";
+    if (href === "/mbti-test") return barePath === "/mbti-test";
+    if (href === "/mbti-test/quick") return barePath === "/mbti-test/quick";
     return barePath === href || barePath.startsWith(`${href}/`);
   };
 
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/95">
-        <div className="mx-auto flex h-12 max-w-[740px] items-center px-3 sm:px-5">
+        <div className="mx-auto flex h-12 max-w-[740px] items-center px-3 sm:px-5 preview-hide">
           <Link href={toLocalePath("/")} className="flex min-w-0 flex-1 items-center gap-1.5 pr-2">
             <span className="truncate text-sm font-extrabold tracking-tight text-slate-900">
               {hasAccent ? brand.slice(0, accentStart) : brand}
@@ -459,7 +483,7 @@ export default function AppHeader() {
                 <b className="text-slate-800">{d("tipTitle")}</b> {d("tipBody")}
               </div>
 
-              <div className="mt-3 text-[11px] font-semibold text-slate-400">© 2026 moimrank</div>
+              <div className="mt-3 text-[11px] font-semibold text-slate-400">© 2026 moimflow</div>
             </div>
           </div>
         </aside>

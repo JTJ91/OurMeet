@@ -15,19 +15,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "moimrank",
+  title: "moimflow",
   description: "궁합 점수 바로 확인!",
   icons: {
     icon: "/favicon.png",
   },
   openGraph: {
     type: "website",
-    title: "moimrank - 모임 궁합",
-    description: "우리 모임에서 누가 제일 잘 맞을까?",
-    url: "https://www.moimrank.com/",
+    title: "MoimFlow | 모임의 흐름",
+    description: "우리 모임의 관계 흐름과 역할 균형을 한눈에 확인하세요.",
+    url: "https://www.moimflow.com/",
     images: [
       {
-        url: "https://www.moimrank.com/og.png?v=5",
+        url: "https://www.moimflow.com/og.png?v=6",
         width: 1200,
         height: 630,
       },

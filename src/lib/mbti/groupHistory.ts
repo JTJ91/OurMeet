@@ -10,7 +10,7 @@ export type SavedGroup = {
   centerMemberId?: string;
 };
 
-const KEY = "moimrank:groups";
+const KEY = "moimflow:groups";
 
 export function readSavedGroups(): SavedGroup[] {
   if (typeof window === "undefined") return [];

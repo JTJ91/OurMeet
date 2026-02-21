@@ -154,3 +154,12 @@ summary { list-style: none; }
   /* 반투명 배경을 흰색으로 고정 */
   background-color: rgba(255, 255, 255, 0.98) !important;
 }
+
+.preview-mode .preview-hide {
+  display: none !important;
+}
+
+/* preview 모드일 때만 보이게 */
+.preview-mode .preview-only {
+  display: block !important;
+}

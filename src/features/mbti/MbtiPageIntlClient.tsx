@@ -7,6 +7,7 @@ import EgoGraphCanvasResponsiveIntl, { EgoNode } from "@/features/mbti/component
 import { calcCompatLevel, calcCompatScore } from "@/lib/mbti/mbtiCompat";
 import BottomCTA from "@/components/BottomCTA";
 import membersByLocale from "./members.json";
+import { useSearchParams } from "next/navigation";
 
 type Member = {
   id: string;
@@ -36,6 +37,9 @@ export default function MbtiPageIntlClient({ locale }: Props) {
   const initialCenterId = members[0].id;
   const [centerId, setCenterId] = useState<string>(initialCenterId);
   const [activeQuickTab, setActiveQuickTab] = useState<QuickMenuTab>("tests");
+
+  const searchParams = useSearchParams();
+  const isPreview = searchParams.get("preview") === "1";
 
   const membersById = useMemo(() => {
     const m = new Map<string, (typeof members)[number]>();
@@ -68,16 +72,21 @@ export default function MbtiPageIntlClient({ locale }: Props) {
   }, [members, centerId, center.mbti]);
 
   return (
-    <main className="mbti-page-bg pb-10">
+    <main
+    className={[
+      "mbti-page-bg pb-10",
+      isPreview ? "preview-mode" : "",
+    ].join(" ")}
+  >
       <div className="mbti-shell flex min-h-screen flex-col">
-        <div className="mbti-card-frame flex items-center justify-between">
+        <div className="mbti-card-frame flex items-center justify-between preview-hide">
           <Link href={`${base}/`} className="mbti-back-btn">
             <span aria-hidden>←</span>
             <span>{t("backHome")}</span>
           </Link>
         </div>
 
-        <section className="mt-4">
+        <section className="mt-4 preview-hide">
           <div className="mbti-card mbti-card-frame p-6">
             <h1 className="text-3xl font-extrabold leading-tight">
               {t("titleLine1")}
@@ -126,7 +135,7 @@ export default function MbtiPageIntlClient({ locale }: Props) {
           </div>
         </section>
 
-        <section ref={testsSectionRef} id="mbti-tests" className="mt-5 scroll-mt-24">
+        <section ref={testsSectionRef} id="mbti-tests" className="mt-5 scroll-mt-24 preview-hide">
           <div className="mbti-card mbti-card-frame p-4">
             <div className="mb-3 grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1">
               <button

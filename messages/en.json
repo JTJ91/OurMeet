@@ -516,7 +516,7 @@
     "page": {
       "back": "Back",
       "title": "How is chemistry score calculated?",
-      "intro1": "Moimrank does not compare only the four MBTI letters. Instead, we compare how each type's ",
+      "intro1": "moimflow does not compare only the four MBTI letters. Instead, we compare how each type's ",
       "introHighlight": "thinking habit (cognitive functions)",
       "intro1Tail": " interacts with another.",
       "intro2": "In short, we look at whether the way people observe, think, and decide connects smoothly.",
@@ -532,7 +532,7 @@
         "tail": "These baseline thinking patterns are called cognitive functions."
       },
       "section2": {
-        "title": "How Moimrank reads chemistry",
+        "title": "How moimflow reads chemistry",
         "items": {
           "0": {
             "title": "1) Do the dominant styles collide?",
@@ -600,13 +600,13 @@
       "page": {
         "back": "Back",
         "title": "Frequently Asked Questions",
-        "intro1": "Moimrank is a tool for \"fun + understanding\". We gathered common questions about chemistry scores/types, role suggestions, and interpretation in one place.",
+        "intro1": "moimflow is a tool for \"fun + understanding\". We gathered common questions about chemistry scores/types, role suggestions, and interpretation in one place.",
         "intro2Prefix": "In short,",
         "intro2Highlight": "it shows whether people's thinking styles connect naturally",
         "intro2Suffix": "within a group.",
         "item1": {
-          "title": "Q. What exactly does Moimrank do?",
-          "p1": "Based on members' MBTI, Moimrank organizes the relationship graph, chemistry scores, and role suggestions in an easy-to-read way.",
+          "title": "Q. What exactly does moimflow do?",
+          "p1": "Based on members' MBTI, moimflow organizes the relationship graph, chemistry scores, and role suggestions in an easy-to-read way.",
           "bullets": {
             "one": "✔ Who matches well with whom (chemistry ranking)",
             "two": "✔ What kind of group flow you have (summary/type)",
@@ -635,7 +635,7 @@
           "complement": "🧩 Complement — Efficiency rises a lot when roles are divided well",
           "spark": "⚡ Spark — Fast and exciting, but assumptions/tone can cause misunderstanding",
           "explosive": "🧨 Explosive — On tiring days, emotional cost can grow without conversation rules",
-          "p2": "Moimrank shows representative pairs by type using scores, so you can quickly see which patterns are common in your group."
+          "p2": "moimflow shows representative pairs by type using scores, so you can quickly see which patterns are common in your group."
         },
         "item6": {
           "title": "Q. How are group role suggestions decided?",
@@ -653,7 +653,7 @@
         },
         "item9": {
           "title": "Q. Is personal information safe?",
-          "p1": "Moimrank is designed to work with minimal inputs and recommends using only nickname and MBTI for analysis.",
+          "p1": "moimflow is designed to work with minimal inputs and recommends using only nickname and MBTI for analysis.",
           "p2": "We recommend not entering sensitive information such as real name or contact details."
         },
         "item10": {
@@ -668,7 +668,7 @@
     "page": {
       "back": "Back",
       "title": "Privacy Policy",
-      "intro": "Moimrank (the “Service”) values your privacy and complies with applicable laws. This policy explains what information is collected and used during service use, and what rights users have.",
+      "intro": "moimflow (the “Service”) values your privacy and complies with applicable laws. This policy explains what information is collected and used during service use, and what rights users have.",
       "effectiveDateLabel": "Effective date",
       "effectiveDate": "2026-01-01",
       "contactLabel": "Contact",
@@ -761,13 +761,13 @@
       "back": "Back",
       "title": "Terms of Service",
       "introPrefix": "These Terms govern rights, obligations, and responsibilities between users and the operator regarding use of the",
-      "introBrand": "Moimrank",
+      "introBrand": "moimflow",
       "introSuffix": "service.",
       "updatedLabel": "Last updated",
       "updatedDate": "2026-02-09",
       "section1": {
         "title": "1. Service overview",
-        "p1": "Based on MBTI inputs from group members, Moimrank provides relationship/chemistry scores, rankings, distribution, and role suggestions as reference information for fun.",
+        "p1": "Based on MBTI inputs from group members, moimflow provides relationship/chemistry scores, rankings, distribution, and role suggestions as reference information for fun.",
         "p2": "Service results are not intended to define or judge a person’s character, relationships, or abilities, and should not be used as the sole basis for real-life decisions."
       },
       "section2": {
@@ -778,7 +778,7 @@
       },
       "section3": {
         "title": "3. Advertising and affiliate notice",
-        "p1": "To operate the Service, Moimrank may include advertising (e.g., Google AdSense) or affiliate links (e.g., Coupang Partners).",
+        "p1": "To operate the Service, moimflow may include advertising (e.g., Google AdSense) or affiliate links (e.g., Coupang Partners).",
         "noticeTitle": "Example disclosure text (recommended)",
         "noticeBody": "This page may include affiliate links. If a user purchases through those links, the operator may receive a commission.",
         "p2Prefix": "Under ad policies,",
@@ -829,8 +829,36 @@
     }
   },
   "landing": {
-    "brandPrefix": "Group",
-    "brandAccent": "Rank",
+    "brandPrefix": "moim",
+    "brandAccent": "flow",
+    "tagline": "Measure group relationship scores, rankings, and chemistry for fun",
+    "platformHeadline1": "Explore your group's",
+    "platformHeadlineAccent": "relationship scores and rankings",
+    "platformHeadline2": "through data-driven insights",
+    "platformDescription1": "moimflow combines MBTI with conversation tendencies, role distribution, and interaction patterns to measure your group's relationship scores and chemistry rankings for fun.",
+    "platformDescription2": "From friends and work teams to clubs and study groups, quickly spot who clicks and where conflicts may appear.",
+    "feature": {
+      "mbtiCogChem": {
+        "title": "MBTI Cognitive Chemistry",
+        "desc": "See chemistry, friction points, and role balance in one view based on members' cognitive-function flow.",
+        "b1": "Compatibility score + relationship graph",
+        "b2": "Top/bottom 3 chemistry ranking",
+        "b3": "Role fit recommendations"
+      },
+      "saju": {
+        "title": "Saju-based Compatibility",
+        "desc": "A feature interpreting tendencies, flow, and compatibility from birth date and time from a group perspective is in preparation.",
+        "b1": "Personal tendency summary",
+        "b2": "Two-person/group compatibility",
+        "b3": "Monthly flow and caution points"
+      }
+    },
+    "preview": "Preview",
+    "view": "Open",
+    "wait": "Coming soon",
+    "close": "Close",
+    "closeAria": "Close preview modal",
+    "previewHint": "Preview may show only part of the screen. Use Open to check the full feature.",
     "headlinePrefix": "In our group,",
     "headlineAccent": "who matches best with whom",
     "headlineSuffix": "Chemistry analysis shown as interaction flow",
@@ -1228,7 +1256,7 @@
   },
   "components": {
     "header": {
-      "brand": "Moimrank",
+      "brand": "moimflow",
       "mbti": "MBTI",
       "guides": "Guides",
       "create": "Create Group"
@@ -1243,7 +1271,7 @@
       "faq": "FAQ",
       "terms": "Terms",
       "privacy": "Privacy",
-      "copyright": "2026 Moimrank. All rights reserved."
+      "copyright": "2026 moimflow. All rights reserved."
     },
     "toTop": {
       "ariaLabel": "Back to top",

@@ -5,6 +5,7 @@ import { locales } from "@/i18n/config";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import ClientOverlays from "@/components/ClientOverlays";
+import LayoutChrome from "@/components/LayoutChrome";
 
 type Props = {
   children: React.ReactNode;
@@ -26,11 +27,12 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider>
-      <AppHeader />
-      <div lang={locale} className="flex-1">
-        {children}
-      </div>
-      <Footer />
+      <LayoutChrome>
+        <div lang={locale} className="flex-1">
+          {children}
+        </div>
+      </LayoutChrome>
+
       <ClientOverlays />
     </NextIntlClientProvider>
   );

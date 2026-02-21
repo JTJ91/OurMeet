@@ -1,7 +1,7 @@
 import { defaultLocale, locales, type Locale } from "./config";
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") || "https://www.moimrank.com";
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") || "https://www.moimflow.com";
 
 function absoluteUrl(path: string) {
   return `${SITE_URL}${path}`;
