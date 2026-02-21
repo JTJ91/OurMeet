@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toLocalePath } from "@/i18n/path";
 
 function detectLocale(pathname: string): "ko" | "en" | "ja" {
   const m = pathname.match(/^\/(ko|en|ja)(?=\/|$)/);
@@ -20,11 +21,7 @@ export default function Footer() {
   const bare = stripLocale(pathname);
   const t = useTranslations("components.footer");
 
-  const toLocalePath = (href: string) => {
-    const normalized = href.startsWith("/") ? href : `/${href}`;
-    if (locale === "ko") return normalized;
-    return normalized === "/" ? `/${locale}` : `/${locale}${normalized}`;
-  };
+  const toPath = (href: string) => toLocalePath(locale, href);
 
   const mbtiContext =
     bare.startsWith("/mbti") || bare.startsWith("/guides/mbti") || bare.startsWith("/systems/mbti");
@@ -34,21 +31,21 @@ export default function Footer() {
       <div className="flex flex-wrap items-center justify-center gap-3">
         {mbtiContext ? (
           <>
-            <Link href={toLocalePath("/mbti")} className="transition hover:text-slate-700">{t("mbtiHome")}</Link>
+            <Link href={toPath("/mbti")} className="transition hover:text-slate-700">{t("mbtiHome")}</Link>
             <span className="text-slate-300">·</span>
-            <Link href={toLocalePath("/guides/mbti")} className="transition hover:text-slate-700">{t("mbtiGuides")}</Link>
+            <Link href={toPath("/guides/mbti")} className="transition hover:text-slate-700">{t("mbtiGuides")}</Link>
             <span className="text-slate-300">·</span>
-            <Link href={toLocalePath("/mbti/cognitive-functions")} className="transition hover:text-slate-700">{t("cognitive")}</Link>
+            <Link href={toPath("/mbti/cognitive-functions")} className="transition hover:text-slate-700">{t("cognitive")}</Link>
             <span className="text-slate-300">·</span>
-            <Link href={toLocalePath("/faq/mbti")} className="transition hover:text-slate-700">{t("faq")}</Link>
+            <Link href={toPath("/faq/mbti")} className="transition hover:text-slate-700">{t("faq")}</Link>
           </>
         ) : null}
       </div>
 
       <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
-        <Link href={toLocalePath("/terms")} className="transition hover:text-slate-700">{t("terms")}</Link>
+        <Link href={toPath("/terms")} className="transition hover:text-slate-700">{t("terms")}</Link>
         <span className="text-slate-300">·</span>
-        <Link href={toLocalePath("/privacy")} className="transition hover:text-slate-700">{t("privacy")}</Link>
+        <Link href={toPath("/privacy")} className="transition hover:text-slate-700">{t("privacy")}</Link>
       </div>
 
       <div className="mt-4 text-[11px] text-slate-400">{t("copyright")}</div>

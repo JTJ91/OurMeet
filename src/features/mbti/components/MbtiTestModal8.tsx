@@ -190,7 +190,7 @@ export default function MbtiTestModal({
     }
 
     const qs = qp.toString();
-    const base = activeLocale === "ko" ? "" : `/${activeLocale}`;
+    const base = `/${activeLocale}`;
     return `${base}/mbti-test${qs ? `?${qs}` : ""}`;
   }, [activeLocale, context, groupId, returnTo]);
 

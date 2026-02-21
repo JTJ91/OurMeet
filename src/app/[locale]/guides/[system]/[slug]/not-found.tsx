@@ -8,7 +8,7 @@ type Props = {
 export default async function LocalizedGuideNotFound({ params }: Props) {
   const locale = (await params)?.locale ?? "ko";
   const t = await getTranslations({ locale, namespace: "guides.notFound" });
-  const base = locale === "ko" ? "" : `/${locale}`;
+  const base = `/${locale}`;
 
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900">

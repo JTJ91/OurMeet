@@ -8,7 +8,6 @@ function absoluteUrl(path: string) {
 }
 
 function localizePath(path: string, locale: Locale) {
-  if (locale === defaultLocale) return path;
   return path === "/" ? `/${locale}` : `/${locale}${path}`;
 }
 

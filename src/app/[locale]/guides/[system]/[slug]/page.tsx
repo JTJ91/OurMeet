@@ -47,7 +47,7 @@ export async function generateMetadata({
     };
   }
 
-  const localePrefix = locale === "ko" ? "" : `/${locale}`;
+  const localePrefix = `/${locale}`;
 
   return {
     title: `${guide.title} | moimflow`,

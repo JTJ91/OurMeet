@@ -8,6 +8,8 @@ import { calcCompatLevel, calcCompatScore } from "@/lib/mbti/mbtiCompat";
 import BottomCTA from "@/components/BottomCTA";
 import membersByLocale from "./members.json";
 import { useSearchParams } from "next/navigation";
+import { toLocalePath } from "@/i18n/path";
+import type { Locale } from "@/i18n/config";
 
 type Member = {
   id: string;
@@ -29,9 +31,9 @@ type Props = {
 type QuickMenuTab = "tests" | "guides";
 
 export default function MbtiPageIntlClient({ locale }: Props) {
+  const activeLocale = (locale === "en" || locale === "ja" ? locale : "ko") as Locale;
   const t = useTranslations("mbti.page");
   const members = useMemo(() => getMembers(locale), [locale]);
-  const base = locale === "ko" ? "" : `/${locale}`;
   const testsSectionRef = useRef<HTMLElement | null>(null);
 
   const initialCenterId = members[0].id;
@@ -80,7 +82,7 @@ export default function MbtiPageIntlClient({ locale }: Props) {
   >
       <div className="mbti-shell flex min-h-screen flex-col">
         <div className="mbti-card-frame flex items-center justify-between preview-hide">
-          <Link href={`${base}/`} className="mbti-back-btn">
+          <Link href={toLocalePath(activeLocale, "/")} className="mbti-back-btn">
             <span aria-hidden>←</span>
             <span>{t("backHome")}</span>
           </Link>
@@ -104,7 +106,7 @@ export default function MbtiPageIntlClient({ locale }: Props) {
 
             <div className="mt-3 flex flex-wrap items-center gap-3 text-xs font-bold">
               <Link
-                href={`${base}/mbti/cognitive-functions`}
+                href={toLocalePath(activeLocale, "/mbti/cognitive-functions")}
                 className="text-slate-500 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-700"
               >
                 {t("cognitiveGuide")}
@@ -163,7 +165,7 @@ export default function MbtiPageIntlClient({ locale }: Props) {
             {activeQuickTab === "tests" ? (
               <div className="grid grid-cols-1 gap-2">
                 <Link
-                  href={`${base}/mbti-test/quick`}
+                  href={toLocalePath(activeLocale, "/mbti-test/quick")}
                   className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)] items-start gap-x-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white sm:grid-cols-[minmax(0,9rem)_minmax(0,1fr)]"
                 >
                   <span className="leading-snug">{t("testQuickLabel")}</span>
@@ -173,7 +175,7 @@ export default function MbtiPageIntlClient({ locale }: Props) {
                 </Link>
 
                 <Link
-                  href={`${base}/mbti-test`}
+                  href={toLocalePath(activeLocale, "/mbti-test")}
                   className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)] items-start gap-x-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white sm:grid-cols-[minmax(0,9rem)_minmax(0,1fr)]"
                 >
                   <span className="leading-snug">{t("testFullLabel")}</span>
@@ -185,7 +187,7 @@ export default function MbtiPageIntlClient({ locale }: Props) {
             ) : (
               <div className="grid grid-cols-1 gap-2">
                 <Link
-                  href={`${base}/guides/mbti`}
+                  href={toLocalePath(activeLocale, "/guides/mbti")}
                   className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)] items-start gap-x-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white sm:grid-cols-[minmax(0,9rem)_minmax(0,1fr)]"
                 >
                   <span className="leading-snug">{t("guidesLabel")}</span>
@@ -195,7 +197,7 @@ export default function MbtiPageIntlClient({ locale }: Props) {
                 </Link>
 
                 <Link
-                  href={`${base}/mbti/cognitive-functions`}
+                  href={toLocalePath(activeLocale, "/mbti/cognitive-functions")}
                   className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)] items-start gap-x-3 rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-white sm:grid-cols-[minmax(0,9rem)_minmax(0,1fr)]"
                 >
                   <span className="leading-snug">{t("usageLabel")}</span>

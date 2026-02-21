@@ -2,14 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { usePathname } from "next/navigation";
 
 export default function FloatingToTop() {
   const [show, setShow] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [ctaVisible, setCtaVisible] = useState(false);
   const t = useTranslations("components.toTop");
-  const pathname = usePathname();
 
   useEffect(() => {
     let rafId = 0;
@@ -44,6 +42,7 @@ export default function FloatingToTop() {
   }, []);
 
   useEffect(() => {
+    let target: Element | null = null;
     const io = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
@@ -53,17 +52,28 @@ export default function FloatingToTop() {
       { threshold: 0.01 }
     );
 
-    const target = document.querySelector("[data-bottom-cta]");
-    if (target) {
-      io.observe(target);
-    } else {
-      queueMicrotask(() => setCtaVisible(false));
-    }
+    const attach = () => {
+      const next = document.querySelector("[data-bottom-cta]");
+      if (next === target) return;
+      if (target) io.unobserve(target);
+      target = next;
+
+      if (target) {
+        io.observe(target);
+      } else {
+        queueMicrotask(() => setCtaVisible(false));
+      }
+    };
+    const mo = new MutationObserver(() => attach());
+
+    attach();
+    mo.observe(document.body, { childList: true, subtree: true });
 
     return () => {
+      mo.disconnect();
       io.disconnect();
     };
-  }, [pathname]);
+  }, []);
 
   if (!show || menuOpen || ctaVisible) return null;
 

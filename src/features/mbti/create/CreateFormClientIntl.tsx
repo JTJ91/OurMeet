@@ -46,7 +46,7 @@ function isValidMbti(mbti: string) {
 }
 
 function localeBase(locale: string) {
-  return locale === "ko" ? "" : `/${locale}`;
+  return `/${locale}`;
 }
 
 function sanitizeMbtiInput(value: string) {
@@ -99,6 +99,8 @@ export default function CreateFormClientIntl({ locale }: Props) {
   const [optionalOpen, setOptionalOpen] = useState(false);
 
   const sp = useSearchParams();
+  const initialGroupName = sp.get("groupName") ?? "";
+  const initialNickname = sanitizeNicknameInput(sp.get("nickname") ?? "");
   const mbtiFromTest = sanitizeMbtiInput(sp.get("mbti") ?? "");
   const queryAxis = {
     ePercent: parsePercentQuery(sp.get("ePercent")),
@@ -127,6 +129,8 @@ export default function CreateFormClientIntl({ locale }: Props) {
   const nicknameHint = nicknameHintByLocale(locale);
 
   const [mbtiValue, setMbtiValue] = useState<string>(initialMbti);
+  const [groupNameValue, setGroupNameValue] = useState(initialGroupName);
+  const [nicknameValue, setNicknameValue] = useState(initialNickname);
   const [mbtiSource, setMbtiSource] = useState<"manual" | "auto">(axisFromTest ? "auto" : "manual");
   const [didTouchPercent, setDidTouchPercent] = useState(false);
   const [percents, setPercents] = useState<AxisPercentState>(() =>
@@ -250,6 +254,10 @@ export default function CreateFormClientIntl({ locale }: Props) {
       from: "create",
       returnTo: `${base}/mbti/create`,
     });
+    const groupName = groupNameValue.trim();
+    const nickname = sanitizeNicknameInput(nicknameValue);
+    if (groupName) qs.set("groupName", groupName);
+    if (nickname) qs.set("nickname", nickname);
     router.push(`${base}${targetPath}?${qs.toString()}`);
   }
 
@@ -328,7 +336,11 @@ export default function CreateFormClientIntl({ locale }: Props) {
           required
           placeholder={t("groupName.placeholder")}
           disabled={isSubmitting}
+          value={groupNameValue}
           className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-white px-4 text-[16px] outline-none focus:border-[#1E88E5]/50 disabled:opacity-60"
+          onChange={(e) => {
+            setGroupNameValue(e.currentTarget.value);
+          }}
         />
       </label>
 
@@ -340,12 +352,13 @@ export default function CreateFormClientIntl({ locale }: Props) {
           maxLength={6}
           placeholder={t("nickname.placeholder")}
           disabled={isSubmitting}
+          value={nicknameValue}
           className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-white px-4 text-[16px] outline-none focus:border-[#1E88E5]/50 disabled:opacity-60"
           onKeyDown={(e) => {
             if (e.key === " ") e.preventDefault();
           }}
           onChange={(e) => {
-            e.currentTarget.value = sanitizeNicknameInput(e.currentTarget.value);
+            setNicknameValue(sanitizeNicknameInput(e.currentTarget.value));
           }}
         />
         <p className="mt-1 text-[11px] text-slate-500">{nicknameHint}</p>

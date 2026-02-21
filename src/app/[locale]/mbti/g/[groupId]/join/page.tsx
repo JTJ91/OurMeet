@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/mbti/prisma";
 import JoinFormClientIntl from "@/features/mbti/g/[groupId]/join/JoinFormClientIntl";
 import { alternatesForPath } from "@/i18n/metadata";
+import { getScopedMessages } from "@/i18n/scoped-messages";
 
 type Props = {
   params: Promise<{ locale: string; groupId: string }>;
@@ -18,12 +20,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 function localeBase(locale: string) {
-  return locale === "ko" ? "" : `/${locale}`;
+  return `/${locale}`;
 }
 
 export default async function LocalizedGroupJoinPage({ params }: Props) {
   const { locale, groupId } = await params;
   const t = await getTranslations({ locale, namespace: "join.page" });
+  const messages = await getScopedMessages(locale, ["join.form", "create.form"]);
 
   const group = await prisma.group.findUnique({
     where: { id: groupId },
@@ -69,7 +72,9 @@ export default async function LocalizedGroupJoinPage({ params }: Props) {
             />
           </div>
 
-          <JoinFormClientIntl locale={locale} groupId={groupId} isFull={isFull} />
+          <NextIntlClientProvider messages={messages}>
+            <JoinFormClientIntl locale={locale} groupId={groupId} isFull={isFull} />
+          </NextIntlClientProvider>
         </div>
 
         <div className="mbti-card-soft mbti-card-frame mt-4 p-5">

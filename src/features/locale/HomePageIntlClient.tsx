@@ -3,6 +3,8 @@
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import React, { useEffect, useCallback, useState } from "react";
+import { toLocalePath } from "@/i18n/path";
+import type { Locale } from "@/i18n/config";
 
 
 
@@ -148,8 +150,8 @@ function PreviewModal({
 
 
 export default function HomePageIntlClient({ locale }: Props) {
+  const activeLocale = (locale === "en" || locale === "ja" ? locale : "ko") as Locale;
   const t = useTranslations("landing");
-  const base = locale === "ko" ? "" : `/${locale}`;
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewSrc, setPreviewSrc] = useState<string>("");
@@ -168,7 +170,7 @@ export default function HomePageIntlClient({ locale }: Props) {
       title: t("feature.mbtiCogChem.title"),
       desc: t("feature.mbtiCogChem.desc"),
       status: "LIVE",
-      href: `${base}/mbti`,
+      href: toLocalePath(activeLocale, "/mbti"),
       bullets: [t("feature.mbtiCogChem.b1"), t("feature.mbtiCogChem.b2"), t("feature.mbtiCogChem.b3")],
       preview: <div />,
     },

@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default function RelatedGuides({ guide, system, locale = "ko", relatedGuides }: Props) {
-  const base = locale === "ko" ? "" : `/${locale}`;
+  const base = `/${locale}`;
   const copy = DETAIL_COPY[locale];
   const list = relatedGuides ?? guide.related?.map((slug) => getGuide(slug)).filter((g): g is Guide => Boolean(g)) ?? [];
 

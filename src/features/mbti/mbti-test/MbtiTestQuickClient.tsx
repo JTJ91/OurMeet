@@ -172,7 +172,7 @@ export default function MbtiTestQuickClient({ locale }: Props) {
   const total = QUESTIONS.length;
   const activeLocale = normalizeLocale(locale);
   const ui = UI_TEXT[activeLocale];
-  const base = activeLocale === "ko" ? "" : `/${activeLocale}`;
+  const base = `/${activeLocale}`;
 
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
@@ -197,6 +197,25 @@ export default function MbtiTestQuickClient({ locale }: Props) {
   const groupId = sp.get("groupId") ?? "";
   const returnTo = sp.get("returnTo");
   const isFromForm = from === "create" || from === "join";
+  const passthroughParams = useMemo(() => {
+    const qs = new URLSearchParams();
+    for (const [key, value] of sp.entries()) {
+      if (
+        key === "from" ||
+        key === "groupId" ||
+        key === "returnTo" ||
+        key === "mbti" ||
+        key === "ePercent" ||
+        key === "nPercent" ||
+        key === "tPercent" ||
+        key === "jPercent"
+      ) {
+        continue;
+      }
+      if (value) qs.append(key, value);
+    }
+    return qs;
+  }, [sp]);
 
   const progressPct = useMemo(() => {
     return Math.round(((step + 1) / total) * 100);
@@ -207,9 +226,12 @@ export default function MbtiTestQuickClient({ locale }: Props) {
     if (from) qp.set("from", from);
     if (groupId) qp.set("groupId", groupId);
     if (returnTo) qp.set("returnTo", returnTo);
+    for (const [key, value] of passthroughParams.entries()) {
+      qp.append(key, value);
+    }
     const qs = qp.toString();
     return `${base}/mbti-test${qs ? `?${qs}` : ""}`;
-  }, [base, from, groupId, returnTo]);
+  }, [base, from, groupId, passthroughParams, returnTo]);
 
   function queryFromResult(type: string, axes: MbtiTestResult["axes"]) {
     const qs = new URLSearchParams({
@@ -224,19 +246,24 @@ export default function MbtiTestQuickClient({ locale }: Props) {
 
   function goBackWithMbti(type: string, axes: MbtiTestResult["axes"]) {
     const mbtiQ = queryFromResult(type, axes);
+    const merged = new URLSearchParams(passthroughParams);
+    for (const [key, value] of new URLSearchParams(mbtiQ).entries()) {
+      merged.set(key, value);
+    }
+    const mergedQ = merged.toString();
 
     if (returnTo) {
       const sep = returnTo.includes("?") ? "&" : "?";
-      router.push(`${returnTo}${sep}${mbtiQ}`);
+      router.push(`${returnTo}${sep}${mergedQ}`);
       return;
     }
 
     if (groupId) {
-      router.push(`${base}/mbti/g/${encodeURIComponent(groupId)}/join?${mbtiQ}`);
+      router.push(`${base}/mbti/g/${encodeURIComponent(groupId)}/join?${mergedQ}`);
       return;
     }
 
-    router.push(`${base}/mbti/create?${mbtiQ}`);
+    router.push(`${base}/mbti/create?${mergedQ}`);
   }
 
   function resetAll() {

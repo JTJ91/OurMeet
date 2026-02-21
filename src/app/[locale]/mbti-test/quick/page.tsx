@@ -14,7 +14,7 @@ type Props = {
 };
 
 function localeBase(locale: string) {
-  return locale === "ko" ? "" : `/${locale}`;
+  return `/${locale}`;
 }
 
 function readFirst(value?: string | string[]) {

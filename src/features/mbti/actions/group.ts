@@ -160,7 +160,7 @@ function nicknameLengthError(locale: Locale) {
 }
 
 function localeBase(locale: Locale) {
-  return locale === "ko" ? "" : `/${locale}`;
+  return `/${locale}`;
 }
 
 export async function createGroupAction(formData: FormData) {

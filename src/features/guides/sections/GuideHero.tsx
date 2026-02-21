@@ -16,7 +16,7 @@ export default function GuideHero({ guide, system, locale = "ko" }: Props) {
   const meta = GROUP_META[guide.groupType];
   const localizedMeta = GROUP_META_I18N[locale][guide.groupType];
   const copy = DETAIL_COPY[locale];
-  const base = locale === "ko" ? "" : `/${locale}`;
+  const base = `/${locale}`;
 
   const systemPath =
     system === "mbti" ? `${base}/mbti` : system === "saju" ? `${base}/saju` : `${base}/`;

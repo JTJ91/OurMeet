@@ -5,16 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { readSavedGroups, removeSavedGroup, SavedGroup } from "@/lib/mbti/groupHistory";
+import { toLocalePath } from "@/i18n/path";
 
 function detectLocale(pathname: string): "ko" | "en" | "ja" {
   const m = pathname.match(/^\/(ko|en|ja)(?=\/|$)/);
   return (m?.[1] as "ko" | "en" | "ja") ?? "ko";
-}
-
-function toLocalePath(locale: "ko" | "en" | "ja", href: string) {
-  const normalized = href.startsWith("/") ? href : `/${href}`;
-  if (locale === "ko") return normalized;
-  return normalized === "/" ? `/${locale}` : `/${locale}${normalized}`;
 }
 
 export default function BottomCTA({ desktopSticky = false }: { desktopSticky?: boolean }) {

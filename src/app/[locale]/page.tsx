@@ -1,8 +1,10 @@
 ﻿import type { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import HomePageIntlClient from "@/features/locale/HomePageIntlClient";
 import { locales, type Locale } from "@/i18n/config";
 import { canonicalForPath, hreflangForPath } from "@/i18n/seo";
+import { getScopedMessages } from "@/i18n/scoped-messages";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -30,5 +32,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function LocalizedHomePage({ params }: Props) {
   const { locale } = await params;
-  return <HomePageIntlClient locale={locale} />;
+  const messages = await getScopedMessages(locale, ["landing"]);
+  return (
+    <NextIntlClientProvider messages={messages}>
+      <HomePageIntlClient locale={locale} />
+    </NextIntlClientProvider>
+  );
 }

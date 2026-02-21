@@ -29,7 +29,7 @@ export default function GraphClientIntl({
   pairAverageScore: number | null;
 }) {
   const t = useTranslations("groupGraph.client");
-  const base = locale === "ko" ? "" : `/${locale}`;
+  const base = `/${locale}`;
 
   const router = useRouter();
   const sp = useSearchParams();

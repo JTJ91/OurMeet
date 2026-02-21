@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/mbti/prisma";
 import { notFound } from "next/navigation";
+import { unstable_cache } from "next/cache";
 import InviteActionsIntl from "@/features/mbti/components/InviteActions";
 import GraphClientIntl from "@/features/mbti/g/[groupId]/GraphClientIntl";
 import {
@@ -24,8 +25,10 @@ import {
 
 
 import Link from "next/link";
+import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { alternatesForPath } from "@/i18n/metadata";
+import { getScopedMessages } from "@/i18n/scoped-messages";
 import { Compass, Sparkles, Zap, ListChecks, Handshake } from "lucide-react";
 
 type TranslateValues = Record<string, string | number | Date>;
@@ -550,7 +553,7 @@ type MemberCompatSource = {
   prefs: MemberPrefs;
 };
 
-async function getRankings(groupId: string) {
+async function getRankingsRaw(groupId: string) {
   const group = await prisma.group.findUnique({
     where: { id: groupId },
     include: { members: true },
@@ -624,6 +627,14 @@ async function getRankings(groupId: string) {
     allPairs,
     membersForCalc,
   };
+}
+
+async function getRankings(groupId: string) {
+  return unstable_cache(
+    async () => getRankingsRaw(groupId),
+    [`group-rankings:${groupId}`],
+    { tags: [`group-rankings:${groupId}`], revalidate: 60 }
+  )();
 }
 
 
@@ -719,9 +730,18 @@ export default async function GroupPage({
   const tt = (key: string, fallback: string, values?: TranslateValues) => tx(t, key, fallback, values);
   const sp = (await searchParams) ?? {};
   const centerId = sp.center;
-  const base = locale === "ko" ? "" : `/${locale}`;
+  const base = `/${locale}`;
   const graphLocale = locale === "en" || locale === "ja" ? locale : "ko";
   const tg = await getTranslations({ locale, namespace: "groupGraph.server" });
+  const clientMessages = await getScopedMessages(locale, [
+    "groupGraph.client",
+    "mbti.egoGraphCanvas",
+    "groupComponents.chemTopWorst",
+    "groupComponents.chemMoreList",
+    "groupComponents.roleMoreList",
+    "groupActions.invite",
+    "groupActions.save",
+  ]);
 
   const cached = await getRankings(groupId);
   if (!cached) return notFound();
@@ -934,7 +954,9 @@ export default async function GroupPage({
               </div>
 
               <div className="relative">
-                <InviteActionsIntl groupId={group.id} />
+                <NextIntlClientProvider messages={clientMessages}>
+                  <InviteActionsIntl groupId={group.id} />
+                </NextIntlClientProvider>
               </div>
             </div>
 
@@ -972,15 +994,17 @@ export default async function GroupPage({
             </div>
 
             {centerMember ? (
-              <GraphClientIntl
-                locale={graphLocale}
-                groupId={groupId}
-                groupName={group.name}
-                center={{ id: centerMember.id, nickname: centerMember.nickname, mbti: centerMember.mbti }}
-                nodes={graphNodes}
-                memberCount={membersForCalc.length}
-                pairAverageScore={graphAverageScore}
-              />
+              <NextIntlClientProvider messages={clientMessages}>
+                <GraphClientIntl
+                  locale={graphLocale}
+                  groupId={groupId}
+                  groupName={group.name}
+                  center={{ id: centerMember.id, nickname: centerMember.nickname, mbti: centerMember.mbti }}
+                  nodes={graphNodes}
+                  memberCount={membersForCalc.length}
+                  pairAverageScore={graphAverageScore}
+                />
+              </NextIntlClientProvider>
             ) : (
               <section className="p-5">
                 <p className="text-sm text-slate-500">{tg("emptyMembers")}</p>
@@ -996,7 +1020,9 @@ export default async function GroupPage({
           subtitle={tt("chemRankSubtitle", "상·하위 조합")}
           tone="blue"
         >
-          <ChemTopWorstIntl best3={best3} worst3={worst3} />
+          <NextIntlClientProvider messages={clientMessages}>
+            <ChemTopWorstIntl best3={best3} worst3={worst3} />
+          </NextIntlClientProvider>
         </SectionCard2>
 
         {/* ✅ 1) MBTI 분포 */}

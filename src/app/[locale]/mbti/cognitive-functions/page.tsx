@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LocalizedCognitiveFunctionsPage({ params }: Props) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "cognitive.page" });
-  const base = locale === "ko" ? "" : `/${locale}`;
+  const base = `/${locale}`;
 
   return (
     <main className="mbti-page-bg">

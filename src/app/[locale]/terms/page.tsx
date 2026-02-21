@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LocalizedTermsPage({ params }: Props) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "terms.page" });
-  const base = locale === "ko" ? "" : `/${locale}`;
+  const base = `/${locale}`;
 
   return (
     <main className="min-h-screen bg-[#F5F9FF] text-slate-900">

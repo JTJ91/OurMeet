@@ -13,7 +13,7 @@ type Props = {
 export default function MbtiGuidesPage({ locale = "ko" }: Props) {
   const system = "mbti";
   const copy = PAGE_COPY[locale];
-  const base = locale === "ko" ? "" : `/${locale}`;
+  const base = `/${locale}`;
   const groupMeta = GROUP_META_I18N[locale];
   const formatCount = (count: number) => (locale === "en" ? `${count} ${copy.countSuffix}` : `${count}${copy.countSuffix}`);
 

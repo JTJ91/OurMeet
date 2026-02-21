@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { readSavedGroups, removeSavedGroup, SavedGroup } from "@/lib/mbti/groupHistory";
 import LocaleSwitcher from "@/features/locale/components/LocaleSwitcher";
+import { toLocalePath } from "@/i18n/path";
 
 type Locale = "ko" | "en" | "ja";
 
@@ -126,13 +127,7 @@ export default function AppHeader() {
   const [recentOpen, setRecentOpen] = useState(false);
   const [groups, setGroups] = useState<SavedGroup[]>([]);
 
-  const toLocalePath = useCallback(
-    (href: string) => {
-      const normalized = href.startsWith("/") ? href : `/${href}`;
-      return locale === "ko" ? normalized : normalized === "/" ? `/${locale}` : `/${locale}${normalized}`;
-    },
-    [locale]
-  );
+  const toPath = useCallback((href: string) => toLocalePath(locale, href), [locale]);
 
   const tree: TreeGroup[] = useMemo(
     () => [
@@ -241,7 +236,7 @@ export default function AppHeader() {
     <>
       <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/95">
         <div className="mx-auto flex h-12 max-w-[740px] items-center px-3 sm:px-5 preview-hide">
-          <Link href={toLocalePath("/")} className="flex min-w-0 flex-1 items-center gap-1.5 pr-2">
+          <Link href={toPath("/")} className="flex min-w-0 flex-1 items-center gap-1.5 pr-2">
             <span className="truncate text-sm font-extrabold tracking-tight text-slate-900">
               {hasAccent ? brand.slice(0, accentStart) : brand}
               {hasAccent ? <span className="text-[#1E88E5]">{brand.slice(accentStart)}</span> : null}
@@ -369,7 +364,7 @@ export default function AppHeader() {
                                   return (
                                     <li key={it.href}>
                                       <Link
-                                        href={toLocalePath(it.href)}
+                                        href={toPath(it.href)}
                                         onClick={closeDrawer}
                                         className={[
                                           "group relative flex items-center px-8 py-2 text-sm font-semibold transition",
@@ -422,7 +417,7 @@ export default function AppHeader() {
                                                   return (
                                                     <li key={gr.id} className="flex items-center gap-2">
                                                       <Link
-                                                        href={toLocalePath(href)}
+                                                        href={toPath(href)}
                                                         prefetch={false}
                                                         onClick={closeDrawer}
                                                         className="group flex-1 rounded-2xl border border-slate-200/70 bg-white/85 px-3 py-2 hover:bg-white transition"

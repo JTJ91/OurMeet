@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import CreateFormClientIntl from "@/features/mbti/create/CreateFormClientIntl";
 import { alternatesForPath } from "@/i18n/metadata";
+import { getScopedMessages } from "@/i18n/scoped-messages";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
 
 function localeBase(locale: string) {
-  return locale === "ko" ? "" : `/${locale}`;
+  return `/${locale}`;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -23,6 +25,7 @@ export default async function LocalizedCreatePage({ params }: Props) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "create.page" });
   const base = localeBase(locale);
+  const messages = await getScopedMessages(locale, ["create.form"]);
 
   return (
     <main className="mbti-page-bg pb-10">
@@ -51,7 +54,9 @@ export default async function LocalizedCreatePage({ params }: Props) {
 
         <section className="mt-6">
           <div className="mbti-card mbti-card-frame p-5">
-            <CreateFormClientIntl locale={locale} />
+            <NextIntlClientProvider messages={messages}>
+              <CreateFormClientIntl locale={locale} />
+            </NextIntlClientProvider>
           </div>
         </section>
       </div>
