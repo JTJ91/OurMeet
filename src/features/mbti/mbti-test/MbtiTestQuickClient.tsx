@@ -382,12 +382,12 @@ export default function MbtiTestQuickClient({ locale }: Props) {
 
       const file = new File([blob], `mbti-quick-result-${type}.png`, { type: "image/png" });
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ title, text, url: shareUrl, files: [file] });
+        await navigator.share({ title, url: shareUrl, files: [file] });
         return;
       }
 
       if (navigator.share) {
-        await navigator.share({ title, text, url: shareUrl });
+        await navigator.share({ title, url: shareUrl });
         return;
       }
 
