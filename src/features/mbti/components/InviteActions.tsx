@@ -1,25 +1,39 @@
 ﻿"use client";
 
+import { usePathname, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { toLocalePath } from "@/i18n/path";
 
 type Props = {
   groupId: string;
 };
 
+function detectLocale(pathname: string): "ko" | "en" | "ja" {
+  const m = pathname.match(/^\/(ko|en|ja)(?=\/|$)/);
+  return (m?.[1] as "ko" | "en" | "ja") ?? "ko";
+}
+
 export default function InviteActionsIntl({ groupId }: Props) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const locale = detectLocale(pathname);
   const t = useTranslations("groupActions.invite");
   const [copied, setCopied] = useState(false);
+  const centerId = searchParams.get("center");
 
   const fullUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
     const shareVer = process.env.NEXT_PUBLIC_SHARE_VER ?? "1";
-
-    const u = new URL(`mbti/g/${groupId}`, window.location.origin);
+    const localizedPath = toLocalePath(locale, `/mbti/g/${groupId}`);
+    const u = new URL(localizedPath, window.location.origin);
     u.searchParams.set("v", shareVer);
+    if (centerId) {
+      u.searchParams.set("center", centerId);
+    }
 
     return u.toString();
-  }, [groupId]);
+  }, [centerId, groupId, locale]);
 
   const share = async () => {
     try {

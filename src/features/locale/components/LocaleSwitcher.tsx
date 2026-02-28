@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { locales, type Locale } from "@/i18n/config";
 
 const localeLabel: Record<Locale, string> = {
@@ -13,6 +13,7 @@ const localeLabel: Record<Locale, string> = {
 export default function LocaleSwitcher() {
   const router = useRouter();
   const pathname = usePathname() || "/";
+  const searchParams = useSearchParams();
   const currentLocale = (pathname.match(/^\/(ko|en|ja)(?=\/|$)/)?.[1] ?? "ko") as Locale;
   const containerRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState(false);
@@ -24,11 +25,14 @@ export default function LocaleSwitcher() {
 
   const onChangeLocale = (nextLocale: Locale) => {
     const basePath = stripLocalePrefix(pathname);
+    const queryString = searchParams.toString();
+    const suffix = queryString ? `?${queryString}` : "";
     if (nextLocale === "ko") {
-      router.replace(basePath);
+      router.replace(`${basePath}${suffix}`);
       return;
     }
-    router.replace(basePath === "/" ? `/${nextLocale}` : `/${nextLocale}${basePath}`);
+    const nextPath = basePath === "/" ? `/${nextLocale}` : `/${nextLocale}${basePath}`;
+    router.replace(`${nextPath}${suffix}`);
   };
 
   useEffect(() => {

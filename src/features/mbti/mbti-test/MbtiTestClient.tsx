@@ -456,7 +456,7 @@ export default function MbtiTestClient({ locale }: Props) {
     if (typeof window === "undefined") return;
     if (!resultCaptureRef.current) return;
 
-    const shareUrl = `${window.location.origin}${base}/mbti-test`;
+    const shareUrl = new URL(window.location.pathname, window.location.origin).toString();
     const title = `${ui.resultTitle}: ${type}`;
     const text = shareUrl;
 
@@ -483,12 +483,12 @@ export default function MbtiTestClient({ locale }: Props) {
 
       const file = new File([blob], `mbti-result-${type}.png`, { type: "image/png" });
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ title, text, files: [file] });
+        await navigator.share({ title, text, url: shareUrl, files: [file] });
         return;
       }
 
       if (navigator.share) {
-        await navigator.share({ title, text });
+        await navigator.share({ title, text, url: shareUrl });
         return;
       }
 
